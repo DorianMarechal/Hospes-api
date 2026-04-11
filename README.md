@@ -60,10 +60,10 @@ vendor/bin/phpunit --testsuite=functional
 
 ## Documentation
 
-- [Cahier des charges](docs/hospes-cahier-des-charges.md)
-- [Modele de donnees (DBML)](docs/hospes-dbml.dbml)
-- [Cartographie API](docs/hospes-endpoints.md)
-- [Strategie de tests](docs/hospes-tests.md)
+- [Cahier des charges](https://github.com/DorianMarechal/Hospes-docs/blob/main/hospes-cahier-des-charges.md)
+- [Modele de donnees (DBML)](https://github.com/DorianMarechal/Hospes-docs/blob/main/hospes-dbml.dbml)
+- [Cartographie API](https://github.com/DorianMarechal/Hospes-docs/blob/main/hospes-endpoints.md)
+- [Strategie de tests](https://github.com/DorianMarechal/Hospes-docs/blob/main/hospes-tests.md)
 
 ## Licence
 
