@@ -1,0 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+CREATE DATABASE hospes_test;
+\c hospes_test
+CREATE EXTENSION IF NOT EXISTS btree_gist;

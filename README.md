@@ -22,10 +22,18 @@ API REST de gestion de reservations pour hebergeurs independants. Multi-logement
 git clone https://github.com/DorianMarechal/Hospes-api.git
 cd Hospes-api
 composer install
+docker compose up -d database
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 php bin/console lexik:jwt:generate-keypair
 symfony server:start
+```
+
+### Stack Docker complete (prod-like)
+
+```bash
+docker compose up -d --build
+# API accessible sur http://localhost:8080
 ```
 
 ## Qualite
