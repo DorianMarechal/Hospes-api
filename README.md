@@ -4,14 +4,14 @@ API REST de gestion de reservations pour hebergeurs independants. Multi-logement
 
 ## Stack
 
-- PHP 8.3 / Symfony 7.4 LTS
+- PHP 8.4 / Symfony 7.4 LTS
 - API Platform
 - Doctrine ORM / PostgreSQL (btree_gist)
 - JWT (LexikJWTAuthenticationBundle)
 
 ## Prerequis
 
-- PHP 8.3
+- PHP 8.4
 - Composer
 - PostgreSQL (avec extension btree_gist)
 - Symfony CLI
