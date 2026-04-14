@@ -8,7 +8,6 @@ use App\Entity\HostProfile;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HostProfileProcessor implements ProcessorInterface
 {
