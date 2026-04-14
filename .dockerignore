@@ -2,7 +2,8 @@
 .github
 .idea
 .vscode
-docker
+docker/caddy
+docker/postgres
 docs
 var
 vendor
