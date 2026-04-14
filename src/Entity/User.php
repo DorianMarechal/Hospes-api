@@ -17,7 +17,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[UniqueEntity('email', message: 'This email is already registered')]
 #[ApiResource(
     operations: [
-        new Get(uriTemplate: '/auth/me'),
+        new Get(
+            uriTemplate: '/auth/me',
+            provider: 'App\State\MeProvider',
+            security: "is_granted('ROLE_USER')",
+        ),
     ],
     normalizationContext: ['groups' => ['user:read']],
 )]
