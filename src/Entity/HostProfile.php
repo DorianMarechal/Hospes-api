@@ -2,17 +2,23 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\HostProfileRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: HostProfileRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['host-profile:read']],
+)]
 class HostProfile
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['host-profile:read'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'hostProfile', cascade: ['persist', 'remove'])]
@@ -20,36 +26,43 @@ class HostProfile
     private ?User $user = null;
 
     #[ORM\Column(length: 200)]
+    #[Groups(['host-profile:read'])]
     private ?string $businessName = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['host-profile:read'])]
     private ?string $legalForm = null;
 
     #[ORM\Column(length: 2)]
+    #[Groups(['host-profile:read'])]
     private ?string $country = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $vatNumber = null;
-
     #[ORM\Column(length: 255)]
+    #[Groups(['host-profile:read'])]
     private ?string $billingAddress = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['host-profile:read'])]
     private ?string $billingCity = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['host-profile:read'])]
     private ?string $billingPostalCode = null;
 
     #[ORM\Column(length: 2)]
+    #[Groups(['host-profile:read'])]
     private ?string $billingCountry = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['host-profile:read'])]
     private ?string $timezone = null;
 
     #[ORM\Column]
+    #[Groups(['host-profile:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['host-profile:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
@@ -112,18 +125,6 @@ class HostProfile
     public function setCountry(string $country): static
     {
         $this->country = $country;
-
-        return $this;
-    }
-
-    public function getVatNumber(): ?string
-    {
-        return $this->vatNumber;
-    }
-
-    public function setVatNumber(?string $vatNumber): static
-    {
-        $this->vatNumber = $vatNumber;
 
         return $this;
     }
