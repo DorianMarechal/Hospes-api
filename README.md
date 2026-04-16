@@ -36,6 +36,17 @@ docker compose up -d --build
 # API accessible sur http://localhost:8080
 ```
 
+## Comptes demo
+
+```bash
+php bin/console doctrine:fixtures:load --no-interaction
+```
+
+| Role  | Email             | Mot de passe     |
+|-------|-------------------|------------------|
+| Admin | admin@hospes.dev  | Admin@Hospes2026 |
+| Hote  | host@hospes.dev   | Host@Hospes2026  |
+
 ## Qualite
 
 ```bash
