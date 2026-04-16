@@ -71,9 +71,16 @@ class HostProfile
     #[ORM\OneToMany(targetEntity: HostLegalIdentifier::class, mappedBy: 'hostProfileId', orphanRemoval: true)]
     private Collection $hostLegalIdentifiers;
 
+    /**
+     * @var Collection<int, Lodging>
+     */
+    #[ORM\OneToMany(targetEntity: Lodging::class, mappedBy: 'host', orphanRemoval: true)]
+    private Collection $lodgings;
+
     public function __construct()
     {
         $this->hostLegalIdentifiers = new ArrayCollection();
+        $this->lodgings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -237,6 +244,36 @@ class HostProfile
             // set the owning side to null (unless already changed)
             if ($hostLegalIdentifier->getHostProfile() === $this) {
                 $hostLegalIdentifier->setHostProfile(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Lodging>
+     */
+    public function getLodgings(): Collection
+    {
+        return $this->lodgings;
+    }
+
+    public function addLodging(Lodging $lodging): static
+    {
+        if (!$this->lodgings->contains($lodging)) {
+            $this->lodgings->add($lodging);
+            $lodging->setHost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLodging(Lodging $lodging): static
+    {
+        if ($this->lodgings->removeElement($lodging)) {
+            // set the owning side to null (unless already changed)
+            if ($lodging->getHost() === $this) {
+                $lodging->setHost(null);
             }
         }
 
