@@ -2,20 +2,44 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Enum\CancellationPolicy;
 use App\Enum\LodgingType;
 use App\Repository\LodgingRepository;
+use App\State\LodgingProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: LodgingRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(
+            security: "is_granted('ROLE_HOST')",
+            processor: LodgingProcessor::class
+        ),
+        new Patch(
+            security: "is_granted('ROLE_HOST')",
+            processor: LodgingProcessor::class
+        ),
+    ],
+    normalizationContext: ['groups' => ['lodging:read']],
+    denormalizationContext: ['groups' => ['lodging:write']]
+)]
 class Lodging
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['lodging:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'lodgings')]
@@ -23,84 +47,111 @@ class Lodging
     private ?HostProfile $host = null;
 
     #[ORM\Column(length: 150)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $name = null;
 
     #[ORM\Column(enumType: LodgingType::class)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?LodgingType $type = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $capacity = null;
 
     #[ORM\Column]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $basePriceWeek = null;
 
     #[ORM\Column]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $basePriceWeekend = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $cleaningFee = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $touristTaxPerPerson = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $depositAmount = null;
 
     #[ORM\Column(enumType: CancellationPolicy::class)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?CancellationPolicy $cancellationPolicy = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $minStay = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?int $maxStay = null;
 
     #[ORM\Column(nullable: false, options: ['default' => false])]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?bool $orphanProtection = false;
 
     #[ORM\Column(type: Types::TIME_IMMUTABLE)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?\DateTimeImmutable $checkinTime = null;
 
     #[ORM\Column(type: Types::TIME_IMMUTABLE)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?\DateTimeImmutable $checkoutTime = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $region = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $postalCode = null;
 
     #[ORM\Column(length: 2)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $country = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $latitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
+    #[Groups(['lodging:read', 'lodging:write'])]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
+    #[Groups(['lodging:read'])]
     private ?string $averageRating = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['lodging:read'])]
     private ?int $reviewCount = null;
 
     #[ORM\Column]
+    #[Groups(['lodging:read'])]
     private ?bool $isActive = null;
 
     #[ORM\Column]
+    #[Groups(['lodging:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['lodging:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
@@ -108,6 +159,7 @@ class Lodging
      */
     #[ORM\OneToMany(targetEntity: LodgingImage::class, mappedBy: 'lodging', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
+    #[Groups(['lodging:read'])]
     private Collection $lodgingImages;
 
     public function __construct()
@@ -420,7 +472,7 @@ class Lodging
         return $this;
     }
 
-    public function isActive(): ?bool
+    public function getIsActive(): ?bool
     {
         return $this->isActive;
     }
