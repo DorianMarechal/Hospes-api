@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: HostProfileRepository::class)]
 #[ApiResource(
+    operations: [],
     normalizationContext: ['groups' => ['host-profile:read']],
 )]
 class HostProfile

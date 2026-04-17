@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\HostProfile;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -37,6 +38,19 @@ class DemoFixtures extends Fixture
         $host->setCreatedAt(new DateTimeImmutable());
         $host->setUpdatedAt(new DateTimeImmutable());
         $manager->persist($host);
+
+        $hostProfile = new HostProfile();
+        $hostProfile->setUser($host);
+        $hostProfile->setBusinessName('Demo Hosting');
+        $hostProfile->setCountry('FR');
+        $hostProfile->setBillingAddress('1 rue de la Demo');
+        $hostProfile->setBillingCity('Paris');
+        $hostProfile->setBillingPostalCode('75001');
+        $hostProfile->setBillingCountry('FR');
+        $hostProfile->setTimezone('Europe/Paris');
+        $hostProfile->setCreatedAt(new DateTimeImmutable());
+        $hostProfile->setUpdatedAt(new DateTimeImmutable());
+        $manager->persist($hostProfile);
 
         $manager->flush();
     }
