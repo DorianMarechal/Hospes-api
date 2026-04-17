@@ -13,7 +13,7 @@ fixtures:
 	php bin/console doctrine:fixtures:load --no-interaction
 
 lint:
-	vendor/bin/phpstan analyse -l 6 src
+	vendor/bin/phpstan analyse -l 6 src --memory-limit=256M
 	vendor/bin/php-cs-fixer fix
 	vendor/bin/php-cs-fixer check
 
