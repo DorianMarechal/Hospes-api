@@ -13,43 +13,42 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: 'App\State\HostProfileProcessor',
             normalizationContext: ['groups' => ['host-profile:read']],
             security: "is_granted('ROLE_HOST')",
-        )
+        ),
     ]
 )]
 class HostProfileRequest
 {
     public function __construct(
-
         #[Assert\NotBlank]
         #[Assert\Length(max: 200)]
-        public string $businessName = "",
+        public string $businessName = '',
 
         #[Assert\Length(max: 50)]
         public ?string $legalForm = null,
 
         #[Assert\NotBlank]
         #[Assert\Country]
-        public string $country = "",
+        public string $country = '',
 
         #[Assert\NotBlank]
         #[Assert\Length(max: 255)]
-        public string $billingAddress = "",
+        public string $billingAddress = '',
 
         #[Assert\NotBlank]
         #[Assert\Length(max: 100)]
-        public string $billingCity = "",
+        public string $billingCity = '',
 
         #[Assert\NotBlank]
         #[Assert\Length(max: 10)]
-        public string $billingPostalCode = "",
+        public string $billingPostalCode = '',
 
         #[Assert\NotBlank]
         #[Assert\Country]
-        public string $billingCountry = "",
+        public string $billingCountry = '',
 
         #[Assert\NotBlank]
         #[Assert\Timezone]
-        public string $timezone = "",
-    )
-    {}
+        public string $timezone = '',
+    ) {
+    }
 }

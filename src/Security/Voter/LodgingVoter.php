@@ -2,17 +2,17 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\Lodging;
+use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use App\Entity\Lodging;
-use App\Entity\User;
 
 /** @extends Voter<string, Lodging> */
 final class LodgingVoter extends Voter
 {
-    public const EDIT   = 'LODGING_EDIT';
-    public const VIEW   = 'LODGING_VIEW';
+    public const EDIT = 'LODGING_EDIT';
+    public const VIEW = 'LODGING_VIEW';
     public const DELETE = 'LODGING_DELETE';
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -27,7 +27,6 @@ final class LodgingVoter extends Voter
 
         switch ($attribute) {
             case self::VIEW:
-
                 return true;
 
             case self::EDIT:
@@ -39,11 +38,11 @@ final class LodgingVoter extends Voter
                     return false;
                 }
 
-                if(in_array('ROLE_ADMIN', $user->getRoles())){
+                if (in_array('ROLE_ADMIN', $user->getRoles())) {
                     return true;
                 }
 
-                if($subject->getHost()->getId() === $user->getHostProfile()?->getId()){
+                if ($subject->getHost()->getId() === $user->getHostProfile()?->getId()) {
                     return true;
                 }
 

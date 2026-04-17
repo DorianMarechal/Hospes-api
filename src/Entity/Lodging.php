@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         ),
         new Delete(
             security: "is_granted('LODGING_DELETE', object)"
-        )
+        ),
     ],
     normalizationContext: ['groups' => ['lodging:read']],
     denormalizationContext: ['groups' => ['lodging:write']]
@@ -52,7 +52,7 @@ class Lodging
 
     #[ORM\Column(length: 150)]
     #[Groups(['lodging:read', 'lodging:write'])]
-    private ?string $name = null;
+    private ?string $name = 'null';
 
     #[ORM\Column(enumType: LodgingType::class)]
     #[Groups(['lodging:read', 'lodging:write'])]

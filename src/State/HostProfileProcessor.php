@@ -5,18 +5,16 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\HostProfile;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class HostProfileProcessor implements ProcessorInterface
 {
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Security $security,
-    )
-    {}
+    ) {
+    }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
@@ -34,17 +32,16 @@ class HostProfileProcessor implements ProcessorInterface
         $hostProfile->setLegalForm($data->legalForm);
         $hostProfile->setTimezone($data->timezone);
 
-        if($isNew === null){
+        if (null === $isNew) {
             $hostProfile->setUser($user);
-            $hostProfile->setCreatedAt(new DateTimeImmutable());
+            $hostProfile->setCreatedAt(new \DateTimeImmutable());
         }
 
-        $hostProfile->setUpdatedAt(new DateTimeImmutable());
+        $hostProfile->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->persist($hostProfile);
         $this->entityManager->flush();
 
         return $hostProfile;
-
     }
 }

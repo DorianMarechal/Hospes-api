@@ -2,8 +2,8 @@
 
 namespace App\Validator;
 
-use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -11,7 +11,7 @@ class ValidPhoneNumberValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint)
     {
-        if($value === null){
+        if (null === $value) {
             return;
         }
 
@@ -21,7 +21,7 @@ class ValidPhoneNumberValidator extends ConstraintValidator
             $number = $phoneUtil->parse($value);
             $regionCode = $phoneUtil->getRegionCodeForNumber($number);
 
-            if(!$phoneUtil->isValidNumber($number) || $phoneUtil->getNumberType($number) !== \libphonenumber\PhoneNumberType::MOBILE){
+            if (!$phoneUtil->isValidNumber($number) || \libphonenumber\PhoneNumberType::MOBILE !== $phoneUtil->getNumberType($number)) {
                 $example = $phoneUtil->format(
                     $phoneUtil->getExampleNumberForType($regionCode, \libphonenumber\PhoneNumberType::MOBILE),
                     \libphonenumber\PhoneNumberFormat::INTERNATIONAL

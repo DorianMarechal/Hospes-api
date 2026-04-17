@@ -13,16 +13,15 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/auth/register',
             processor: 'App\State\RegisterProcessor',
             normalizationContext: ['groups' => ['user:read']],
-        )
+        ),
     ]
 )]
-class RegisterRequest{
-
+class RegisterRequest
+{
     public function __construct(
-
         #[Assert\NotBlank]
         #[Assert\Email]
-        public string $email = "",
+        public string $email = '',
 
         #[Assert\NotBlank]
         #[Assert\Length(min: 12)]
@@ -34,22 +33,20 @@ class RegisterRequest{
             minScore: Assert\PasswordStrength::STRENGTH_MEDIUM,
             message: 'Password is too weak. Avoid repeated characters, common words and predictable patterns'
         )]
-        public string $password = "",
+        public string $password = '',
 
         #[Assert\NotBlank]
-        public string $firstName = "",
+        public string $firstName = '',
 
         #[Assert\NotBlank]
-        public string $lastName = "",
+        public string $lastName = '',
 
         #[PhoneValidation]
         public ?string $phone = null,
 
         #[Assert\NotBlank]
         #[Assert\Choice(choices: ['host', 'customer'])]
-        public string $accountType = "",
-
-    ){}
-
+        public string $accountType = '',
+    ) {
+    }
 }
-
