@@ -184,12 +184,19 @@ class Lodging
     #[ORM\OneToMany(targetEntity: BlockedDate::class, mappedBy: 'Lodging', orphanRemoval: true)]
     private Collection $blockedDates;
 
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'lodging', orphanRemoval: true)]
+    private Collection $bookings;
+
     public function __construct()
     {
         $this->lodgingImages = new ArrayCollection();
         $this->priceOverrides = new ArrayCollection();
         $this->seasons = new ArrayCollection();
         $this->blockedDates = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -647,6 +654,36 @@ class Lodging
             // set the owning side to null (unless already changed)
             if ($blockedDate->getLodging() === $this) {
                 $blockedDate->setLodging(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->setLodging($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): static
+    {
+        if ($this->bookings->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getLodging() === $this) {
+                $booking->setLodging(null);
             }
         }
 
