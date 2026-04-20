@@ -166,9 +166,30 @@ class Lodging
     #[Groups(['lodging:read'])]
     private Collection $lodgingImages;
 
+    /**
+     * @var Collection<int, PriceOverride>
+     */
+    #[ORM\OneToMany(targetEntity: PriceOverride::class, mappedBy: 'Lodging')]
+    private Collection $priceOverrides;
+
+    /**
+     * @var Collection<int, Season>
+     */
+    #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'Lodging')]
+    private Collection $seasons;
+
+    /**
+     * @var Collection<int, BlockedDate>
+     */
+    #[ORM\OneToMany(targetEntity: BlockedDate::class, mappedBy: 'Lodging', orphanRemoval: true)]
+    private Collection $blockedDates;
+
     public function __construct()
     {
         $this->lodgingImages = new ArrayCollection();
+        $this->priceOverrides = new ArrayCollection();
+        $this->seasons = new ArrayCollection();
+        $this->blockedDates = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -536,6 +557,96 @@ class Lodging
             // set the owning side to null (unless already changed)
             if ($lodgingImage->getLodging() === $this) {
                 $lodgingImage->setLodging(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PriceOverride>
+     */
+    public function getPriceOverrides(): Collection
+    {
+        return $this->priceOverrides;
+    }
+
+    public function addPriceOverride(PriceOverride $priceOverride): static
+    {
+        if (!$this->priceOverrides->contains($priceOverride)) {
+            $this->priceOverrides->add($priceOverride);
+            $priceOverride->setLodging($this);
+        }
+
+        return $this;
+    }
+
+    public function removePriceOverride(PriceOverride $priceOverride): static
+    {
+        if ($this->priceOverrides->removeElement($priceOverride)) {
+            // set the owning side to null (unless already changed)
+            if ($priceOverride->getLodging() === $this) {
+                $priceOverride->setLodging(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Season>
+     */
+    public function getSeasons(): Collection
+    {
+        return $this->seasons;
+    }
+
+    public function addSeason(Season $season): static
+    {
+        if (!$this->seasons->contains($season)) {
+            $this->seasons->add($season);
+            $season->setLodging($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeason(Season $season): static
+    {
+        if ($this->seasons->removeElement($season)) {
+            // set the owning side to null (unless already changed)
+            if ($season->getLodging() === $this) {
+                $season->setLodging(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BlockedDate>
+     */
+    public function getBlockedDates(): Collection
+    {
+        return $this->blockedDates;
+    }
+
+    public function addBlockedDate(BlockedDate $blockedDate): static
+    {
+        if (!$this->blockedDates->contains($blockedDate)) {
+            $this->blockedDates->add($blockedDate);
+            $blockedDate->setLodging($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlockedDate(BlockedDate $blockedDate): static
+    {
+        if ($this->blockedDates->removeElement($blockedDate)) {
+            // set the owning side to null (unless already changed)
+            if ($blockedDate->getLodging() === $this) {
+                $blockedDate->setLodging(null);
             }
         }
 
