@@ -16,28 +16,28 @@ class BlockedDateRepository extends ServiceEntityRepository
         parent::__construct($registry, BlockedDate::class);
     }
 
-//    /**
-//     * @return BlockedDate[] Returns an array of BlockedDate objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    //    /**
+    //     * @return BlockedDate[] Returns an array of BlockedDate objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('b')
+    //            ->andWhere('b.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('b.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-//    public function findOneBySomeField($value): ?BlockedDate
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    public function findOneBySomeField($value): ?BlockedDate
+    //    {
+    //        return $this->createQueryBuilder('b')
+    //            ->andWhere('b.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

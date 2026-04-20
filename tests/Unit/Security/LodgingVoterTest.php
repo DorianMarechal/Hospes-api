@@ -31,7 +31,7 @@ class LodgingVoterTest extends TestCase
         return $token;
     }
 
-    private function setId(object $entity, int $id):void
+    private function setId(object $entity, int $id): void
     {
         $reflection = new \ReflectionProperty($entity, 'id');
         $reflection->setValue($entity, $id);
@@ -83,7 +83,7 @@ class LodgingVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function testEditGrantedForAdmin():void
+    public function testEditGrantedForAdmin(): void
     {
         $admin = new User();
         $admin->setRoles(['ROLE_ADMIN']);
