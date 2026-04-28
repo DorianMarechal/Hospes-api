@@ -7,6 +7,7 @@ use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /** @extends Voter<string, Lodging> */
 final class LodgingVoter extends Voter
@@ -15,9 +16,14 @@ final class LodgingVoter extends Voter
     public const VIEW = 'LODGING_VIEW';
     public const DELETE = 'LODGING_DELETE';
 
+    public function __construct(
+        private RoleHierarchyInterface $roleHierarchy,
+    ) {
+    }
+
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
+        return \in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
             && $subject instanceof Lodging;
     }
 
@@ -31,14 +37,14 @@ final class LodgingVoter extends Voter
 
             case self::EDIT:
             case self::DELETE:
-                // if the user is anonymous, do not grant access
                 if (!$user instanceof User) {
                     $vote?->addReason('The user must be logged in to access this resource.');
 
                     return false;
                 }
 
-                if (in_array('ROLE_ADMIN', $user->getRoles())) {
+                $reachableRoles = $this->roleHierarchy->getReachableRoleNames($user->getRoles());
+                if (\in_array('ROLE_ADMIN', $reachableRoles, true)) {
                     return true;
                 }
 

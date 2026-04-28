@@ -15,3 +15,8 @@ api_platform:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+
+when@prod:
+    api_platform:
+        enable_docs: false
+        enable_entrypoint: false

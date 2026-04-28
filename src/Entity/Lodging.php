@@ -18,6 +18,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LodgingRepository::class)]
 #[ApiResource(
@@ -54,10 +55,13 @@ class Lodging
 
     #[ORM\Column(length: 150)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 150)]
     private ?string $name = null;
 
     #[ORM\Column(enumType: LodgingType::class)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\NotNull]
     private ?LodgingType $type = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -66,38 +70,51 @@ class Lodging
 
     #[ORM\Column]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\NotNull]
+    #[Assert\Positive]
     private ?int $capacity = null;
 
     #[ORM\Column]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
     private ?int $basePriceWeek = null;
 
     #[ORM\Column]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
     private ?int $basePriceWeekend = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\PositiveOrZero]
     private ?int $cleaningFee = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\PositiveOrZero]
     private ?int $touristTaxPerPerson = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\PositiveOrZero]
     private ?int $depositAmount = null;
 
     #[ORM\Column(enumType: CancellationPolicy::class)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\NotNull]
     private ?CancellationPolicy $cancellationPolicy = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\Positive]
     private ?int $minStay = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['lodging:read', 'lodging:write'])]
+    #[Assert\Positive]
+    #[Assert\GreaterThanOrEqual(propertyPath: 'minStay')]
     private ?int $maxStay = null;
 
     #[ORM\Column(nullable: false, options: ['default' => false])]

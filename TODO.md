@@ -34,14 +34,14 @@
 
 ## Phase 2 — Securite et validation
 
-- [ ] Implementer UserChecker (verifier isActive)
-- [ ] Ajouter Assert constraints sur Lodging et Season (prix positifs, capacity, min/maxStay)
-- [ ] Ajouter rate limiting sur login (symfony/rate-limiter)
-- [ ] Configurer JWT TTL explicite dans lexik_jwt_authentication.yaml
+- [x] Implementer UserChecker (verifier isActive)
+- [x] Ajouter Assert constraints sur Lodging et Season (prix positifs, capacity, min/maxStay)
+- [x] Ajouter rate limiting sur login (symfony/rate-limiter)
+- [x] Configurer JWT TTL explicite dans lexik_jwt_authentication.yaml
 - [ ] Rotater secrets (APP_SECRET, JWT passphrase) + nettoyer git history
-- [ ] Fix role hierarchy dans LodgingVoter (utiliser AuthorizationChecker au lieu de in_array)
-- [ ] Desactiver Swagger/docs en prod
-- [ ] Catch UniqueConstraintViolationException dans RegisterProcessor
+- [x] Fix role hierarchy dans LodgingVoter (utiliser RoleHierarchyInterface au lieu de in_array)
+- [x] Desactiver Swagger/docs en prod
+- [x] Catch UniqueConstraintViolationException dans RegisterProcessor
 
 ## Phase 3 — Reprendre le developpement (roadmap V1)
 
@@ -94,11 +94,11 @@ _(voir sections numerotees ci-dessous)_
 
 - [x] Entite Season
 - [x] Entite PriceOverride
-- [ ] POST /api/lodgings/{id}/seasons (+ validation non-chevauchement)
-- [ ] GET /api/lodgings/{id}/seasons
-- [ ] PUT /api/seasons/{id}
-- [ ] DELETE /api/seasons/{id}
-- [ ] SeasonOverlapValidator
+- [x] POST /api/lodgings/{id}/seasons (+ validation non-chevauchement)
+- [x] GET /api/lodgings/{id}/seasons
+- [x] PUT /api/seasons/{id}
+- [x] DELETE /api/seasons/{id}
+- [x] SeasonOverlapValidator
 - [ ] Endpoints PriceOverride (CRUD)
 
 ## 4. Disponibilite (3 endpoints)
@@ -111,9 +111,9 @@ _(voir sections numerotees ci-dessous)_
 ## 5. Blocage de dates (3 endpoints)
 
 - [x] Entite BlockedDate
-- [ ] POST /api/lodgings/{id}/blocked-dates (+ validation pas de resa sur ces dates)
-- [ ] GET /api/lodgings/{id}/blocked-dates
-- [ ] DELETE /api/blocked-dates/{id}
+- [x] POST /api/lodgings/{id}/blocked-dates (+ validation pas de resa sur ces dates)
+- [x] GET /api/lodgings/{id}/blocked-dates
+- [x] DELETE /api/blocked-dates/{id}
 
 ## 6. Sync iCal (5 endpoints)
 
@@ -129,27 +129,27 @@ _(voir sections numerotees ci-dessous)_
 
 - [x] Entite Booking + BookingNight
 - [x] Enum BookingStatus
-- [ ] POST /api/bookings (pending + TTL 15 min)
-- [ ] GET /api/bookings/{id}
-- [ ] GET /api/bookings?reference={ref}
-- [ ] PUT /api/bookings/{id}/dates (modif dates + recalcul prix)
-- [ ] POST /api/bookings/{id}/confirm
-- [ ] POST /api/bookings/{id}/cancel (+ politique annulation)
-- [ ] GET /api/me/bookings
-- [ ] GET /api/lodgings/{id}/bookings
-- [ ] GET /api/bookings/{id}/nights
-- [ ] GET /api/bookings/{id}/history
-- [ ] POST /api/lodgings/{id}/quote (devis)
-- [ ] BookingReferenceGenerator
+- [x] POST /api/bookings (pending + TTL 15 min)
+- [x] GET /api/bookings/{id}
+- [x] GET /api/bookings?reference={ref}
+- [x] PUT /api/bookings/{id}/dates (modif dates + recalcul prix)
+- [x] POST /api/bookings/{id}/confirm
+- [x] POST /api/bookings/{id}/cancel (+ politique annulation)
+- [x] GET /api/me/bookings
+- [x] GET /api/lodgings/{id}/bookings
+- [x] GET /api/bookings/{id}/nights
+- [x] GET /api/bookings/{id}/history
+- [x] POST /api/lodgings/{id}/quote (devis)
+- [x] BookingReferenceGenerator
 - [ ] PendingBookingCleaner (cron + lazy check)
-- [ ] BookingAccessVoter
+- [x] BookingAccessVoter
 
 ## 8. Services metier
 
 - [x] AvailabilityResolver
 - [x] LegalIdentifierValidator
-- [ ] PriceCalculator (nuit par nuit, saisons, weekend)
-- [ ] OrphanProtectionChecker (AR-14 a AR-17)
+- [x] PriceCalculator (nuit par nuit, saisons, weekend)
+- [x] OrphanProtectionChecker (AR-14 a AR-17)
 - [ ] CancellationPolicyResolver
 - [ ] DepositManager
 - [ ] NotificationDispatcher
@@ -243,8 +243,8 @@ _(voir sections numerotees ci-dessous)_
 - [x] PHPUnit configure (phpunit.dist.xml)
 - [x] Tests unitaires LodgingVoter (9 tests)
 - [x] Tests unitaires AvailabilityResolver (12 tests)
-- [ ] Tests unitaires PriceCalculator
-- [ ] Tests unitaires OrphanProtectionChecker
+- [x] Tests unitaires PriceCalculator (12 tests)
+- [x] Tests unitaires OrphanProtectionChecker (9 tests)
 - [ ] Tests unitaires StaffVoter
 - [ ] Tests unitaires BookingAccessVoter
 - [ ] Tests unitaires SeasonOverlapValidator

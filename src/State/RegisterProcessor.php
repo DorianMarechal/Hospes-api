@@ -5,7 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\User;
-use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -15,16 +15,11 @@ class RegisterProcessor implements ProcessorInterface
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
         private EntityManagerInterface $entityManager,
-        private UserRepository $userRepository,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariable = [], array $context = []): mixed
     {
-        if ($this->userRepository->findOneBy(['email' => $data->email])) {
-            throw new HttpException(422, 'This email is already registered');
-        }
-
         $user = new User();
 
         $user->setEmail($data->email);
@@ -47,7 +42,12 @@ class RegisterProcessor implements ProcessorInterface
         $user->setIsActive(true);
 
         $this->entityManager->persist($user);
-        $this->entityManager->flush();
+
+        try {
+            $this->entityManager->flush();
+        } catch (UniqueConstraintViolationException) {
+            throw new HttpException(409, 'This email is already registered');
+        }
 
         return $user;
     }

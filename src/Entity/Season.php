@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
 #[ORM\Index(columns: ['lodging_id', 'start_date', 'end_date'], name: 'idx_season_lodging_dates')]
@@ -63,30 +64,42 @@ class Season
 
     #[ORM\Column(length: 80)]
     #[Groups(['season:read', 'season:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 80)]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['season:read', 'season:write'])]
+    #[Assert\NotNull]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['season:read', 'season:write'])]
+    #[Assert\NotNull]
+    #[Assert\GreaterThan(propertyPath: 'startDate')]
     private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column]
     #[Groups(['season:read', 'season:write'])]
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
     private ?int $priceWeek = null;
 
     #[ORM\Column]
     #[Groups(['season:read', 'season:write'])]
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
     private ?int $priceWeekend = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['season:read', 'season:write'])]
+    #[Assert\Positive]
     private ?int $minStay = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['season:read', 'season:write'])]
+    #[Assert\Positive]
+    #[Assert\GreaterThanOrEqual(propertyPath: 'minStay')]
     private ?int $maxStay = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
