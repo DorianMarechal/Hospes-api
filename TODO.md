@@ -117,13 +117,13 @@ _(voir sections numerotees ci-dessous)_
 
 ## 6. Sync iCal (5 endpoints)
 
-- [ ] Entite IcalFeed
-- [ ] POST /api/lodgings/{id}/ical-feeds
-- [ ] GET /api/lodgings/{id}/ical-feeds
-- [ ] DELETE /api/ical-feeds/{id}
-- [ ] POST /api/ical-feeds/{id}/sync
-- [ ] GET /api/lodgings/{id}/ical-export.ics
-- [ ] IcalSyncService
+- [x] Entite IcalFeed
+- [x] POST /api/lodgings/{id}/ical-feeds
+- [x] GET /api/lodgings/{id}/ical-feeds
+- [x] DELETE /api/ical-feeds/{id}
+- [x] POST /api/ical-feeds/{id}/sync
+- [x] GET /api/lodgings/{id}/ical-export.ics
+- [x] IcalSyncService
 
 ## 7. Reservations (11 endpoints)
 

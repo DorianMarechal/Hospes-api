@@ -56,6 +56,7 @@ security:
         - { path: ^/api/auth/forgot-password, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/reset-password,  roles: PUBLIC_ACCESS }
         - { path: ^/api/staff-invitations/, roles: PUBLIC_ACCESS }
+        - { path: ^/api/lodgings/[^/]+/ical-export\.ics, roles: PUBLIC_ACCESS }
         - { path: ^/api/availability,       roles: PUBLIC_ACCESS }
         - { path: ^/api/lodgings/[^/]+/availability, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs,               roles: PUBLIC_ACCESS }
