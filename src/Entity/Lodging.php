@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: LodgingRepository::class)]
 #[ApiResource(
@@ -41,10 +42,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class Lodging
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Groups(['lodging:read'])]
-    private ?int $id = null;
+    private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'lodgings')]
     #[ORM\JoinColumn(nullable: false)]
@@ -169,13 +171,13 @@ class Lodging
     /**
      * @var Collection<int, PriceOverride>
      */
-    #[ORM\OneToMany(targetEntity: PriceOverride::class, mappedBy: 'lodging')]
+    #[ORM\OneToMany(targetEntity: PriceOverride::class, mappedBy: 'lodging', cascade: ['persist', 'remove'])]
     private Collection $priceOverrides;
 
     /**
      * @var Collection<int, Season>
      */
-    #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'lodging')]
+    #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'lodging', cascade: ['persist', 'remove'])]
     private Collection $seasons;
 
     /**
@@ -199,7 +201,7 @@ class Lodging
         $this->bookings = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

@@ -4,14 +4,17 @@ namespace App\Entity;
 
 use App\Repository\HostLegalIdentifierRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: HostLegalIdentifierRepository::class)]
+#[ORM\UniqueConstraint(columns: ['host_profile_id', 'type', 'country'], name: 'uniq_legal_identifier_profile_type_country')]
 class HostLegalIdentifier
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'hostLegalIdentifiers')]
     #[ORM\JoinColumn(nullable: false)]
@@ -35,7 +38,7 @@ class HostLegalIdentifier
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

@@ -9,11 +9,11 @@ use App\Security\Voter\LodgingVoter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Uid\Uuid;
 
 class LodgingVoterTest extends TestCase
 {
     private LodgingVoter $voter;
-    private int $nextId = 1;
     private const VIEW = LodgingVoter::VIEW;
     private const EDIT = LodgingVoter::EDIT;
     private const DELETE = LodgingVoter::DELETE;
@@ -31,16 +31,16 @@ class LodgingVoterTest extends TestCase
         return $token;
     }
 
-    private function setId(object $entity, int $id): void
+    private function setId(object $entity, ?Uuid $id = null): void
     {
         $reflection = new \ReflectionProperty($entity, 'id');
-        $reflection->setValue($entity, $id);
+        $reflection->setValue($entity, $id ?? Uuid::v7());
     }
 
     private function createHostWithLodging(): array
     {
         $hostProfile = new HostProfile();
-        $this->setId($hostProfile, $this->nextId++);
+        $this->setId($hostProfile);
 
         $host = new User();
         $host->setRoles(['ROLE_HOST']);

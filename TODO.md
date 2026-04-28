@@ -24,13 +24,13 @@
 
 ## Phase 1 — Fondations DB (migration majeure)
 
-- [ ] Migrer tous les PKs INT → UUID v7
-- [ ] Ajouter contrainte EXCLUDE USING gist sur booking (double-booking prevention)
-- [ ] Ajouter index manquants (booking pending/expiry, season lodging/dates, blocked_date lodging/dates)
-- [ ] Ajouter contraintes uniques manquantes (price_override lodging+date, booking.reference, host_legal_identifier profile+type+country)
+- [x] Migrer tous les PKs INT → UUID v7
+- [x] Ajouter contrainte EXCLUDE USING gist sur booking (double-booking prevention)
+- [x] Ajouter index manquants (booking pending/expiry, season lodging/dates, blocked_date lodging/dates)
+- [x] Ajouter contraintes uniques manquantes (price_override lodging+date, booking.reference, host_legal_identifier profile+type+country)
 - [ ] Migrer timestamps → TIMESTAMPTZ
-- [ ] Ajouter onDelete strategies sur les FK
-- [ ] Fix cascade strategies (Lodging→Season, Lodging→PriceOverride)
+- [x] Ajouter onDelete strategies sur les FK
+- [x] Fix cascade strategies (Lodging→Season, Lodging→PriceOverride)
 
 ## Phase 2 — Securite et validation
 

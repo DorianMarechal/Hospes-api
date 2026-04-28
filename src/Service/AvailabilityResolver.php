@@ -7,6 +7,7 @@ use App\Entity\Booking;
 use App\Entity\Lodging;
 use App\Entity\Season;
 use App\Enum\BookingStatus;
+use Symfony\Component\Uid\Uuid;
 
 class AvailabilityResolver
 {
@@ -63,10 +64,10 @@ class AvailabilityResolver
         \DateTimeImmutable $checkout,
         array $existingBookings,
         array $blockedDates,
-        ?int $excludeBookingId,
+        ?Uuid $excludeBookingId,
     ): bool {
         foreach ($existingBookings as $booking) {
-            if (null !== $booking->getId() && $booking->getId() === $excludeBookingId) {
+            if (null !== $booking->getId() && $booking->getId()->equals($excludeBookingId)) {
                 continue;
             }
 

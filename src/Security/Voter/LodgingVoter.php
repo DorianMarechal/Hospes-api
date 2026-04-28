@@ -42,7 +42,7 @@ final class LodgingVoter extends Voter
                     return true;
                 }
 
-                if ($subject->getHost()->getId() === $user->getHostProfile()?->getId()) {
+                if (null !== $subject->getHost()?->getId() && $subject->getHost()->getId()->equals($user->getHostProfile()?->getId())) {
                     return true;
                 }
 

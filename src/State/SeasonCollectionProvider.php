@@ -28,7 +28,7 @@ class SeasonCollectionProvider implements ProviderInterface
         /** @var \App\Entity\User $user */
         $user = $this->security->getUser();
 
-        if (null === $lodging->getHost() || $lodging->getHost()->getId() !== $user->getHostProfile()?->getId()) {
+        if (null === $lodging->getHost() || !$lodging->getHost()->getId()?->equals($user->getHostProfile()?->getId())) {
             throw new AccessDeniedHttpException('You do not own this lodging');
         }
 

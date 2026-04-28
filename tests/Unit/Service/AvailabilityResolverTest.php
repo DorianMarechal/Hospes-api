@@ -9,6 +9,7 @@ use App\Entity\Season;
 use App\Enum\BookingStatus;
 use App\Service\AvailabilityResolver;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Uuid;
 
 class AvailabilityResolverTest extends TestCase
 {
@@ -28,7 +29,7 @@ class AvailabilityResolverTest extends TestCase
         string $checkout,
         BookingStatus $status = BookingStatus::CONFIRMED,
         ?\DateTimeImmutable $expiresAt = null,
-        ?int $id = null,
+        ?Uuid $id = null,
     ): Booking {
         $booking = new Booking();
         $booking->setCheckin(new \DateTimeImmutable($checkin));
@@ -183,7 +184,8 @@ class AvailabilityResolverTest extends TestCase
     // AR-9/10 : Modification → exclut la resa modifiee du check dispo
     public function testExcludedBookingIsIgnored(): void
     {
-        $existing = $this->createBooking('2026-07-10', '2026-07-13', BookingStatus::CONFIRMED, null, 42);
+        $bookingId = Uuid::v7();
+        $existing = $this->createBooking('2026-07-10', '2026-07-13', BookingStatus::CONFIRMED, null, $bookingId);
 
         $result = $this->resolver->isAvailable(
             $this->lodging,
@@ -191,7 +193,7 @@ class AvailabilityResolverTest extends TestCase
             new \DateTimeImmutable('2026-07-14'),
             [$existing],
             [],
-            42,
+            $bookingId,
         );
 
         $this->assertTrue($result);

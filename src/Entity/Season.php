@@ -16,8 +16,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
+#[ORM\Index(columns: ['lodging_id', 'start_date', 'end_date'], name: 'idx_season_lodging_dates')]
 #[NoSeasonOverlap]
 #[ApiResource(
     operations: [
@@ -48,10 +50,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class Season
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Groups(['season:read'])]
-    private ?int $id = null;
+    private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'seasons')]
     #[JoinColumn(nullable: false)]
@@ -94,7 +97,7 @@ class Season
     #[Groups(['season:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

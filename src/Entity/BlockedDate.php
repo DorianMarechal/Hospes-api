@@ -6,15 +6,18 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BlockedDateRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: BlockedDateRepository::class)]
+#[ORM\Index(columns: ['lodging_id', 'start_date', 'end_date'], name: 'idx_blocked_date_lodging_dates')]
 #[ApiResource(operations: [])]
 class BlockedDate
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'blockedDates')]
     #[ORM\JoinColumn(nullable: false)]
@@ -38,7 +41,7 @@ class BlockedDate
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

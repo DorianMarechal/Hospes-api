@@ -32,7 +32,7 @@ class SeasonProcessor implements ProcessorInterface
                 throw new HttpException(404, 'Lodging not found');
             }
 
-            if (null === $lodging->getHost() || $lodging->getHost()->getId() !== $user->getHostProfile()?->getId()) {
+            if (null === $lodging->getHost() || !$lodging->getHost()->getId()?->equals($user->getHostProfile()?->getId())) {
                 throw new HttpException(403, 'You do not own this lodging');
             }
 

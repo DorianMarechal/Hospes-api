@@ -7,15 +7,18 @@ use App\Repository\PriceOverrideRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: PriceOverrideRepository::class)]
+#[ORM\UniqueConstraint(columns: ['lodging_id', 'date'], name: 'uniq_price_override_lodging_date')]
 #[ApiResource(operations: [])]
 class PriceOverride
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'priceOverrides')]
     #[JoinColumn(nullable: false)]
@@ -36,7 +39,7 @@ class PriceOverride
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
