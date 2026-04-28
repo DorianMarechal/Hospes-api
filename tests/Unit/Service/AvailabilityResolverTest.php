@@ -34,10 +34,10 @@ class AvailabilityResolverTest extends TestCase
         $booking->setCheckin(new \DateTimeImmutable($checkin));
         $booking->setCheckout(new \DateTimeImmutable($checkout));
         $booking->setStatus($status);
-        if ($expiresAt !== null) {
+        if (null !== $expiresAt) {
             $booking->setExpiresAt($expiresAt);
         }
-        if ($id !== null) {
+        if (null !== $id) {
             $reflection = new \ReflectionProperty($booking, 'id');
             $reflection->setValue($booking, $id);
         }

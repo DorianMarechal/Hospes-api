@@ -3,49 +3,95 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\SeasonRepository;
+use App\State\SeasonCollectionProvider;
+use App\State\SeasonProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
+use App\Validator\NoSeasonOverlap;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
-#[ApiResource]
+#[NoSeasonOverlap]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/lodgings/{lodgingId}/seasons',
+            security: "is_granted('ROLE_HOST')",
+            provider: SeasonCollectionProvider::class
+        ),
+        new Get(
+            security: "is_granted('LODGING_EDIT', object.getLodging())"
+        ),
+        new Post(
+            security: "is_granted('ROLE_HOST')",
+            uriTemplate: '/lodgings/{lodgingId}/seasons',
+            processor: SeasonProcessor::class
+        ),
+        new Put(
+            security: "is_granted('LODGING_EDIT', object.getLodging())",
+            processor: SeasonProcessor::class
+        ),
+        new Delete(
+            security: "is_granted('LODGING_EDIT', object.getLodging())",
+        ),
+    ],
+    normalizationContext: ['groups' => ['season:read']],
+    denormalizationContext: ['groups' => ['season:write']]
+)]
 class Season
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['season:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'seasons')]
     #[JoinColumn(nullable: false)]
+    #[Groups(['season:read'])]
     private ?Lodging $lodging = null;
 
     #[ORM\Column(length: 80)]
+    #[Groups(['season:read', 'season:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['season:read', 'season:write'])]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['season:read', 'season:write'])]
     private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column]
+    #[Groups(['season:read', 'season:write'])]
     private ?int $priceWeek = null;
 
     #[ORM\Column]
+    #[Groups(['season:read', 'season:write'])]
     private ?int $priceWeekend = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['season:read', 'season:write'])]
     private ?int $minStay = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['season:read', 'season:write'])]
     private ?int $maxStay = null;
 
     #[ORM\Column]
+    #[Groups(['season:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['season:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int

@@ -16,7 +16,6 @@ lint:
 	vendor/bin/phpstan analyse -l 6 src --memory-limit=256M
 	vendor/bin/php-cs-fixer fix
 
-
 test:
 	vendor/bin/phpunit --testsuite=unit
 	vendor/bin/phpunit --testsuite=integration

@@ -66,7 +66,7 @@ class AvailabilityResolver
         ?int $excludeBookingId,
     ): bool {
         foreach ($existingBookings as $booking) {
-            if ($booking->getId() !== null && $booking->getId() === $excludeBookingId) {
+            if (null !== $booking->getId() && $booking->getId() === $excludeBookingId) {
                 continue;
             }
 
