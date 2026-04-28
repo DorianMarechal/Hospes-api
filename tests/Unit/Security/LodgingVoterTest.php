@@ -9,6 +9,7 @@ use App\Security\Voter\LodgingVoter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Uid\Uuid;
 
 class LodgingVoterTest extends TestCase
@@ -20,12 +21,18 @@ class LodgingVoterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->voter = new LodgingVoter();
+        $roleHierarchy = new RoleHierarchy([
+            'ROLE_ADMIN' => ['ROLE_HOST', 'ROLE_CUSTOMER'],
+            'ROLE_HOST' => ['ROLE_USER'],
+            'ROLE_CUSTOMER' => ['ROLE_USER'],
+            'ROLE_STAFF' => ['ROLE_USER'],
+        ]);
+        $this->voter = new LodgingVoter($roleHierarchy);
     }
 
     private function createToken(?User $user): TokenInterface
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
 
         return $token;

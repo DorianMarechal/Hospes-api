@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Booking;
+use App\Entity\Lodging;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +18,29 @@ class BookingRepository extends ServiceEntityRepository
         parent::__construct($registry, Booking::class);
     }
 
-    //    /**
-    //     * @return Booking[] Returns an array of Booking objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Booking[]
+     */
+    public function findByLodging(Lodging $lodging): array
+    {
+        return $this->findBy(['lodging' => $lodging]);
+    }
 
-    //    public function findOneBySomeField($value): ?Booking
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @return Booking[]
+     */
+    public function findByCustomer(User $customer): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.customer = :customer')
+            ->setParameter('customer', $customer)
+            ->orderBy('b.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByReference(string $reference): ?Booking
+    {
+        return $this->findOneBy(['reference' => $reference]);
+    }
 }

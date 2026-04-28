@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BookingNightRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: BookingNightRepository::class)]
@@ -17,6 +18,7 @@ class BookingNight
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['booking_night:read', 'booking:read'])]
     private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingNights')]
@@ -24,12 +26,15 @@ class BookingNight
     private ?Booking $booking = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['booking_night:read', 'booking:read'])]
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column]
+    #[Groups(['booking_night:read', 'booking:read'])]
     private ?int $price = null;
 
     #[ORM\Column(length: 80)]
+    #[Groups(['booking_night:read', 'booking:read'])]
     private ?string $source = null;
 
     public function getId(): ?Uuid

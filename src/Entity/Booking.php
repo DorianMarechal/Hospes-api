@@ -3,89 +3,186 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Dto\BookingRequest;
+use App\Dto\CancelBookingRequest;
+use App\Dto\ModifyBookingDatesRequest;
 use App\Enum\BookingStatus;
 use App\Enum\CancellationPolicy;
 use App\Repository\BookingRepository;
+use App\State\BookingByLodgingProvider;
+use App\State\BookingByReferenceProvider;
+use App\State\BookingCancelProcessor;
+use App\State\BookingConfirmProcessor;
+use App\State\BookingCreateProcessor;
+use App\State\BookingHistoryProvider;
+use App\State\BookingModifyDatesProcessor;
+use App\State\BookingNightsProvider;
+use App\State\MyBookingsProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
-#[ApiResource(operations: [])]
+#[ApiResource(
+    operations: [
+        new Post(
+            uriTemplate: '/bookings',
+            input: BookingRequest::class,
+            security: "is_granted('ROLE_CUSTOMER')",
+            processor: BookingCreateProcessor::class,
+        ),
+        new Get(
+            uriTemplate: '/bookings/{id}',
+            security: "is_granted('BOOKING_VIEW', object)",
+        ),
+        new GetCollection(
+            uriTemplate: '/bookings',
+            provider: BookingByReferenceProvider::class,
+        ),
+        new GetCollection(
+            uriTemplate: '/me/bookings',
+            security: "is_granted('ROLE_CUSTOMER')",
+            provider: MyBookingsProvider::class,
+        ),
+        new GetCollection(
+            uriTemplate: '/lodgings/{lodgingId}/bookings',
+            security: "is_granted('ROLE_HOST')",
+            provider: BookingByLodgingProvider::class,
+        ),
+        new GetCollection(
+            uriTemplate: '/bookings/{id}/nights',
+            provider: BookingNightsProvider::class,
+            security: "is_granted('ROLE_USER')",
+            normalizationContext: ['groups' => ['booking_night:read']],
+        ),
+        new GetCollection(
+            uriTemplate: '/bookings/{id}/history',
+            security: "is_granted('BOOKING_VIEW', object)",
+            provider: BookingHistoryProvider::class,
+            normalizationContext: ['groups' => ['booking_history:read']],
+        ),
+        new Post(
+            uriTemplate: '/bookings/{id}/confirm',
+            security: "is_granted('BOOKING_VIEW', object)",
+            input: false,
+            processor: BookingConfirmProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/bookings/{id}/cancel',
+            input: CancelBookingRequest::class,
+            security: "is_granted('BOOKING_CANCEL', object)",
+            processor: BookingCancelProcessor::class,
+        ),
+        new Put(
+            uriTemplate: '/bookings/{id}/dates',
+            input: ModifyBookingDatesRequest::class,
+            security: "is_granted('BOOKING_EDIT', object)",
+            processor: BookingModifyDatesProcessor::class,
+        ),
+    ],
+    normalizationContext: ['groups' => ['booking:read']],
+    denormalizationContext: ['groups' => ['booking:write']],
+)]
 class Booking
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['booking:read'])]
     private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['booking:read'])]
     private ?Lodging $lodging = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['booking:read'])]
     private ?User $customer = null;
 
     #[ORM\Column(length: 30, unique: true)]
+    #[Groups(['booking:read'])]
     private ?string $reference = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['booking:read'])]
     private ?\DateTimeImmutable $checkin = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['booking:read'])]
     private ?\DateTimeImmutable $checkout = null;
 
     #[ORM\Column]
+    #[Groups(['booking:read'])]
     private ?int $guestsCount = null;
 
     #[ORM\Column]
+    #[Groups(['booking:read'])]
     private ?int $numberOfNights = null;
 
     #[ORM\Column]
+    #[Groups(['booking:read'])]
     private ?int $nightsTotal = null;
 
     #[ORM\Column]
+    #[Groups(['booking:read'])]
     private ?int $cleaningFee = null;
 
     #[ORM\Column]
+    #[Groups(['booking:read'])]
     private ?int $touristTaxTotal = null;
 
     #[ORM\Column]
+    #[Groups(['booking:read'])]
     private ?int $depositAmount = null;
 
     #[ORM\Column]
+    #[Groups(['booking:read'])]
     private ?int $totalPrice = null;
 
     #[ORM\Column(enumType: CancellationPolicy::class)]
+    #[Groups(['booking:read'])]
     private ?CancellationPolicy $cancellationPolicy = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['booking:read'])]
     private ?User $cancelledBy = null;
 
     #[ORM\Column(enumType: BookingStatus::class)]
+    #[Groups(['booking:read'])]
     private ?BookingStatus $status = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['booking:read'])]
     private ?string $cancellationReason = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    #[Groups(['booking:read'])]
     private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
+    #[Groups(['booking:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
+    #[Groups(['booking:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
      * @var Collection<int, BookingNight>
      */
     #[ORM\OneToMany(targetEntity: BookingNight::class, mappedBy: 'booking', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['booking:read'])]
     private Collection $bookingNights;
 
     public function __construct()
@@ -295,7 +392,7 @@ class Booking
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(\DateTimeImmutable $expiresAt): static
+    public function setExpiresAt(?\DateTimeImmutable $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
 
