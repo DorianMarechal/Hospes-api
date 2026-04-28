@@ -172,15 +172,15 @@ _(voir sections numerotees ci-dessous)_
 
 ## 11. Staff (7 endpoints)
 
-- [ ] Entites StaffAssignment, StaffPermission, StaffLodging
-- [ ] POST /api/me/staff (invitation)
-- [ ] GET /api/me/staff
-- [ ] POST /api/staff-invitations/{token}/accept
-- [ ] PUT /api/staff-assignments/{id}/permissions
-- [ ] PUT /api/staff-assignments/{id}/lodgings
-- [ ] POST /api/staff-assignments/{id}/revoke
-- [ ] GET /api/me/permissions
-- [ ] StaffVoter
+- [x] Entites StaffAssignment, StaffPermission, StaffLodging
+- [x] POST /api/me/staff (invitation)
+- [x] GET /api/me/staff
+- [x] POST /api/staff-invitations/{token}/accept
+- [x] PUT /api/staff-assignments/{id}/permissions
+- [x] PUT /api/staff-assignments/{id}/lodgings
+- [x] POST /api/staff-assignments/{id}/revoke
+- [x] GET /api/me/permissions
+- [x] StaffVoter
 
 ## 12. Messagerie (5 endpoints)
 
