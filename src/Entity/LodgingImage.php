@@ -2,18 +2,43 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\LodgingImageRepository;
+use App\State\LodgingImageProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LodgingImageRepository::class)]
+#[ApiResource(
+    operations: [
+        new Post(
+            uriTemplate: '/lodgings/{lodgingId}/images',
+            security: "is_granted('ROLE_HOST')",
+            processor: LodgingImageProcessor::class,
+        ),
+        new Put(
+            security: "is_granted('LODGING_EDIT', object.getLodging())",
+        ),
+        new Delete(
+            security: "is_granted('LODGING_EDIT', object.getLodging())",
+        ),
+    ],
+    normalizationContext: ['groups' => ['lodging_image:read']],
+    denormalizationContext: ['groups' => ['lodging_image:write']],
+)]
 class LodgingImage
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['lodging_image:read', 'lodging:read'])]
     private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'lodgingImages')]
@@ -21,15 +46,23 @@ class LodgingImage
     private ?Lodging $lodging = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['lodging_image:read', 'lodging_image:write', 'lodging:read'])]
+    #[Assert\NotBlank]
+    #[Assert\Url]
     private ?string $url = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['lodging_image:read', 'lodging_image:write', 'lodging:read'])]
     private ?string $altText = null;
 
     #[ORM\Column]
+    #[Groups(['lodging_image:read', 'lodging_image:write', 'lodging:read'])]
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
     private ?int $position = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
+    #[Groups(['lodging_image:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?Uuid

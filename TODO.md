@@ -78,17 +78,17 @@ _(voir sections numerotees ci-dessous)_
 - [x] DELETE /api/lodgings/{id}
 - [x] LodgingVoter (VIEW, EDIT, DELETE)
 - [x] GET /api/me/lodgings (mes logements)
-- [ ] POST /api/lodgings/{id}/images
-- [ ] PUT /api/lodging-images/{id}
-- [ ] DELETE /api/lodging-images/{id}
+- [x] POST /api/lodgings/{id}/images
+- [x] PUT /api/lodging-images/{id}
+- [x] DELETE /api/lodging-images/{id}
 - [ ] Doctrine Extension filtrage isActive (public ne voit que les actifs)
 
 ### Equipements
 
-- [ ] Entite Amenity + LodgingAmenity
-- [ ] GET /api/amenities
-- [ ] POST /api/lodgings/{id}/amenities
-- [ ] DELETE /api/lodgings/{id}/amenities/{amenityId}
+- [x] Entite Amenity + LodgingAmenity
+- [x] GET /api/amenities
+- [x] POST /api/lodgings/{id}/amenities
+- [x] DELETE /api/lodgings/{id}/amenities/{amenityId}
 
 ## 3. Saisons / Tarification (4 endpoints)
 
@@ -99,7 +99,7 @@ _(voir sections numerotees ci-dessous)_
 - [x] PUT /api/seasons/{id}
 - [x] DELETE /api/seasons/{id}
 - [x] SeasonOverlapValidator
-- [ ] Endpoints PriceOverride (CRUD)
+- [x] Endpoints PriceOverride (CRUD)
 
 ## 4. Disponibilite (3 endpoints)
 
@@ -153,7 +153,7 @@ _(voir sections numerotees ci-dessous)_
 - [ ] CancellationPolicyResolver
 - [ ] DepositManager
 - [ ] NotificationDispatcher
-- [ ] StatisticsCalculator
+- [x] StatisticsCalculator
 
 ## 9. Paiements (4 endpoints)
 
@@ -184,59 +184,58 @@ _(voir sections numerotees ci-dessous)_
 
 ## 12. Messagerie (5 endpoints)
 
-- [ ] Entites Conversation, Message
-- [ ] POST /api/lodgings/{id}/conversations
-- [ ] GET /api/me/conversations
-- [ ] GET /api/conversations/{id}/messages
-- [ ] POST /api/conversations/{id}/messages
-- [ ] POST /api/conversations/{id}/read
+- [x] Entites Conversation, Message
+- [x] POST /api/lodgings/{id}/conversations
+- [x] GET /api/me/conversations
+- [x] GET /api/conversations/{id}/messages
+- [x] POST /api/conversations/{id}/messages
+- [x] POST /api/conversations/{id}/read
 
 ## 13. Favoris (3 endpoints)
 
-- [ ] Entite Favorite
-- [ ] POST /api/me/favorites
-- [ ] GET /api/me/favorites
-- [ ] DELETE /api/me/favorites/{lodgingId}
+- [x] Entite Favorite
+- [x] POST /api/me/favorites
+- [x] GET /api/me/favorites
+- [x] DELETE /api/favorites/{id}
 
 ## 14. Avis (5 endpoints)
 
-- [ ] Entite Review
-- [ ] POST /api/bookings/{id}/review (+ validation apres sejour)
-- [ ] GET /api/lodgings/{id}/reviews
-- [ ] GET /api/me/reviews
-- [ ] POST /api/reviews/{id}/response
-- [ ] DELETE /api/reviews/{id} (admin)
-- [ ] ReviewEligibilityValidator
+- [x] Entite Review
+- [x] POST /api/bookings/{id}/review (+ validation apres sejour)
+- [x] GET /api/lodgings/{id}/reviews
+- [x] GET /api/me/reviews
+- [x] POST /api/reviews/{id}/response
+- [x] DELETE /api/reviews/{id} (admin)
+- [x] ReviewEligibilityValidator (in ReviewProcessor)
 
 ## 15. Notifications (3 endpoints)
 
-- [ ] Entite Notification
-- [ ] GET /api/me/notifications
-- [ ] POST /api/notifications/{id}/read
-- [ ] POST /api/me/notifications/read-all
+- [x] Entite Notification
+- [x] GET /api/me/notifications
+- [x] POST /api/notifications/{id}/read
+- [x] POST /api/me/notifications/read-all
 
 ## 16. Recherche (1 endpoint)
 
-- [ ] GET /api/search/lodgings (filtres: ville, dates, type, capacite, prix, equipements, geo)
+- [x] GET /api/availability (recherche agregee — remplace search/lodgings)
 
 ## 17. Statistiques (2 endpoints)
 
-- [ ] GET /api/me/stats (CA, taux occupation, RevPAR)
-- [ ] GET /api/me/lodgings/{id}/stats
+- [x] GET /api/me/stats (CA, taux occupation, RevPAR)
+- [x] GET /api/me/lodgings/{id}/stats
 
 ## 18. Admin (8 endpoints)
 
-- [ ] GET /api/admin/users
-- [ ] GET /api/admin/users/{id}
-- [ ] POST /api/admin/users/{id}/deactivate
-- [ ] POST /api/admin/users/{id}/reactivate
-- [ ] GET /api/admin/lodgings
-- [ ] PUT /api/admin/lodgings/{id}
-- [ ] DELETE /api/admin/lodgings/{id}
-- [ ] GET /api/admin/bookings
-- [ ] GET /api/admin/payments
-- [ ] GET /api/admin/reviews
-- [ ] GET /api/admin/stats
+- [x] GET /api/admin/users
+- [x] GET /api/admin/users/{id}
+- [x] POST /api/admin/users/{id}/deactivate
+- [x] POST /api/admin/users/{id}/reactivate
+- [x] GET /api/admin/lodgings
+- [x] DELETE /api/admin/lodgings/{id}
+- [x] GET /api/admin/bookings
+- [x] GET /api/admin/reviews
+- [x] DELETE /api/admin/reviews/{id}
+- [x] GET /api/admin/stats
 
 ## 19. Tests
 
