@@ -21,7 +21,7 @@ class HostProfileProcessor implements ProcessorInterface
         /** @var \App\Entity\User $user */
         $user = $this->security->getUser();
         $hostProfile = $user->getHostProfile() ?? new HostProfile();
-        $isNew = $hostProfile->getId();
+        $isNew = null === $hostProfile->getId();
 
         $hostProfile->setBusinessName($data->businessName);
         $hostProfile->setBillingAddress($data->billingAddress);
@@ -32,7 +32,7 @@ class HostProfileProcessor implements ProcessorInterface
         $hostProfile->setLegalForm($data->legalForm);
         $hostProfile->setTimezone($data->timezone);
 
-        if (null === $isNew) {
+        if ($isNew) {
             $hostProfile->setUser($user);
             $hostProfile->setCreatedAt(new \DateTimeImmutable());
         }

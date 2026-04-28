@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 
 #[ORM\Entity(repositoryClass: PriceOverrideRepository::class)]
-#[ApiResource]
+#[ApiResource(operations: [])]
 class PriceOverride
 {
     #[ORM\Id]

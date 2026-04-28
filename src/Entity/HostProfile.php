@@ -69,13 +69,13 @@ class HostProfile
     /**
      * @var Collection<int, HostLegalIdentifier>
      */
-    #[ORM\OneToMany(targetEntity: HostLegalIdentifier::class, mappedBy: 'hostProfileId', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: HostLegalIdentifier::class, mappedBy: 'hostProfile', orphanRemoval: true)]
     private Collection $hostLegalIdentifiers;
 
     /**
      * @var Collection<int, Lodging>
      */
-    #[ORM\OneToMany(targetEntity: Lodging::class, mappedBy: 'host', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Lodging::class, mappedBy: 'host')]
     private Collection $lodgings;
 
     public function __construct()

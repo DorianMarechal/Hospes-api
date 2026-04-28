@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookingNightRepository::class)]
 #[ORM\UniqueConstraint(columns: ['booking_id', 'date'])]
-#[ApiResource]
+#[ApiResource(operations: [])]
 class BookingNight
 {
     #[ORM\Id]

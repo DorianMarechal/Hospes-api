@@ -52,7 +52,7 @@ class Lodging
 
     #[ORM\Column(length: 150)]
     #[Groups(['lodging:read', 'lodging:write'])]
-    private ?string $name = 'null';
+    private ?string $name = null;
 
     #[ORM\Column(enumType: LodgingType::class)]
     #[Groups(['lodging:read', 'lodging:write'])]
@@ -169,25 +169,25 @@ class Lodging
     /**
      * @var Collection<int, PriceOverride>
      */
-    #[ORM\OneToMany(targetEntity: PriceOverride::class, mappedBy: 'Lodging')]
+    #[ORM\OneToMany(targetEntity: PriceOverride::class, mappedBy: 'lodging')]
     private Collection $priceOverrides;
 
     /**
      * @var Collection<int, Season>
      */
-    #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'Lodging')]
+    #[ORM\OneToMany(targetEntity: Season::class, mappedBy: 'lodging')]
     private Collection $seasons;
 
     /**
      * @var Collection<int, BlockedDate>
      */
-    #[ORM\OneToMany(targetEntity: BlockedDate::class, mappedBy: 'Lodging', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: BlockedDate::class, mappedBy: 'lodging', orphanRemoval: true)]
     private Collection $blockedDates;
 
     /**
      * @var Collection<int, Booking>
      */
-    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'lodging', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'lodging')]
     private Collection $bookings;
 
     public function __construct()

@@ -9,7 +9,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ValidPhoneNumberValidator extends ConstraintValidator
 {
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (null === $value) {
             return;

@@ -11,10 +11,10 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\SeasonRepository;
 use App\State\SeasonCollectionProvider;
 use App\State\SeasonProcessor;
+use App\Validator\NoSeasonOverlap;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
-use App\Validator\NoSeasonOverlap;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]

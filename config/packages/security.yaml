@@ -48,8 +48,10 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api,       roles: PUBLIC_ACCESS } #repasser en IS_AUTHENTICATED_FULLY
+        - { path: ^/api/login,          roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/register,  roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs,           roles: PUBLIC_ACCESS }
+        - { path: ^/api,                roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:

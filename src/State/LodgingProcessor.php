@@ -24,7 +24,7 @@ class LodgingProcessor implements ProcessorInterface
         $user = $this->security->getUser();
         $hostProfile = $user->getHostProfile();
 
-        if (null === $hostProfile->getId()) {
+        if (null === $hostProfile || null === $hostProfile->getId()) {
             throw new HttpException(403, 'You must complete your host profile before creating a lodging');
         }
 
@@ -36,8 +36,6 @@ class LodgingProcessor implements ProcessorInterface
 
         $data->setUpdatedAt(new \DateTimeImmutable());
 
-        $perciste = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-
-        return $perciste;
+        return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
     }
 }

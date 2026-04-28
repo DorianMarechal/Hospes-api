@@ -7,6 +7,56 @@
 
 ---
 
+## Phase 0 — Correctifs critiques (bloquants)
+
+- [x] Fix 5 erreurs mappedBy Doctrine (Lodging→seasons/blockedDates/priceOverrides, User→bookings, HostProfile→hostLegalIdentifiers)
+- [x] Fix Lodging.name default 'null' (string) → null
+- [x] Fix NPE LodgingProcessor ($hostProfile->getId() sur null)
+- [x] Fix NPE SeasonProcessor ($lodging->getHost()->getId() sur null)
+- [x] Fix $isNew inversé dans HostProfileProcessor
+- [x] Retirer orphanRemoval: true sur Lodging→bookings et HostProfile→lodgings
+- [x] Ajouter operations: [] sur Booking, BlockedDate, BookingNight, PriceOverride (bloquer CRUD par defaut)
+- [x] Reactiver IS_AUTHENTICATED_FULLY dans security.yaml (+ whitelist register/login)
+- [x] Fix ownership check dans SeasonCollectionProvider
+- [x] Fix variable $perciste dans LodgingProcessor
+- [x] Fix gethostProfile/sethostProfile casing dans HostLegalIdentifier
+- [x] Fix ValidPhoneNumberValidator return type void
+
+## Phase 1 — Fondations DB (migration majeure)
+
+- [ ] Migrer tous les PKs INT → UUID v7
+- [ ] Ajouter contrainte EXCLUDE USING gist sur booking (double-booking prevention)
+- [ ] Ajouter index manquants (booking pending/expiry, season lodging/dates, blocked_date lodging/dates)
+- [ ] Ajouter contraintes uniques manquantes (price_override lodging+date, booking.reference, host_legal_identifier profile+type+country)
+- [ ] Migrer timestamps → TIMESTAMPTZ
+- [ ] Ajouter onDelete strategies sur les FK
+- [ ] Fix cascade strategies (Lodging→Season, Lodging→PriceOverride)
+
+## Phase 2 — Securite et validation
+
+- [ ] Implementer UserChecker (verifier isActive)
+- [ ] Ajouter Assert constraints sur Lodging et Season (prix positifs, capacity, min/maxStay)
+- [ ] Ajouter rate limiting sur login (symfony/rate-limiter)
+- [ ] Configurer JWT TTL explicite dans lexik_jwt_authentication.yaml
+- [ ] Rotater secrets (APP_SECRET, JWT passphrase) + nettoyer git history
+- [ ] Fix role hierarchy dans LodgingVoter (utiliser AuthorizationChecker au lieu de in_array)
+- [ ] Desactiver Swagger/docs en prod
+- [ ] Catch UniqueConstraintViolationException dans RegisterProcessor
+
+## Phase 3 — Reprendre le developpement (roadmap V1)
+
+_(voir sections numerotees ci-dessous)_
+
+## Phase 4 — Tests et CI
+
+- [ ] Creer factories Foundry pour toutes les entites
+- [ ] Tests unitaires manquants (PriceCalculator, OrphanProtection, StaffVoter, BookingAccessVoter, CancellationPolicyResolver)
+- [ ] Tests integration PostgreSQL
+- [ ] Tests fonctionnels API (auth, lodging, season, booking)
+- [ ] GitHub Actions CI pipeline (lint → phpstan → unit → integration → functional)
+
+---
+
 ## 1. Authentification (8 endpoints)
 
 - [x] POST /api/auth/register

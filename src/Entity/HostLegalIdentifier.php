@@ -40,12 +40,12 @@ class HostLegalIdentifier
         return $this->id;
     }
 
-    public function gethostProfile(): ?HostProfile
+    public function getHostProfile(): ?HostProfile
     {
         return $this->hostProfile;
     }
 
-    public function sethostProfile(?HostProfile $hostProfile): static
+    public function setHostProfile(?HostProfile $hostProfile): static
     {
         $this->hostProfile = $hostProfile;
 

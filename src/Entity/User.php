@@ -89,7 +89,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Booking>
      */
-    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'customerId')]
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'customer')]
     private Collection $bookings;
 
     public function __construct()
