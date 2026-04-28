@@ -89,11 +89,11 @@ class Season
     #[Groups(['season:read', 'season:write'])]
     private ?int $maxStay = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['season:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['season:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 

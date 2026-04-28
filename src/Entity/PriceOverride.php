@@ -33,10 +33,10 @@ class PriceOverride
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $label = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?Uuid

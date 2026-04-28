@@ -28,7 +28,7 @@
 - [x] Ajouter contrainte EXCLUDE USING gist sur booking (double-booking prevention)
 - [x] Ajouter index manquants (booking pending/expiry, season lodging/dates, blocked_date lodging/dates)
 - [x] Ajouter contraintes uniques manquantes (price_override lodging+date, booking.reference, host_legal_identifier profile+type+country)
-- [ ] Migrer timestamps → TIMESTAMPTZ
+- [x] Migrer timestamps → TIMESTAMPTZ
 - [x] Ajouter onDelete strategies sur les FK
 - [x] Fix cascade strategies (Lodging→Season, Lodging→PriceOverride)
 

@@ -152,11 +152,11 @@ class Lodging
     #[Groups(['lodging:read'])]
     private ?bool $isActive = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['lodging:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['lodging:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 

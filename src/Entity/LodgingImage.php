@@ -29,7 +29,7 @@ class LodgingImage
     #[ORM\Column]
     private ?int $position = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?Uuid

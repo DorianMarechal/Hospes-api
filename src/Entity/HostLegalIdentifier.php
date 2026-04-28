@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\HostLegalIdentifierRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
@@ -32,10 +33,10 @@ class HostLegalIdentifier
     #[ORM\Column]
     private ?bool $isVerified = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $verifiedAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?Uuid
