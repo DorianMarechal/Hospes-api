@@ -12,6 +12,7 @@ use App\Enum\CancellationPolicy;
 use App\Enum\LodgingType;
 use App\Repository\LodgingRepository;
 use App\State\LodgingProcessor;
+use App\State\MyLodgingsProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -25,6 +26,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(),
         new Get(),
+        new GetCollection(
+            uriTemplate: '/me/lodgings',
+            security: "is_granted('ROLE_HOST')",
+            provider: MyLodgingsProvider::class,
+        ),
         new Post(
             security: "is_granted('ROLE_HOST')",
             processor: LodgingProcessor::class

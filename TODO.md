@@ -63,11 +63,11 @@ _(voir sections numerotees ci-dessous)_
 - [x] POST /api/auth/login (JWT LexikJWT)
 - [x] GET /api/auth/me
 - [x] PUT /api/auth/me/host-profile
-- [ ] POST /api/auth/refresh
-- [ ] PUT /api/auth/me (modifier profil)
-- [ ] PUT /api/auth/me/password
-- [ ] POST /api/auth/forgot-password
-- [ ] POST /api/auth/reset-password
+- [x] POST /api/auth/refresh (gesdinet/jwt-refresh-token-bundle)
+- [x] PUT /api/auth/me (modifier profil)
+- [x] PUT /api/auth/me/password
+- [x] POST /api/auth/forgot-password
+- [x] POST /api/auth/reset-password
 
 ## 2. Logements (12 endpoints)
 
@@ -77,7 +77,7 @@ _(voir sections numerotees ci-dessous)_
 - [x] PATCH /api/lodgings/{id}
 - [x] DELETE /api/lodgings/{id}
 - [x] LodgingVoter (VIEW, EDIT, DELETE)
-- [ ] GET /api/me/lodgings (mes logements)
+- [x] GET /api/me/lodgings (mes logements)
 - [ ] POST /api/lodgings/{id}/images
 - [ ] PUT /api/lodging-images/{id}
 - [ ] DELETE /api/lodging-images/{id}
@@ -104,9 +104,9 @@ _(voir sections numerotees ci-dessous)_
 ## 4. Disponibilite (3 endpoints)
 
 - [x] AvailabilityResolver (isAvailable + validateStayDuration)
-- [ ] GET /api/availability (recherche agregee)
-- [ ] GET /api/lodgings/{id}/availability?checkin=&checkout=
-- [ ] GET /api/lodgings/{id}/calendar?month=YYYY-MM
+- [x] GET /api/availability (recherche agregee)
+- [x] GET /api/lodgings/{id}/availability?checkin=&checkout=
+- [x] GET /api/lodgings/{id}/calendar?month=YYYY-MM
 
 ## 5. Blocage de dates (3 endpoints)
 
@@ -141,7 +141,7 @@ _(voir sections numerotees ci-dessous)_
 - [x] GET /api/bookings/{id}/history
 - [x] POST /api/lodgings/{id}/quote (devis)
 - [x] BookingReferenceGenerator
-- [ ] PendingBookingCleaner (cron + lazy check)
+- [x] PendingBookingCleaner (cron + lazy check)
 - [x] BookingAccessVoter
 
 ## 8. Services metier
@@ -267,4 +267,4 @@ _(voir sections numerotees ci-dessous)_
 - [x] Makefile
 - [ ] GitHub Actions CI (lint -> phpstan -> unit -> integration -> functional)
 - [ ] Contrainte EXCLUDE USING gist (btree_gist) sur booking
-- [ ] Cron PendingBookingCleaner
+- [x] Cron PendingBookingCleaner (app:bookings:clean-expired)
