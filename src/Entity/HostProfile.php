@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Enum\PaymentProvider;
 use App\Repository\HostProfileRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -60,6 +61,18 @@ class HostProfile
     #[ORM\Column(length: 50)]
     #[Groups(['host-profile:read'])]
     private ?string $timezone = null;
+
+    #[ORM\Column(enumType: PaymentProvider::class, nullable: true)]
+    #[Groups(['host-profile:read'])]
+    private ?PaymentProvider $paymentProvider = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['host-profile:read'])]
+    private ?string $paymentProviderAccountId = null;
+
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    #[Groups(['host-profile:read'])]
+    private ?\DateTimeImmutable $paymentProviderOnboardedAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['host-profile:read'])]
@@ -196,6 +209,42 @@ class HostProfile
     public function setTimezone(string $timezone): static
     {
         $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    public function getPaymentProvider(): ?PaymentProvider
+    {
+        return $this->paymentProvider;
+    }
+
+    public function setPaymentProvider(?PaymentProvider $paymentProvider): static
+    {
+        $this->paymentProvider = $paymentProvider;
+
+        return $this;
+    }
+
+    public function getPaymentProviderAccountId(): ?string
+    {
+        return $this->paymentProviderAccountId;
+    }
+
+    public function setPaymentProviderAccountId(?string $paymentProviderAccountId): static
+    {
+        $this->paymentProviderAccountId = $paymentProviderAccountId;
+
+        return $this;
+    }
+
+    public function getPaymentProviderOnboardedAt(): ?\DateTimeImmutable
+    {
+        return $this->paymentProviderOnboardedAt;
+    }
+
+    public function setPaymentProviderOnboardedAt(?\DateTimeImmutable $paymentProviderOnboardedAt): static
+    {
+        $this->paymentProviderOnboardedAt = $paymentProviderOnboardedAt;
 
         return $this;
     }

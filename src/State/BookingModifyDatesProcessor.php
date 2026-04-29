@@ -10,6 +10,7 @@ use App\Enum\BookingStatus;
 use App\Repository\BlockedDateRepository;
 use App\Repository\BookingRepository;
 use App\Service\AvailabilityResolver;
+use App\Service\NotificationDispatcher;
 use App\Service\OrphanProtectionChecker;
 use App\Service\PriceCalculator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,7 @@ class BookingModifyDatesProcessor implements ProcessorInterface
         private OrphanProtectionChecker $orphanProtectionChecker,
         private PriceCalculator $priceCalculator,
         private Security $security,
+        private NotificationDispatcher $notificationDispatcher,
     ) {
     }
 
@@ -107,6 +109,7 @@ class BookingModifyDatesProcessor implements ProcessorInterface
         $history->setCreatedAt($now);
 
         $this->entityManager->persist($history);
+        $this->notificationDispatcher->bookingModified($booking);
         $this->entityManager->flush();
 
         return $booking;

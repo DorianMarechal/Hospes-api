@@ -185,9 +185,20 @@ class Booking
     #[Groups(['booking:read'])]
     private Collection $bookingNights;
 
+    /**
+     * @var Collection<int, Payment>
+     */
+    #[ORM\OneToMany(targetEntity: Payment::class, mappedBy: 'booking')]
+    private Collection $payments;
+
+    #[ORM\OneToOne(mappedBy: 'booking', cascade: ['persist'])]
+    #[Groups(['booking:read'])]
+    private ?Deposit $deposit = null;
+
     public function __construct()
     {
         $this->bookingNights = new ArrayCollection();
+        $this->payments = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -449,6 +460,39 @@ class Booking
                 $bookingNight->setBooking(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Payment>
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): static
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments->add($payment);
+            $payment->setBooking($this);
+        }
+
+        return $this;
+    }
+
+    public function getDeposit(): ?Deposit
+    {
+        return $this->deposit;
+    }
+
+    public function setDeposit(?Deposit $deposit): static
+    {
+        if (null !== $deposit && $deposit->getBooking() !== $this) {
+            $deposit->setBooking($this);
+        }
+        $this->deposit = $deposit;
 
         return $this;
     }

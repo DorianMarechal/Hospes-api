@@ -7,6 +7,8 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Booking;
 use App\Entity\BookingStatusHistory;
 use App\Enum\BookingStatus;
+use App\Service\DepositManager;
+use App\Service\NotificationDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,6 +18,8 @@ class BookingConfirmProcessor implements ProcessorInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Security $security,
+        private NotificationDispatcher $notificationDispatcher,
+        private DepositManager $depositManager,
     ) {
     }
 
@@ -49,6 +53,10 @@ class BookingConfirmProcessor implements ProcessorInterface
         $data->setUpdatedAt($now);
 
         $this->entityManager->persist($history);
+
+        $this->depositManager->createFromBooking($data);
+        $this->notificationDispatcher->bookingConfirmed($data);
+
         $this->entityManager->flush();
 
         return $data;

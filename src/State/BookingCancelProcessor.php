@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Entity\BookingStatusHistory;
 use App\Enum\BookingStatus;
 use App\Repository\BookingRepository;
+use App\Service\NotificationDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -18,6 +19,7 @@ class BookingCancelProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private BookingRepository $bookingRepository,
         private Security $security,
+        private NotificationDispatcher $notificationDispatcher,
     ) {
     }
 
@@ -51,6 +53,7 @@ class BookingCancelProcessor implements ProcessorInterface
         $booking->setUpdatedAt($now);
 
         $this->entityManager->persist($history);
+        $this->notificationDispatcher->bookingCancelled($booking);
         $this->entityManager->flush();
 
         return $booking;

@@ -1,4 +1,4 @@
-# Hospes API — Roadmap V1
+# Hospes API — Roadmap
 
 ## Legende
 
@@ -7,263 +7,184 @@
 
 ---
 
-## Phase 0 — Correctifs critiques (bloquants)
+# V1 — COMPLETE
 
-- [x] Fix 5 erreurs mappedBy Doctrine (Lodging→seasons/blockedDates/priceOverrides, User→bookings, HostProfile→hostLegalIdentifiers)
-- [x] Fix Lodging.name default 'null' (string) → null
-- [x] Fix NPE LodgingProcessor ($hostProfile->getId() sur null)
-- [x] Fix NPE SeasonProcessor ($lodging->getHost()->getId() sur null)
+<details>
+<summary>Phase 0 — Correctifs critiques (12/12)</summary>
+
+- [x] Fix 5 erreurs mappedBy Doctrine
+- [x] Fix Lodging.name default 'null' → null
+- [x] Fix NPE LodgingProcessor
+- [x] Fix NPE SeasonProcessor
 - [x] Fix $isNew inversé dans HostProfileProcessor
-- [x] Retirer orphanRemoval: true sur Lodging→bookings et HostProfile→lodgings
-- [x] Ajouter operations: [] sur Booking, BlockedDate, BookingNight, PriceOverride (bloquer CRUD par defaut)
-- [x] Reactiver IS_AUTHENTICATED_FULLY dans security.yaml (+ whitelist register/login)
-- [x] Fix ownership check dans SeasonCollectionProvider
-- [x] Fix variable $perciste dans LodgingProcessor
-- [x] Fix gethostProfile/sethostProfile casing dans HostLegalIdentifier
-- [x] Fix ValidPhoneNumberValidator return type void
+- [x] Retirer orphanRemoval sur Lodging→bookings et HostProfile→lodgings
+- [x] Ajouter operations: [] sur entites internes
+- [x] Reactiver IS_AUTHENTICATED_FULLY + whitelist
+- [x] Fix ownership check SeasonCollectionProvider
+- [x] Fix variable $perciste LodgingProcessor
+- [x] Fix casing HostLegalIdentifier
+- [x] Fix ValidPhoneNumberValidator return type
 
-## Phase 1 — Fondations DB (migration majeure)
+</details>
 
-- [x] Migrer tous les PKs INT → UUID v7
-- [x] Ajouter contrainte EXCLUDE USING gist sur booking (double-booking prevention)
-- [x] Ajouter index manquants (booking pending/expiry, season lodging/dates, blocked_date lodging/dates)
-- [x] Ajouter contraintes uniques manquantes (price_override lodging+date, booking.reference, host_legal_identifier profile+type+country)
-- [x] Migrer timestamps → TIMESTAMPTZ
-- [x] Ajouter onDelete strategies sur les FK
-- [x] Fix cascade strategies (Lodging→Season, Lodging→PriceOverride)
+<details>
+<summary>Phase 1 — Fondations DB (7/7)</summary>
 
-## Phase 2 — Securite et validation
+- [x] UUID v7 sur tous les PKs
+- [x] Contrainte EXCLUDE USING gist (btree_gist)
+- [x] Index manquants
+- [x] Contraintes uniques manquantes
+- [x] Timestamps → TIMESTAMPTZ
+- [x] onDelete strategies sur FK
+- [x] Fix cascade strategies
 
-- [x] Implementer UserChecker (verifier isActive)
-- [x] Ajouter Assert constraints sur Lodging et Season (prix positifs, capacity, min/maxStay)
-- [x] Ajouter rate limiting sur login (symfony/rate-limiter)
-- [x] Configurer JWT TTL explicite dans lexik_jwt_authentication.yaml
+</details>
+
+<details>
+<summary>Phase 2 — Securite et validation (7/8)</summary>
+
+- [x] UserChecker (verifier isActive)
+- [x] Assert constraints (prix, capacity, min/maxStay)
+- [x] Rate limiting login
+- [x] JWT TTL explicite
+- [x] Fix role hierarchy LodgingVoter
+- [x] Swagger/docs desactive en prod
+- [x] Catch UniqueConstraintViolationException RegisterProcessor
 - [ ] Rotater secrets (APP_SECRET, JWT passphrase) + nettoyer git history
-- [x] Fix role hierarchy dans LodgingVoter (utiliser RoleHierarchyInterface au lieu de in_array)
-- [x] Desactiver Swagger/docs en prod
-- [x] Catch UniqueConstraintViolationException dans RegisterProcessor
 
-## Phase 3 — Reprendre le developpement (roadmap V1)
+</details>
 
-_(voir sections numerotees ci-dessous)_
+<details>
+<summary>Phase 3 — Endpoints (78 endpoints, 8 services metier)</summary>
 
-## Phase 4 — Tests et CI
+- [x] Auth (8 endpoints)
+- [x] Logements (12 endpoints + images + amenities + isActive filter)
+- [x] Saisons / Tarification (4 endpoints + PriceOverride CRUD)
+- [x] Disponibilite (3 endpoints + AvailabilityResolver)
+- [x] Blocage de dates (3 endpoints)
+- [x] Sync iCal (5 endpoints + IcalSyncService)
+- [x] Reservations (11 endpoints + BookingReferenceGenerator + PendingBookingCleaner)
+- [x] Paiements (4 endpoints + PaymentProvider config)
+- [x] Cautions (3 endpoints + DepositManager)
+- [x] Staff (7 endpoints + StaffVoter)
+- [x] Messagerie (5 endpoints)
+- [x] Favoris (3 endpoints)
+- [x] Avis (5 endpoints + ReviewEligibilityValidator)
+- [x] Notifications (3 endpoints + NotificationDispatcher)
+- [x] Recherche (1 endpoint)
+- [x] Statistiques (2 endpoints + StatisticsCalculator)
+- [x] Admin (10 endpoints)
+- [x] Services metier : CancellationPolicyResolver, DepositManager, NotificationDispatcher
 
-- [ ] Creer factories Foundry pour toutes les entites
-- [ ] Tests unitaires manquants (PriceCalculator, OrphanProtection, StaffVoter, BookingAccessVoter, CancellationPolicyResolver)
-- [ ] Tests integration PostgreSQL
-- [ ] Tests fonctionnels API (auth, lodging, season, booking)
-- [ ] GitHub Actions CI pipeline (lint → phpstan → unit → integration → functional)
+</details>
+
+<details>
+<summary>Phase 4 — Tests (82 unit + 29 functional + 7 integration)</summary>
+
+- [x] Factories Foundry (User, HostProfile, Lodging, Season, Booking, BlockedDate)
+- [x] Trait ApiTestHelper
+- [x] Tests unitaires (LodgingVoter, AvailabilityResolver, PriceCalculator, OrphanProtection, StaffVoter, BookingAccessVoter, SeasonOverlapValidator, CancellationPolicyResolver, DepositManager)
+- [x] Tests integration PostgreSQL (EXCLUDE gist, unique constraints, cascades)
+- [x] Tests fonctionnels (Auth, Lodging, Season, Booking, BlockedDate, Staff)
+- [x] GitHub Actions CI (lint → phpstan → unit → functional)
+
+</details>
 
 ---
 
-## 1. Authentification (8 endpoints)
+# V2 — A FAIRE
 
-- [x] POST /api/auth/register
-- [x] POST /api/auth/login (JWT LexikJWT)
-- [x] GET /api/auth/me
-- [x] PUT /api/auth/me/host-profile
-- [x] POST /api/auth/refresh (gesdinet/jwt-refresh-token-bundle)
-- [x] PUT /api/auth/me (modifier profil)
-- [x] PUT /api/auth/me/password
-- [x] POST /api/auth/forgot-password
-- [x] POST /api/auth/reset-password
+## Phase 5 — Securite & ops
 
-## 2. Logements (12 endpoints)
+- [ ] Rotater secrets (APP_SECRET, JWT passphrase) + nettoyer git history
+- [ ] CORS configuration pour frontend
+- [ ] Helmet-style security headers (Content-Security-Policy, X-Frame-Options)
+- [ ] Audit log des actions admin (qui a fait quoi, quand)
+- [ ] Rate limiting global par IP (pas seulement login)
+- [ ] Monitoring : health check endpoint (/api/health)
 
-- [x] POST /api/lodgings
-- [x] GET /api/lodgings (collection)
-- [x] GET /api/lodgings/{id}
-- [x] PATCH /api/lodgings/{id}
-- [x] DELETE /api/lodgings/{id}
-- [x] LodgingVoter (VIEW, EDIT, DELETE)
-- [x] GET /api/me/lodgings (mes logements)
-- [x] POST /api/lodgings/{id}/images
-- [x] PUT /api/lodging-images/{id}
-- [x] DELETE /api/lodging-images/{id}
-- [ ] Doctrine Extension filtrage isActive (public ne voit que les actifs)
+## Phase 6 — Integration paiement Stripe Connect
 
-### Equipements
+- [ ] Installer stripe/stripe-php
+- [ ] Implementer le flux OAuth Stripe Connect (redirect + callback)
+- [ ] Stocker stripe_account_id sur HostProfile (remplacer les placeholders)
+- [ ] Creer PaymentIntent via Stripe API dans PaymentCreateProcessor
+- [ ] Webhook Stripe : payment_intent.succeeded → mettre Payment.status = succeeded
+- [ ] Webhook Stripe : payment_intent.payment_failed → mettre Payment.status = failed
+- [ ] Remboursement automatique via Stripe Refund API dans PaymentRefundProcessor
+- [ ] Remboursement auto sur annulation selon CancellationPolicyResolver
+- [ ] Dashboard paiements Stripe Connect pour les hotes (lien redirect)
 
-- [x] Entite Amenity + LodgingAmenity
-- [x] GET /api/amenities
-- [x] POST /api/lodgings/{id}/amenities
-- [x] DELETE /api/lodgings/{id}/amenities/{amenityId}
+## Phase 7 — Double validation des modifications de reservation
 
-## 3. Saisons / Tarification (4 endpoints)
+- [ ] Entite BookingModificationRequest (proposed dates, proposed price, status)
+- [ ] POST /api/bookings/{id}/modification-request (proposer modif)
+- [ ] POST /api/booking-modifications/{id}/accept
+- [ ] POST /api/booking-modifications/{id}/reject
+- [ ] Expiration auto des propositions (TTL configurable)
+- [ ] Notifications aux deux parties (propose, accepte, refuse, expire)
+- [ ] Recalcul prix uniquement apres acceptation des deux parties
 
-- [x] Entite Season
-- [x] Entite PriceOverride
-- [x] POST /api/lodgings/{id}/seasons (+ validation non-chevauchement)
-- [x] GET /api/lodgings/{id}/seasons
-- [x] PUT /api/seasons/{id}
-- [x] DELETE /api/seasons/{id}
-- [x] SeasonOverlapValidator
-- [x] Endpoints PriceOverride (CRUD)
+## Phase 8 — Notifications temps reel
 
-## 4. Disponibilite (3 endpoints)
+- [ ] Installer Mercure (symfony/mercure-bundle)
+- [ ] Hub Mercure (Docker ou managed)
+- [ ] Publier les notifications sur un topic user-specific
+- [ ] Publier les messages de conversation en temps reel
+- [ ] SSE/WebSocket endpoint pour le frontend
+- [ ] Fallback : garder le modele pull pour les clients sans WebSocket
 
-- [x] AvailabilityResolver (isAvailable + validateStayDuration)
-- [x] GET /api/availability (recherche agregee)
-- [x] GET /api/lodgings/{id}/availability?checkin=&checkout=
-- [x] GET /api/lodgings/{id}/calendar?month=YYYY-MM
+## Phase 9 — Recherche avancee
 
-## 5. Blocage de dates (3 endpoints)
+- [ ] Recherche geospatiale (PostGIS extension, ST_DWithin)
+- [ ] Filtres composes : prix min/max, equipements, note minimale
+- [ ] Tri par pertinence (distance + note + prix)
+- [ ] Pagination cursor-based pour les gros resultats
+- [ ] Cache des resultats de recherche (Redis/Varnish)
 
-- [x] Entite BlockedDate
-- [x] POST /api/lodgings/{id}/blocked-dates (+ validation pas de resa sur ces dates)
-- [x] GET /api/lodgings/{id}/blocked-dates
-- [x] DELETE /api/blocked-dates/{id}
+## Phase 10 — RGPD & conformite
 
-## 6. Sync iCal (5 endpoints)
+- [ ] GET /api/me/data-export (export donnees personnelles JSON)
+- [ ] DELETE /api/me/account (anonymisation : pseudonymiser les donnees liees aux resas passees)
+- [ ] Consentement explicite a l'inscription (champ + date)
+- [ ] Politique de retention des donnees (cron suppression comptes inactifs > 3 ans)
+- [ ] Log des consentements
 
-- [x] Entite IcalFeed
-- [x] POST /api/lodgings/{id}/ical-feeds
-- [x] GET /api/lodgings/{id}/ical-feeds
-- [x] DELETE /api/ical-feeds/{id}
-- [x] POST /api/ical-feeds/{id}/sync
-- [x] GET /api/lodgings/{id}/ical-export.ics
-- [x] IcalSyncService
+## Phase 11 — Performance & scalabilite
 
-## 7. Reservations (11 endpoints)
+- [ ] Cache HTTP (Varnish/CDN) pour endpoints publics (lodgings, availability, reviews)
+- [ ] Redis pour rate limiting et sessions
+- [ ] Optimisation queries N+1 (Doctrine eager loading sur endpoints critiques)
+- [ ] Pagination keyset sur collections volumineuses (bookings, notifications)
+- [ ] Async : Symfony Messenger pour NotificationDispatcher + emails
+- [ ] Cron iCal sync periodique (toutes les 15 min)
 
-- [x] Entite Booking + BookingNight
-- [x] Enum BookingStatus
-- [x] POST /api/bookings (pending + TTL 15 min)
-- [x] GET /api/bookings/{id}
-- [x] GET /api/bookings?reference={ref}
-- [x] PUT /api/bookings/{id}/dates (modif dates + recalcul prix)
-- [x] POST /api/bookings/{id}/confirm
-- [x] POST /api/bookings/{id}/cancel (+ politique annulation)
-- [x] GET /api/me/bookings
-- [x] GET /api/lodgings/{id}/bookings
-- [x] GET /api/bookings/{id}/nights
-- [x] GET /api/bookings/{id}/history
-- [x] POST /api/lodgings/{id}/quote (devis)
-- [x] BookingReferenceGenerator
-- [x] PendingBookingCleaner (cron + lazy check)
-- [x] BookingAccessVoter
+## Phase 12 — Emails transactionnels
 
-## 8. Services metier
+- [ ] Template emails (Symfony Mailer + Twig)
+- [ ] Email confirmation de reservation (customer)
+- [ ] Email notification nouvelle reservation (hote)
+- [ ] Email annulation (customer + hote)
+- [ ] Email invitation staff
+- [ ] Email reinitialisation mot de passe (deja le flow, ajouter le vrai envoi)
+- [ ] Email rappel check-in J-1
+- [ ] Email demande d'avis apres checkout J+1
+- [ ] Provider : Resend, Postmark ou SES
 
-- [x] AvailabilityResolver
-- [x] LegalIdentifierValidator
-- [x] PriceCalculator (nuit par nuit, saisons, weekend)
-- [x] OrphanProtectionChecker (AR-14 a AR-17)
-- [ ] CancellationPolicyResolver
-- [ ] DepositManager
-- [ ] NotificationDispatcher
-- [x] StatisticsCalculator
+## Phase 13 — Tests supplementaires
 
-## 9. Paiements (4 endpoints)
+- [ ] Augmenter couverture tests fonctionnels (~110 cibles selon le cahier des charges)
+- [ ] Tests Stripe webhooks (mock)
+- [ ] Tests Mercure (mock hub)
+- [ ] Tests de charge (k6 ou Artillery)
+- [ ] Tests de securite automatises (OWASP ZAP)
 
-- [ ] Entite Payment
-- [ ] POST /api/bookings/{id}/payments
-- [ ] GET /api/bookings/{id}/payments
-- [ ] GET /api/me/payments
-- [ ] POST /api/payments/{id}/refund
+## Phase 14 — Deploiement
 
-## 10. Cautions (3 endpoints)
-
-- [ ] Entite Deposit
-- [ ] GET /api/bookings/{id}/deposit
-- [ ] POST /api/bookings/{id}/deposit/retain
-- [ ] POST /api/bookings/{id}/deposit/release
-
-## 11. Staff (7 endpoints)
-
-- [x] Entites StaffAssignment, StaffPermission, StaffLodging
-- [x] POST /api/me/staff (invitation)
-- [x] GET /api/me/staff
-- [x] POST /api/staff-invitations/{token}/accept
-- [x] PUT /api/staff-assignments/{id}/permissions
-- [x] PUT /api/staff-assignments/{id}/lodgings
-- [x] POST /api/staff-assignments/{id}/revoke
-- [x] GET /api/me/permissions
-- [x] StaffVoter
-
-## 12. Messagerie (5 endpoints)
-
-- [x] Entites Conversation, Message
-- [x] POST /api/lodgings/{id}/conversations
-- [x] GET /api/me/conversations
-- [x] GET /api/conversations/{id}/messages
-- [x] POST /api/conversations/{id}/messages
-- [x] POST /api/conversations/{id}/read
-
-## 13. Favoris (3 endpoints)
-
-- [x] Entite Favorite
-- [x] POST /api/me/favorites
-- [x] GET /api/me/favorites
-- [x] DELETE /api/favorites/{id}
-
-## 14. Avis (5 endpoints)
-
-- [x] Entite Review
-- [x] POST /api/bookings/{id}/review (+ validation apres sejour)
-- [x] GET /api/lodgings/{id}/reviews
-- [x] GET /api/me/reviews
-- [x] POST /api/reviews/{id}/response
-- [x] DELETE /api/reviews/{id} (admin)
-- [x] ReviewEligibilityValidator (in ReviewProcessor)
-
-## 15. Notifications (3 endpoints)
-
-- [x] Entite Notification
-- [x] GET /api/me/notifications
-- [x] POST /api/notifications/{id}/read
-- [x] POST /api/me/notifications/read-all
-
-## 16. Recherche (1 endpoint)
-
-- [x] GET /api/availability (recherche agregee — remplace search/lodgings)
-
-## 17. Statistiques (2 endpoints)
-
-- [x] GET /api/me/stats (CA, taux occupation, RevPAR)
-- [x] GET /api/me/lodgings/{id}/stats
-
-## 18. Admin (8 endpoints)
-
-- [x] GET /api/admin/users
-- [x] GET /api/admin/users/{id}
-- [x] POST /api/admin/users/{id}/deactivate
-- [x] POST /api/admin/users/{id}/reactivate
-- [x] GET /api/admin/lodgings
-- [x] DELETE /api/admin/lodgings/{id}
-- [x] GET /api/admin/bookings
-- [x] GET /api/admin/reviews
-- [x] DELETE /api/admin/reviews/{id}
-- [x] GET /api/admin/stats
-
-## 19. Tests
-
-- [x] PHPUnit configure (phpunit.dist.xml)
-- [x] Tests unitaires LodgingVoter (9 tests)
-- [x] Tests unitaires AvailabilityResolver (12 tests)
-- [x] Tests unitaires PriceCalculator (12 tests)
-- [x] Tests unitaires OrphanProtectionChecker (9 tests)
-- [ ] Tests unitaires StaffVoter
-- [ ] Tests unitaires BookingAccessVoter
-- [ ] Tests unitaires SeasonOverlapValidator
-- [ ] Tests unitaires CancellationPolicyResolver
-- [ ] Tests unitaires DepositManager
-- [ ] Tests integration (PostgreSQL, btree_gist)
-- [ ] Tests fonctionnels Auth
-- [ ] Tests fonctionnels Lodging
-- [ ] Tests fonctionnels Season
-- [ ] Tests fonctionnels Booking
-- [ ] Tests fonctionnels BlockedDate
-- [ ] Tests fonctionnels Staff
-- [ ] Trait ApiTestHelper (loginAs, assertJsonResponse, createBookingFixture)
-
-## 20. Infra / CI
-
-- [x] Docker (PostgreSQL, PHP-FPM, Caddy)
-- [x] PHPStan niveau 6
-- [x] PHP-CS-Fixer
-- [x] Makefile
-- [ ] GitHub Actions CI (lint -> phpstan -> unit -> integration -> functional)
-- [ ] Contrainte EXCLUDE USING gist (btree_gist) sur booking
-- [x] Cron PendingBookingCleaner (app:bookings:clean-expired)
+- [ ] Dockerfile production (multi-stage, PHP-FPM + Caddy)
+- [ ] Docker Compose production (PostgreSQL, Redis, Mercure)
+- [ ] Terraform / IaC pour infra cloud (Railway, Fly.io ou AWS)
+- [ ] Secrets management (Vault ou AWS SSM)
+- [ ] CD pipeline (deploy on merge to main)
+- [ ] Backup PostgreSQL automatise
+- [ ] Monitoring (Sentry PHP SDK + uptime)
