@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\AuditLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -14,6 +15,7 @@ class AdminReactivateUserProcessor implements ProcessorInterface
     public function __construct(
         private UserRepository $userRepository,
         private EntityManagerInterface $em,
+        private AuditLogger $auditLogger,
     ) {
     }
 
@@ -26,6 +28,7 @@ class AdminReactivateUserProcessor implements ProcessorInterface
 
         $user->setIsActive(true);
         $user->setUpdatedAt(new \DateTimeImmutable());
+        $this->auditLogger->log('reactivate_user', 'User', $user->getId(), ['email' => $user->getEmail()]);
         $this->em->flush();
 
         return $user;

@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\AuditLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -17,6 +18,7 @@ class AdminDeactivateUserProcessor implements ProcessorInterface
         private UserRepository $userRepository,
         private EntityManagerInterface $em,
         private Security $security,
+        private AuditLogger $auditLogger,
     ) {
     }
 
@@ -35,6 +37,7 @@ class AdminDeactivateUserProcessor implements ProcessorInterface
 
         $user->setIsActive(false);
         $user->setUpdatedAt(new \DateTimeImmutable());
+        $this->auditLogger->log('deactivate_user', 'User', $user->getId(), ['email' => $user->getEmail()]);
         $this->em->flush();
 
         return $user;

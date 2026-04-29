@@ -97,11 +97,11 @@
 ## Phase 5 — Securite & ops
 
 - [ ] Rotater secrets (APP_SECRET, JWT passphrase) + nettoyer git history
-- [ ] CORS configuration pour frontend
-- [ ] Helmet-style security headers (Content-Security-Policy, X-Frame-Options)
-- [ ] Audit log des actions admin (qui a fait quoi, quand)
-- [ ] Rate limiting global par IP (pas seulement login)
-- [ ] Monitoring : health check endpoint (/api/health)
+- [x] CORS configuration pour frontend
+- [x] Helmet-style security headers (Content-Security-Policy, X-Frame-Options)
+- [x] Audit log des actions admin (qui a fait quoi, quand)
+- [x] Rate limiting global par IP (pas seulement login)
+- [x] Monitoring : health check endpoint (/api/health)
 
 ## Phase 6 — Integration paiement Stripe Connect
 

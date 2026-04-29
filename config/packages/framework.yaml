@@ -13,6 +13,10 @@ framework:
             policy: sliding_window
             limit: 5
             interval: '1 minute'
+        api_global:
+            policy: sliding_window
+            limit: 60
+            interval: '1 minute'
 
 when@test:
     framework:
@@ -23,4 +27,8 @@ when@test:
             login:
                 policy: sliding_window
                 limit: 1000
+                interval: '1 minute'
+            api_global:
+                policy: sliding_window
+                limit: 10000
                 interval: '1 minute'
