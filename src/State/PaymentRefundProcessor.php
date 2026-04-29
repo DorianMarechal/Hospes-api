@@ -6,8 +6,10 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\RefundPaymentRequest;
 use App\Entity\Payment;
+use App\Enum\PaymentProvider;
 use App\Enum\PaymentStatus;
 use App\Enum\PaymentType;
+use App\Payment\PaymentGatewayFactory;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -22,6 +24,7 @@ class PaymentRefundProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private Security $security,
         private RoleHierarchyInterface $roleHierarchy,
+        private PaymentGatewayFactory $gatewayFactory,
     ) {
     }
 
@@ -52,11 +55,18 @@ class PaymentRefundProcessor implements ProcessorInterface
 
         $now = new \DateTimeImmutable();
 
-        // Mark original payment as refunded
+        // Call provider refund API
+        $provider = PaymentProvider::tryFrom($payment->getProvider() ?? '');
+        $refundTransactionId = null;
+        if ($provider && $payment->getProviderTransactionId()) {
+            $connectedAccountId = $payment->getBooking()?->getLodging()?->getHost()?->getPaymentProviderAccountId() ?? '';
+            $gateway = $this->gatewayFactory->get($provider);
+            $refundTransactionId = $gateway->refund($payment->getProviderTransactionId(), $payment->getAmount(), $connectedAccountId);
+        }
+
         $payment->setStatus(PaymentStatus::REFUNDED);
         $payment->setUpdatedAt($now);
 
-        // Create refund payment
         $refund = new Payment();
         $refund->setBooking($payment->getBooking());
         $refund->setAmount($payment->getAmount());
@@ -64,6 +74,7 @@ class PaymentRefundProcessor implements ProcessorInterface
         $refund->setMethod($payment->getMethod());
         $refund->setStatus(PaymentStatus::SUCCEEDED);
         $refund->setProvider($payment->getProvider());
+        $refund->setProviderTransactionId($refundTransactionId);
         $refund->setRefundReason($data->reason);
         $refund->setCreatedAt($now);
 

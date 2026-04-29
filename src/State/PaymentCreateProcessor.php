@@ -9,6 +9,7 @@ use App\Entity\Payment;
 use App\Enum\BookingStatus;
 use App\Enum\PaymentStatus;
 use App\Enum\PaymentType;
+use App\Payment\PaymentGatewayFactory;
 use App\Repository\BookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -21,6 +22,7 @@ class PaymentCreateProcessor implements ProcessorInterface
         private BookingRepository $bookingRepository,
         private EntityManagerInterface $entityManager,
         private Security $security,
+        private PaymentGatewayFactory $gatewayFactory,
     ) {
     }
 
@@ -45,9 +47,17 @@ class PaymentCreateProcessor implements ProcessorInterface
         }
 
         $hostProfile = $booking->getLodging()?->getHost();
-        if (null === $hostProfile || null === $hostProfile->getPaymentProviderAccountId()) {
+        if (null === $hostProfile || null === $hostProfile->getPaymentProviderAccountId() || null === $hostProfile->getPaymentProvider()) {
             throw new HttpException(422, 'The host has not configured a payment provider');
         }
+
+        $gateway = $this->gatewayFactory->get($hostProfile->getPaymentProvider());
+        $result = $gateway->createPayment(
+            $data->amount,
+            'eur',
+            $hostProfile->getPaymentProviderAccountId(),
+            'Booking '.$booking->getReference(),
+        );
 
         $now = new \DateTimeImmutable();
 
@@ -57,8 +67,8 @@ class PaymentCreateProcessor implements ProcessorInterface
         $payment->setType(PaymentType::BOOKING);
         $payment->setMethod($data->method);
         $payment->setStatus(PaymentStatus::PENDING);
-        $payment->setProvider($hostProfile->getPaymentProvider()?->value);
-        $payment->setProviderTransactionId($data->providerTransactionId);
+        $payment->setProvider($hostProfile->getPaymentProvider()->value);
+        $payment->setProviderTransactionId($result['transactionId']);
         $payment->setCreatedAt($now);
 
         $this->entityManager->persist($payment);

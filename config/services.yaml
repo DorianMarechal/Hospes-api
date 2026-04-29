@@ -19,5 +19,24 @@ services:
     App\:
         resource: '../src/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Payment gateways
+    App\Payment\StripeGateway:
+        arguments:
+            $stripeSecretKey: '%env(STRIPE_SECRET_KEY)%'
+            $stripeWebhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
+            $stripeClientId: '%env(STRIPE_CLIENT_ID)%'
+            $appBaseUrl: '%env(APP_BASE_URL)%'
+
+    App\Payment\PayPalGateway:
+        arguments:
+            $paypalClientId: '%env(PAYPAL_CLIENT_ID)%'
+            $paypalClientSecret: '%env(PAYPAL_CLIENT_SECRET)%'
+            $paypalWebhookId: '%env(PAYPAL_WEBHOOK_ID)%'
+            $appBaseUrl: '%env(APP_BASE_URL)%'
+            $sandbox: '%env(bool:PAYPAL_SANDBOX)%'
+
+when@test:
+    services:
+        App\Payment\StubPaymentGateway: ~
+        App\Payment\StripeGateway: '@App\Payment\StubPaymentGateway'
+        App\Payment\PayPalGateway: '@App\Payment\StubPaymentGateway'

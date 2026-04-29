@@ -6,7 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\ConnectPaymentProviderRequest;
 use App\Dto\PaymentProviderResult;
-use App\Enum\PaymentProvider;
+use App\Payment\PaymentGatewayFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,6 +16,7 @@ class PaymentProviderConnectProcessor implements ProcessorInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Security $security,
+        private PaymentGatewayFactory $gatewayFactory,
     ) {
     }
 
@@ -40,8 +41,8 @@ class PaymentProviderConnectProcessor implements ProcessorInterface
 
         $this->entityManager->flush();
 
-        // Build the OAuth connect URL (placeholder — real implementation uses Stripe/PayPal SDK)
-        $connectUrl = $this->buildConnectUrl($data->provider, $hostProfile->getId()?->toRfc4122());
+        $gateway = $this->gatewayFactory->get($data->provider);
+        $connectUrl = $gateway->buildOnboardingUrl($hostProfile->getId()?->toRfc4122());
 
         $result = new PaymentProviderResult();
         $result->provider = $data->provider;
@@ -51,14 +52,5 @@ class PaymentProviderConnectProcessor implements ProcessorInterface
         $result->connectUrl = $connectUrl;
 
         return $result;
-    }
-
-    private function buildConnectUrl(PaymentProvider $provider, ?string $hostProfileId): string
-    {
-        // Placeholder URLs — will be replaced by real OAuth URLs when SDK is integrated
-        return match ($provider) {
-            PaymentProvider::STRIPE => '/api/me/payment-provider/oauth/stripe?state='.$hostProfileId,
-            PaymentProvider::PAYPAL => '/api/me/payment-provider/oauth/paypal?state='.$hostProfileId,
-        };
     }
 }

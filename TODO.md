@@ -103,17 +103,32 @@
 - [x] Rate limiting global par IP (pas seulement login)
 - [x] Monitoring : health check endpoint (/api/health)
 
-## Phase 6 — Integration paiement Stripe Connect
+## Phase 6 — Integration paiement Stripe Connect + PayPal
 
-- [ ] Installer stripe/stripe-php
-- [ ] Implementer le flux OAuth Stripe Connect (redirect + callback)
-- [ ] Stocker stripe_account_id sur HostProfile (remplacer les placeholders)
-- [ ] Creer PaymentIntent via Stripe API dans PaymentCreateProcessor
-- [ ] Webhook Stripe : payment_intent.succeeded → mettre Payment.status = succeeded
-- [ ] Webhook Stripe : payment_intent.payment_failed → mettre Payment.status = failed
-- [ ] Remboursement automatique via Stripe Refund API dans PaymentRefundProcessor
-- [ ] Remboursement auto sur annulation selon CancellationPolicyResolver
-- [ ] Dashboard paiements Stripe Connect pour les hotes (lien redirect)
+### Stripe Connect
+- [x] Installer stripe/stripe-php
+- [x] Implementer le flux OAuth Stripe Connect (redirect + callback)
+- [x] Stocker stripe_account_id sur HostProfile (remplacer les placeholders)
+- [x] Creer PaymentIntent via Stripe API dans PaymentCreateProcessor
+- [x] Webhook Stripe : payment_intent.succeeded → mettre Payment.status = succeeded
+- [x] Webhook Stripe : payment_intent.payment_failed → mettre Payment.status = failed
+- [x] Remboursement automatique via Stripe Refund API dans PaymentRefundProcessor
+- [x] Dashboard paiements Stripe Connect pour les hotes (lien redirect)
+
+### PayPal
+- [x] Installer paypal/paypal-server-sdk
+- [x] Implementer le flux OAuth PayPal pour les hotes (onboarding marchand)
+- [x] Stocker paypal_merchant_id sur HostProfile
+- [x] Creer Order via PayPal API dans PaymentCreateProcessor
+- [x] Webhook PayPal : PAYMENT.CAPTURE.COMPLETED → mettre Payment.status = succeeded
+- [x] Webhook PayPal : PAYMENT.CAPTURE.DENIED → mettre Payment.status = failed
+- [x] Remboursement automatique via PayPal Refund API dans PaymentRefundProcessor
+
+### Commun
+- [x] Interface PaymentProviderInterface (create, capture, refund, webhookVerify)
+- [x] PaymentProviderFactory pour selectionner Stripe ou PayPal selon HostProfile
+- [x] Remboursement auto sur annulation selon CancellationPolicyResolver
+- [x] Endpoint choix provider par le customer (Payment.method = card | paypal)
 
 ## Phase 7 — Double validation des modifications de reservation
 
