@@ -14,3 +14,7 @@ when@test:
             resource: '%kernel.project_dir%/tests/Factory/'
             autowire: true
             autoconfigure: true
+        App\Tests\ResetDatabase\:
+            resource: '%kernel.project_dir%/tests/ResetDatabase/'
+            autowire: true
+            autoconfigure: true

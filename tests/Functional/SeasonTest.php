@@ -41,7 +41,6 @@ class SeasonTest extends ApiTestCase
      */
     public function testCreateOverlappingSeasonReturns422(): void
     {
-        $this->markTestSkipped('Overlap check in processor needs investigation with Foundry/API Platform context isolation');
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
         $lodging = LodgingFactory::createOne(['host' => $hostProfile]);

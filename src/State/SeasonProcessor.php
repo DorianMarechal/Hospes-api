@@ -43,9 +43,6 @@ class SeasonProcessor implements ProcessorInterface
 
             $existingSeasons = $this->seasonRepository->findBy(['lodging' => $lodging]);
             foreach ($existingSeasons as $existing) {
-                if (null !== $data->getId() && $existing->getId()?->equals($data->getId())) {
-                    continue;
-                }
                 if ($data->getStartDate() < $existing->getEndDate() && $data->getEndDate() > $existing->getStartDate()) {
                     throw new HttpException(422, 'The selected dates overlap with an existing season');
                 }

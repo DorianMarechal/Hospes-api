@@ -38,6 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_HOST')",
             uriTemplate: '/lodgings/{lodgingId}/seasons',
             uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
+            read: false,
             processor: SeasonProcessor::class
         ),
         new Put(

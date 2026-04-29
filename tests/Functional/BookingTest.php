@@ -109,8 +109,8 @@ class BookingTest extends ApiTestCase
         $hostProfile = HostProfileFactory::createOne();
         $lodging = LodgingFactory::createOne(['host' => $hostProfile]);
 
-        BookingFactory::createOne(['customer' => $customer, 'lodging' => $lodging]);
-        BookingFactory::createOne(['customer' => $customer, 'lodging' => $lodging]);
+        BookingFactory::createOne(['customer' => $customer, 'lodging' => $lodging, 'checkin' => new \DateTimeImmutable('+7 days'), 'checkout' => new \DateTimeImmutable('+10 days')]);
+        BookingFactory::createOne(['customer' => $customer, 'lodging' => $lodging, 'checkin' => new \DateTimeImmutable('+14 days'), 'checkout' => new \DateTimeImmutable('+17 days')]);
 
         $client = $this->authClient($customer);
         $response = $client->request('GET', '/api/me/bookings');
