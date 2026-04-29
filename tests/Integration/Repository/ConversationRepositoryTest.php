@@ -24,7 +24,7 @@ class ConversationRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(ConversationRepository::class);
     }
 
-    public function test_find_by_customer_returns_customer_conversations(): void
+    public function testFindByCustomerReturnsCustomerConversations(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
         $hostProfile = HostProfileFactory::createOne();
@@ -39,7 +39,7 @@ class ConversationRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_customer_excludes_other_customers(): void
+    public function testFindByCustomerExcludesOtherCustomers(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
         $other = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -52,7 +52,7 @@ class ConversationRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_customer_ordered_by_updated_at_desc(): void
+    public function testFindByCustomerOrderedByUpdatedAtDesc(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
 
@@ -65,7 +65,7 @@ class ConversationRepositoryTest extends KernelTestCase
         $this->assertSame($newer->getId()->toRfc4122(), $results[0]->getId()->toRfc4122());
     }
 
-    public function test_find_by_host_returns_host_conversations(): void
+    public function testFindByHostReturnsHostConversations(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -78,7 +78,7 @@ class ConversationRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_host_excludes_other_hosts(): void
+    public function testFindByHostExcludesOtherHosts(): void
     {
         $hostProfile1 = HostProfileFactory::createOne();
         $hostProfile2 = HostProfileFactory::createOne();
@@ -91,7 +91,7 @@ class ConversationRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_customer_returns_empty_when_no_conversations(): void
+    public function testFindByCustomerReturnsEmptyWhenNoConversations(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
 

@@ -3,7 +3,6 @@
 namespace App\Tests\Integration\Repository;
 
 use App\Repository\ReviewRepository;
-use App\Tests\Factory\BookingFactory;
 use App\Tests\Factory\LodgingFactory;
 use App\Tests\Factory\ReviewFactory;
 use App\Tests\Factory\UserFactory;
@@ -24,7 +23,7 @@ class ReviewRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(ReviewRepository::class);
     }
 
-    public function test_find_by_lodging_returns_reviews_for_that_lodging(): void
+    public function testFindByLodgingReturnsReviewsForThatLodging(): void
     {
         $lodging = LodgingFactory::createOne();
         $otherLodging = LodgingFactory::createOne();
@@ -38,7 +37,7 @@ class ReviewRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_lodging_returns_ordered_by_created_at_desc(): void
+    public function testFindByLodgingReturnsOrderedByCreatedAtDesc(): void
     {
         $lodging = LodgingFactory::createOne();
 
@@ -57,7 +56,7 @@ class ReviewRepositoryTest extends KernelTestCase
         $this->assertSame($review2->getId()->toRfc4122(), $results[0]->getId()->toRfc4122());
     }
 
-    public function test_find_by_customer_returns_reviews_for_that_customer(): void
+    public function testFindByCustomerReturnsReviewsForThatCustomer(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
         $otherCustomer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -70,7 +69,7 @@ class ReviewRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_customer_returns_empty_when_no_reviews(): void
+    public function testFindByCustomerReturnsEmptyWhenNoReviews(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
 

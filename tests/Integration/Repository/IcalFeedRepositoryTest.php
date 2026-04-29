@@ -22,7 +22,7 @@ class IcalFeedRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(IcalFeedRepository::class);
     }
 
-    public function test_find_by_lodging_returns_feeds_for_lodging(): void
+    public function testFindByLodgingReturnsFeedsForLodging(): void
     {
         $lodging = LodgingFactory::createOne();
 
@@ -34,7 +34,7 @@ class IcalFeedRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_lodging_excludes_other_lodgings(): void
+    public function testFindByLodgingExcludesOtherLodgings(): void
     {
         $lodging = LodgingFactory::createOne();
         $other = LodgingFactory::createOne();
@@ -47,7 +47,7 @@ class IcalFeedRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_lodging_returns_empty_when_no_feeds(): void
+    public function testFindByLodgingReturnsEmptyWhenNoFeeds(): void
     {
         $lodging = LodgingFactory::createOne();
 

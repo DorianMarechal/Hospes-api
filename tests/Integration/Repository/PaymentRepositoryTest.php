@@ -25,7 +25,7 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(PaymentRepository::class);
     }
 
-    public function test_find_by_booking_returns_payments_for_booking(): void
+    public function testFindByBookingReturnsPaymentsForBooking(): void
     {
         $booking = BookingFactory::createOne();
         $otherBooking = BookingFactory::createOne(['checkin' => new \DateTimeImmutable('+30 days'), 'checkout' => new \DateTimeImmutable('+33 days')]);
@@ -39,7 +39,7 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_booking_returns_empty_when_no_payments(): void
+    public function testFindByBookingReturnsEmptyWhenNoPayments(): void
     {
         $booking = BookingFactory::createOne();
 
@@ -48,7 +48,7 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->assertCount(0, $results);
     }
 
-    public function test_find_by_booking_ordered_by_created_at_desc(): void
+    public function testFindByBookingOrderedByCreatedAtDesc(): void
     {
         $booking = BookingFactory::createOne();
 
@@ -61,7 +61,7 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->assertSame($newer->getId()->toRfc4122(), $results[0]->getId()->toRfc4122());
     }
 
-    public function test_find_received_by_host_returns_booking_payments_for_lodgings(): void
+    public function testFindReceivedByHostReturnsBookingPaymentsForLodgings(): void
     {
         $lodging = LodgingFactory::createOne();
         $booking = BookingFactory::createOne(['lodging' => $lodging]);
@@ -73,7 +73,7 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_received_by_host_excludes_non_booking_type(): void
+    public function testFindReceivedByHostExcludesNonBookingType(): void
     {
         $lodging = LodgingFactory::createOne();
         $booking = BookingFactory::createOne(['lodging' => $lodging]);
@@ -85,14 +85,14 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->assertCount(0, $results);
     }
 
-    public function test_find_received_by_host_returns_empty_for_empty_lodging_ids(): void
+    public function testFindReceivedByHostReturnsEmptyForEmptyLodgingIds(): void
     {
         $results = $this->repository->findReceivedByHost([]);
 
         $this->assertCount(0, $results);
     }
 
-    public function test_has_succeeded_payment_returns_true(): void
+    public function testHasSucceededPaymentReturnsTrue(): void
     {
         $booking = BookingFactory::createOne();
         PaymentFactory::createOne([
@@ -104,7 +104,7 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->assertTrue($this->repository->hasSucceededPayment($booking->_real()));
     }
 
-    public function test_has_succeeded_payment_returns_false_when_only_failed(): void
+    public function testHasSucceededPaymentReturnsFalseWhenOnlyFailed(): void
     {
         $booking = BookingFactory::createOne();
         PaymentFactory::createOne([
@@ -116,7 +116,7 @@ class PaymentRepositoryTest extends KernelTestCase
         $this->assertFalse($this->repository->hasSucceededPayment($booking->_real()));
     }
 
-    public function test_has_succeeded_payment_returns_false_when_no_payments(): void
+    public function testHasSucceededPaymentReturnsFalseWhenNoPayments(): void
     {
         $booking = BookingFactory::createOne();
 

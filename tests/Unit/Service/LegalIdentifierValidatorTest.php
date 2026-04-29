@@ -16,7 +16,7 @@ class LegalIdentifierValidatorTest extends TestCase
     }
 
     #[DataProvider('validIdentifiersProvider')]
-    public function test_validate_accepts_valid_identifiers(string $type, string $value, string $country): void
+    public function testValidateAcceptsValidIdentifiers(string $type, string $value, string $country): void
     {
         $this->assertTrue($this->validator->validate($type, $value, $country));
     }
@@ -58,7 +58,7 @@ class LegalIdentifierValidatorTest extends TestCase
     }
 
     #[DataProvider('invalidIdentifiersProvider')]
-    public function test_validate_rejects_invalid_identifiers(string $type, string $value, string $country): void
+    public function testValidateRejectsInvalidIdentifiers(string $type, string $value, string $country): void
     {
         $this->assertFalse($this->validator->validate($type, $value, $country));
     }
@@ -78,28 +78,28 @@ class LegalIdentifierValidatorTest extends TestCase
         yield 'AT uid missing U' => ['uid', '12345678', 'AT'];
     }
 
-    public function test_validate_throws_for_unsupported_type(): void
+    public function testValidateThrowsForUnsupportedType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         $this->validator->validate('unknown_type', '123', 'FR');
     }
 
-    public function test_validate_throws_for_unsupported_country(): void
+    public function testValidateThrowsForUnsupportedCountry(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         $this->validator->validate('siret', '12345678901234', 'US');
     }
 
-    public function test_get_expected_format_returns_format(): void
+    public function testGetExpectedFormatReturnsFormat(): void
     {
         $format = $this->validator->getExpectedFormat('siret', 'FR');
 
         $this->assertSame('14 digits (e.g. 12345678901234)', $format);
     }
 
-    public function test_get_expected_format_returns_null_for_unknown(): void
+    public function testGetExpectedFormatReturnsNullForUnknown(): void
     {
         $format = $this->validator->getExpectedFormat('unknown', 'FR');
 

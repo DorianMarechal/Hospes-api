@@ -20,7 +20,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->calculator = new StatisticsCalculator($this->bookingRepo);
     }
 
-    public function test_calculate_with_no_bookings(): void
+    public function testCalculateWithNoBookings(): void
     {
         $lodging = new Lodging();
         $this->bookingRepo->method('findByLodging')->willReturn([]);
@@ -39,7 +39,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(0, $result['revpar']);
     }
 
-    public function test_calculate_with_confirmed_booking(): void
+    public function testCalculateWithConfirmedBooking(): void
     {
         $lodging = new Lodging();
 
@@ -63,7 +63,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(30, $result['totalNights']);
     }
 
-    public function test_calculate_excludes_cancelled_bookings(): void
+    public function testCalculateExcludesCancelledBookings(): void
     {
         $lodging = new Lodging();
 
@@ -85,7 +85,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(0, $result['bookingsCount']);
     }
 
-    public function test_calculate_excludes_pending_bookings(): void
+    public function testCalculateExcludesPendingBookings(): void
     {
         $lodging = new Lodging();
 
@@ -107,7 +107,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(0, $result['bookingsCount']);
     }
 
-    public function test_calculate_excludes_bookings_outside_period(): void
+    public function testCalculateExcludesBookingsOutsidePeriod(): void
     {
         $lodging = new Lodging();
 
@@ -129,7 +129,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(0, $result['bookingsCount']);
     }
 
-    public function test_calculate_clips_overlap_to_period(): void
+    public function testCalculateClipsOverlapToPeriod(): void
     {
         $lodging = new Lodging();
 
@@ -153,7 +153,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(4, $result['occupiedNights']);
     }
 
-    public function test_calculate_with_multiple_lodgings(): void
+    public function testCalculateWithMultipleLodgings(): void
     {
         $lodging1 = new Lodging();
         $lodging2 = new Lodging();
@@ -188,7 +188,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(60, $result['totalNights']);
     }
 
-    public function test_calculate_occupancy_rate_and_revpar(): void
+    public function testCalculateOccupancyRateAndRevpar(): void
     {
         $lodging = new Lodging();
 
@@ -212,7 +212,7 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(3333, $result['revpar']);
     }
 
-    public function test_calculate_with_empty_lodgings(): void
+    public function testCalculateWithEmptyLodgings(): void
     {
         $result = $this->calculator->calculate(
             [],

@@ -17,28 +17,28 @@ class ValidPhoneNumberValidatorTest extends ConstraintValidatorTestCase
         return new ValidPhoneNumberValidator();
     }
 
-    public function test_null_value_is_valid(): void
+    public function testNullValueIsValid(): void
     {
         $this->validator->validate(null, new ValidPhoneNumber());
 
         $this->assertNoViolation();
     }
 
-    public function test_valid_french_mobile(): void
+    public function testValidFrenchMobile(): void
     {
         $this->validator->validate('+33612345678', new ValidPhoneNumber());
 
         $this->assertNoViolation();
     }
 
-    public function test_valid_german_mobile(): void
+    public function testValidGermanMobile(): void
     {
         $this->validator->validate('+4915112345678', new ValidPhoneNumber());
 
         $this->assertNoViolation();
     }
 
-    public function test_invalid_number_without_plus(): void
+    public function testInvalidNumberWithoutPlus(): void
     {
         $this->validator->validate('0612345678', new ValidPhoneNumber());
 
@@ -46,7 +46,7 @@ class ValidPhoneNumberValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function test_landline_is_rejected(): void
+    public function testLandlineIsRejected(): void
     {
         // French landline
         $this->validator->validate('+33112345678', new ValidPhoneNumber());
@@ -55,7 +55,7 @@ class ValidPhoneNumberValidatorTest extends ConstraintValidatorTestCase
         $this->assertGreaterThan(0, $violations->count());
     }
 
-    public function test_random_string_is_rejected(): void
+    public function testRandomStringIsRejected(): void
     {
         $this->validator->validate('not-a-number', new ValidPhoneNumber());
 

@@ -38,7 +38,7 @@ class IcalSyncServiceTest extends TestCase
         );
     }
 
-    public function test_sync_returns_zero_when_no_lodging(): void
+    public function testSyncReturnsZeroWhenNoLodging(): void
     {
         $feed = new IcalFeed();
         // lodging is null
@@ -46,7 +46,7 @@ class IcalSyncServiceTest extends TestCase
         $this->assertSame(0, $this->service->sync($feed));
     }
 
-    public function test_sync_creates_blocked_dates_from_ics(): void
+    public function testSyncCreatesBlockedDatesFromIcs(): void
     {
         $lodging = new Lodging();
         $feed = new IcalFeed();
@@ -80,7 +80,7 @@ class IcalSyncServiceTest extends TestCase
         $this->assertSame('ical', $persisted[0]->getSource());
     }
 
-    public function test_sync_removes_existing_ical_blocked_dates(): void
+    public function testSyncRemovesExistingIcalBlockedDates(): void
     {
         $lodging = new Lodging();
         $feed = new IcalFeed();
@@ -109,7 +109,7 @@ class IcalSyncServiceTest extends TestCase
         $this->assertSame($existingBlocked, $removed[0]);
     }
 
-    public function test_sync_skips_events_conflicting_with_bookings(): void
+    public function testSyncSkipsEventsConflictingWithBookings(): void
     {
         $lodging = new Lodging();
         $feed = new IcalFeed();
@@ -137,7 +137,7 @@ class IcalSyncServiceTest extends TestCase
         $this->assertSame(0, $result);
     }
 
-    public function test_sync_ignores_cancelled_bookings_for_conflict_check(): void
+    public function testSyncIgnoresCancelledBookingsForConflictCheck(): void
     {
         $lodging = new Lodging();
         $feed = new IcalFeed();
@@ -165,7 +165,7 @@ class IcalSyncServiceTest extends TestCase
         $this->assertSame(1, $result);
     }
 
-    public function test_sync_parses_datetime_with_timezone(): void
+    public function testSyncParsesDatetimeWithTimezone(): void
     {
         $lodging = new Lodging();
         $feed = new IcalFeed();
@@ -191,7 +191,7 @@ class IcalSyncServiceTest extends TestCase
         $this->assertSame('iCal import', $persisted[0]->getReason());
     }
 
-    public function test_sync_skips_events_without_start_or_end(): void
+    public function testSyncSkipsEventsWithoutStartOrEnd(): void
     {
         $lodging = new Lodging();
         $feed = new IcalFeed();
@@ -213,7 +213,7 @@ class IcalSyncServiceTest extends TestCase
         $this->assertSame(0, $result);
     }
 
-    public function test_sync_handles_multiple_events(): void
+    public function testSyncHandlesMultipleEvents(): void
     {
         $lodging = new Lodging();
         $feed = new IcalFeed();

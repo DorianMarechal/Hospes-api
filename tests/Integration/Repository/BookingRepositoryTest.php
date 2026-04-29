@@ -23,7 +23,7 @@ class BookingRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(BookingRepository::class);
     }
 
-    public function test_find_by_lodging_returns_bookings_for_that_lodging(): void
+    public function testFindByLodgingReturnsBookingsForThatLodging(): void
     {
         $lodging = LodgingFactory::createOne();
         $otherLodging = LodgingFactory::createOne();
@@ -37,7 +37,7 @@ class BookingRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_lodging_returns_empty_when_no_bookings(): void
+    public function testFindByLodgingReturnsEmptyWhenNoBookings(): void
     {
         $lodging = LodgingFactory::createOne();
 
@@ -46,7 +46,7 @@ class BookingRepositoryTest extends KernelTestCase
         $this->assertCount(0, $results);
     }
 
-    public function test_find_by_customer_returns_bookings_ordered_by_created_at_desc(): void
+    public function testFindByCustomerReturnsBookingsOrderedByCreatedAtDesc(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
 
@@ -70,7 +70,7 @@ class BookingRepositoryTest extends KernelTestCase
         $this->assertSame($booking2->getId()->toRfc4122(), $results[0]->getId()->toRfc4122());
     }
 
-    public function test_find_by_customer_excludes_other_customers(): void
+    public function testFindByCustomerExcludesOtherCustomers(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
         $otherCustomer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -83,7 +83,7 @@ class BookingRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_reference_returns_matching_booking(): void
+    public function testFindByReferenceReturnsMatchingBooking(): void
     {
         $booking = BookingFactory::createOne(['reference' => 'HOS-TESTREF1-26']);
 
@@ -93,7 +93,7 @@ class BookingRepositoryTest extends KernelTestCase
         $this->assertSame($booking->getId()->toRfc4122(), $result->getId()->toRfc4122());
     }
 
-    public function test_find_by_reference_returns_null_when_not_found(): void
+    public function testFindByReferenceReturnsNullWhenNotFound(): void
     {
         $result = $this->repository->findByReference('NONEXISTENT');
 

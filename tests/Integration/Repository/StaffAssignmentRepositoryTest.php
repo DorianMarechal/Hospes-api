@@ -22,7 +22,7 @@ class StaffAssignmentRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(StaffAssignmentRepository::class);
     }
 
-    public function test_find_by_host_returns_assignments_for_that_host(): void
+    public function testFindByHostReturnsAssignmentsForThatHost(): void
     {
         $host = UserFactory::createOne(['roles' => ['ROLE_HOST']]);
         $otherHost = UserFactory::createOne(['roles' => ['ROLE_HOST']]);
@@ -36,7 +36,7 @@ class StaffAssignmentRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_invitation_token_returns_matching_assignment(): void
+    public function testFindByInvitationTokenReturnsMatchingAssignment(): void
     {
         $assignment = StaffAssignmentFactory::createOne(['invitationToken' => 'token-abc-123']);
 
@@ -46,14 +46,14 @@ class StaffAssignmentRepositoryTest extends KernelTestCase
         $this->assertSame($assignment->getId()->toRfc4122(), $result->getId()->toRfc4122());
     }
 
-    public function test_find_by_invitation_token_returns_null_when_not_found(): void
+    public function testFindByInvitationTokenReturnsNullWhenNotFound(): void
     {
         $result = $this->repository->findByInvitationToken('nonexistent-token');
 
         $this->assertNull($result);
     }
 
-    public function test_find_active_by_staff_returns_non_revoked_assignment(): void
+    public function testFindActiveByStaffReturnsNonRevokedAssignment(): void
     {
         $staff = UserFactory::createOne(['roles' => ['ROLE_STAFF']]);
 
@@ -68,7 +68,7 @@ class StaffAssignmentRepositoryTest extends KernelTestCase
         $this->assertSame($assignment->getId()->toRfc4122(), $result->getId()->toRfc4122());
     }
 
-    public function test_find_active_by_staff_excludes_revoked(): void
+    public function testFindActiveByStaffExcludesRevoked(): void
     {
         $staff = UserFactory::createOne(['roles' => ['ROLE_STAFF']]);
 
@@ -82,7 +82,7 @@ class StaffAssignmentRepositoryTest extends KernelTestCase
         $this->assertNull($result);
     }
 
-    public function test_find_active_by_staff_returns_null_when_no_assignment(): void
+    public function testFindActiveByStaffReturnsNullWhenNoAssignment(): void
     {
         $staff = UserFactory::createOne(['roles' => ['ROLE_STAFF']]);
 

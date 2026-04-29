@@ -23,7 +23,7 @@ class MessageRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(MessageRepository::class);
     }
 
-    public function test_find_by_conversation_returns_messages(): void
+    public function testFindByConversationReturnsMessages(): void
     {
         $conversation = ConversationFactory::createOne();
         $sender = UserFactory::createOne();
@@ -36,7 +36,7 @@ class MessageRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_conversation_excludes_other_conversations(): void
+    public function testFindByConversationExcludesOtherConversations(): void
     {
         $conv1 = ConversationFactory::createOne();
         $conv2 = ConversationFactory::createOne();
@@ -50,7 +50,7 @@ class MessageRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_conversation_ordered_by_created_at_asc(): void
+    public function testFindByConversationOrderedByCreatedAtAsc(): void
     {
         $conversation = ConversationFactory::createOne();
         $sender = UserFactory::createOne();
@@ -65,7 +65,7 @@ class MessageRepositoryTest extends KernelTestCase
         $this->assertSame($newer->getId()->toRfc4122(), $results[1]->getId()->toRfc4122());
     }
 
-    public function test_find_by_conversation_returns_empty_when_no_messages(): void
+    public function testFindByConversationReturnsEmptyWhenNoMessages(): void
     {
         $conversation = ConversationFactory::createOne();
 

@@ -26,7 +26,7 @@ class NotificationRepositoryTest extends KernelTestCase
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
     }
 
-    public function test_find_by_user_returns_notifications_for_that_user(): void
+    public function testFindByUserReturnsNotificationsForThatUser(): void
     {
         $user = UserFactory::createOne();
         $otherUser = UserFactory::createOne();
@@ -40,7 +40,7 @@ class NotificationRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_user_returns_ordered_by_created_at_desc(): void
+    public function testFindByUserReturnsOrderedByCreatedAtDesc(): void
     {
         $user = UserFactory::createOne();
 
@@ -60,7 +60,7 @@ class NotificationRepositoryTest extends KernelTestCase
         $this->assertSame('Recent', $results[0]->getTitle());
     }
 
-    public function test_mark_all_read_marks_unread_notifications(): void
+    public function testMarkAllReadMarksUnreadNotifications(): void
     {
         $user = UserFactory::createOne();
 
@@ -78,7 +78,7 @@ class NotificationRepositoryTest extends KernelTestCase
         $this->assertCount(3, $notifications);
     }
 
-    public function test_mark_all_read_does_not_affect_other_users(): void
+    public function testMarkAllReadDoesNotAffectOtherUsers(): void
     {
         $user = UserFactory::createOne();
         $otherUser = UserFactory::createOne();
@@ -94,7 +94,7 @@ class NotificationRepositoryTest extends KernelTestCase
         $this->assertFalse($otherNotifs[0]->isRead());
     }
 
-    public function test_mark_all_read_sets_read_at_timestamp(): void
+    public function testMarkAllReadSetsReadAtTimestamp(): void
     {
         $user = UserFactory::createOne();
 

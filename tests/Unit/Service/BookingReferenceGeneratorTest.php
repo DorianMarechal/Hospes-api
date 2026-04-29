@@ -14,14 +14,14 @@ class BookingReferenceGeneratorTest extends TestCase
         $this->generator = new BookingReferenceGenerator();
     }
 
-    public function test_generate_returns_correct_format(): void
+    public function testGenerateReturnsCorrectFormat(): void
     {
         $reference = $this->generator->generate();
 
         $this->assertMatchesRegularExpression('/^HOS-[A-F0-9]{8}-\d{2}$/', $reference);
     }
 
-    public function test_generate_ends_with_current_year(): void
+    public function testGenerateEndsWithCurrentYear(): void
     {
         $reference = $this->generator->generate();
         $expectedSuffix = date('y');
@@ -29,7 +29,7 @@ class BookingReferenceGeneratorTest extends TestCase
         $this->assertStringEndsWith('-'.$expectedSuffix, $reference);
     }
 
-    public function test_generate_returns_unique_values(): void
+    public function testGenerateReturnsUniqueValues(): void
     {
         $references = [];
         for ($i = 0; $i < 100; ++$i) {
@@ -39,7 +39,7 @@ class BookingReferenceGeneratorTest extends TestCase
         $this->assertCount(100, array_unique($references));
     }
 
-    public function test_generate_has_correct_length(): void
+    public function testGenerateHasCorrectLength(): void
     {
         $reference = $this->generator->generate();
 

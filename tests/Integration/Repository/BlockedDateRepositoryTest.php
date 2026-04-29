@@ -22,7 +22,7 @@ class BlockedDateRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(BlockedDateRepository::class);
     }
 
-    public function test_find_by_lodging_returns_blocked_dates_for_lodging(): void
+    public function testFindByLodgingReturnsBlockedDatesForLodging(): void
     {
         $lodging = LodgingFactory::createOne();
 
@@ -34,7 +34,7 @@ class BlockedDateRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_lodging_excludes_other_lodgings(): void
+    public function testFindByLodgingExcludesOtherLodgings(): void
     {
         $lodging = LodgingFactory::createOne();
         $other = LodgingFactory::createOne();
@@ -47,7 +47,7 @@ class BlockedDateRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_lodging_returns_empty_when_no_blocked_dates(): void
+    public function testFindByLodgingReturnsEmptyWhenNoBlockedDates(): void
     {
         $lodging = LodgingFactory::createOne();
 

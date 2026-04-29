@@ -23,7 +23,7 @@ class FavoriteRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(FavoriteRepository::class);
     }
 
-    public function test_find_by_user_returns_user_favorites(): void
+    public function testFindByUserReturnsUserFavorites(): void
     {
         $user = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
         $lodging1 = LodgingFactory::createOne();
@@ -37,7 +37,7 @@ class FavoriteRepositoryTest extends KernelTestCase
         $this->assertCount(2, $results);
     }
 
-    public function test_find_by_user_excludes_other_users(): void
+    public function testFindByUserExcludesOtherUsers(): void
     {
         $user = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
         $other = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -50,7 +50,7 @@ class FavoriteRepositoryTest extends KernelTestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_find_by_user_returns_empty_when_no_favorites(): void
+    public function testFindByUserReturnsEmptyWhenNoFavorites(): void
     {
         $user = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
 
@@ -59,7 +59,7 @@ class FavoriteRepositoryTest extends KernelTestCase
         $this->assertCount(0, $results);
     }
 
-    public function test_find_by_user_ordered_by_created_at_desc(): void
+    public function testFindByUserOrderedByCreatedAtDesc(): void
     {
         $user = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
 

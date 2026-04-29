@@ -50,7 +50,7 @@ class NotificationDispatcherTest extends TestCase
         return $booking;
     }
 
-    public function test_booking_confirmed_creates_notification_for_host(): void
+    public function testBookingConfirmedCreatesNotificationForHost(): void
     {
         $booking = $this->createBookingWithHost();
 
@@ -64,7 +64,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertStringContains('Chalet Montagne', $notif->getContent());
     }
 
-    public function test_booking_confirmed_does_nothing_when_no_host(): void
+    public function testBookingConfirmedDoesNothingWhenNoHost(): void
     {
         $booking = new Booking();
 
@@ -73,7 +73,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertCount(0, $this->persisted);
     }
 
-    public function test_booking_cancelled_notifies_customer_when_host_cancels(): void
+    public function testBookingCancelledNotifiesCustomerWhenHostCancels(): void
     {
         $booking = $this->createBookingWithHost();
         $customer = new User();
@@ -89,7 +89,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertCount(1, $customerNotifs);
     }
 
-    public function test_booking_cancelled_notifies_host_when_customer_cancels(): void
+    public function testBookingCancelledNotifiesHostWhenCustomerCancels(): void
     {
         $booking = $this->createBookingWithHost();
         $customer = new User();
@@ -103,7 +103,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertCount(1, $hostNotifs);
     }
 
-    public function test_booking_cancelled_notifies_both_when_no_cancelled_by(): void
+    public function testBookingCancelledNotifiesBothWhenNoCancelledBy(): void
     {
         $booking = $this->createBookingWithHost();
         $customer = new User();
@@ -115,7 +115,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertCount(2, $this->persisted);
     }
 
-    public function test_booking_modified_creates_notification_for_host(): void
+    public function testBookingModifiedCreatesNotificationForHost(): void
     {
         $booking = $this->createBookingWithHost();
 
@@ -125,7 +125,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertSame('booking_modified', $this->persisted[0]->getType());
     }
 
-    public function test_booking_expired_creates_notification_for_customer(): void
+    public function testBookingExpiredCreatesNotificationForCustomer(): void
     {
         $booking = $this->createBookingWithHost();
         $customer = new User();
@@ -139,7 +139,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertStringContains('15 minutes', $this->persisted[0]->getContent());
     }
 
-    public function test_booking_expired_does_nothing_when_no_customer(): void
+    public function testBookingExpiredDoesNothingWhenNoCustomer(): void
     {
         $booking = new Booking();
 
@@ -148,7 +148,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertCount(0, $this->persisted);
     }
 
-    public function test_staff_invited_creates_notification_for_host(): void
+    public function testStaffInvitedCreatesNotificationForHost(): void
     {
         $host = new User();
         $assignment = new StaffAssignment();
@@ -161,7 +161,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertStringContains('staff@example.com', $this->persisted[0]->getContent());
     }
 
-    public function test_review_received_creates_notification_for_host(): void
+    public function testReviewReceivedCreatesNotificationForHost(): void
     {
         $host = new User();
         $hostProfile = new HostProfile();
@@ -183,7 +183,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertStringContains('Villa Soleil', $this->persisted[0]->getContent());
     }
 
-    public function test_message_received_creates_notification(): void
+    public function testMessageReceivedCreatesNotification(): void
     {
         $user = new User();
 
@@ -194,7 +194,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertStringContains('Chalet Neige', $this->persisted[0]->getContent());
     }
 
-    public function test_payment_received_creates_notification_for_host(): void
+    public function testPaymentReceivedCreatesNotificationForHost(): void
     {
         $booking = $this->createBookingWithHost();
 
@@ -209,7 +209,7 @@ class NotificationDispatcherTest extends TestCase
         $this->assertStringContains('150,00', $this->persisted[0]->getContent());
     }
 
-    public function test_deposit_released_creates_notification_for_customer(): void
+    public function testDepositReleasedCreatesNotificationForCustomer(): void
     {
         $booking = $this->createBookingWithHost();
         $customer = new User();

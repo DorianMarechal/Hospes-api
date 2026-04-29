@@ -21,7 +21,7 @@ class PendingBookingCleanerTest extends TestCase
         $this->cleaner = new PendingBookingCleaner($this->em);
     }
 
-    public function test_clean_expired_builds_correct_query(): void
+    public function testCleanExpiredBuildsCorrectQuery(): void
     {
         $query = $this->createMock(Query::class);
         $query->expects($this->once())
@@ -45,7 +45,7 @@ class PendingBookingCleanerTest extends TestCase
         $this->assertSame(3, $result);
     }
 
-    public function test_clean_expired_returns_zero_when_no_expired(): void
+    public function testCleanExpiredReturnsZeroWhenNoExpired(): void
     {
         $query = $this->createMock(Query::class);
         $query->expects($this->once())
@@ -65,7 +65,7 @@ class PendingBookingCleanerTest extends TestCase
         $this->assertSame(0, $this->cleaner->cleanExpired());
     }
 
-    public function test_clean_expired_sets_cancelled_status_and_now(): void
+    public function testCleanExpiredSetsCancelledStatusAndNow(): void
     {
         $query = $this->createMock(Query::class);
         $query->method('execute')->willReturn(1);

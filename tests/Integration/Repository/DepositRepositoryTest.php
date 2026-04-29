@@ -22,7 +22,7 @@ class DepositRepositoryTest extends KernelTestCase
         $this->repository = self::getContainer()->get(DepositRepository::class);
     }
 
-    public function test_find_by_booking_returns_deposit(): void
+    public function testFindByBookingReturnsDeposit(): void
     {
         $booking = BookingFactory::createOne();
         $deposit = DepositFactory::createOne(['booking' => $booking]);
@@ -33,7 +33,7 @@ class DepositRepositoryTest extends KernelTestCase
         $this->assertSame($deposit->getId()->toRfc4122(), $result->getId()->toRfc4122());
     }
 
-    public function test_find_by_booking_returns_null_when_no_deposit(): void
+    public function testFindByBookingReturnsNullWhenNoDeposit(): void
     {
         $booking = BookingFactory::createOne();
 
@@ -42,7 +42,7 @@ class DepositRepositoryTest extends KernelTestCase
         $this->assertNull($result);
     }
 
-    public function test_find_by_booking_returns_correct_deposit(): void
+    public function testFindByBookingReturnsCorrectDeposit(): void
     {
         $booking1 = BookingFactory::createOne();
         $booking2 = BookingFactory::createOne(['checkin' => new \DateTimeImmutable('+30 days'), 'checkout' => new \DateTimeImmutable('+33 days')]);
