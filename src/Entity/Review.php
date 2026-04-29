@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Dto\ReviewResponseRequest;
 use App\Repository\ReviewRepository;
@@ -23,11 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post(
             uriTemplate: '/bookings/{bookingId}/review',
+            uriVariables: ['bookingId' => new Link(fromClass: Booking::class, toProperty: 'booking')],
             security: "is_granted('ROLE_CUSTOMER')",
             processor: ReviewProcessor::class,
         ),
         new GetCollection(
             uriTemplate: '/lodgings/{lodgingId}/reviews',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             provider: LodgingReviewsProvider::class,
         ),
         new GetCollection(
@@ -39,6 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/reviews/{id}/response',
             security: "is_granted('ROLE_HOST')",
             input: ReviewResponseRequest::class,
+            denormalizationContext: [],
             processor: ReviewResponseProcessor::class,
         ),
         new Delete(

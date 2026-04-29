@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Repository\BlockedDateRepository;
 use App\State\BlockedDateCollectionProvider;
@@ -20,11 +21,13 @@ use Symfony\Component\Uid\Uuid;
     operations: [
         new GetCollection(
             uriTemplate: '/lodgings/{lodgingId}/blocked-dates',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             provider: BlockedDateCollectionProvider::class,
         ),
         new Post(
             uriTemplate: '/lodgings/{lodgingId}/blocked-dates',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             processor: BlockedDateProcessor::class,
         ),

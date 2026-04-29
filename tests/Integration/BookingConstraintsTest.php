@@ -28,7 +28,7 @@ class BookingConstraintsTest extends KernelTestCase
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
     }
 
-    public function test_exclude_gist_prevents_overlapping_bookings(): void
+    public function testExcludeGistPreventsOverlappingBookings(): void
     {
         $lodging = LodgingFactory::createOne();
         $customer1 = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -72,7 +72,7 @@ class BookingConstraintsTest extends KernelTestCase
         $this->em->flush();
     }
 
-    public function test_cancelled_booking_does_not_block_overlap(): void
+    public function testCancelledBookingDoesNotBlockOverlap(): void
     {
         $lodging = LodgingFactory::createOne();
         $customer1 = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -116,7 +116,7 @@ class BookingConstraintsTest extends KernelTestCase
         $this->assertNotNull($booking2->getId());
     }
 
-    public function test_adjacent_bookings_are_allowed(): void
+    public function testAdjacentBookingsAreAllowed(): void
     {
         $lodging = LodgingFactory::createOne();
         $customer1 = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -158,7 +158,7 @@ class BookingConstraintsTest extends KernelTestCase
         $this->assertNotNull($booking2->getId());
     }
 
-    public function test_booking_reference_unique_constraint(): void
+    public function testBookingReferenceUniqueConstraint(): void
     {
         $lodging = LodgingFactory::createOne();
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']]);
@@ -199,7 +199,7 @@ class BookingConstraintsTest extends KernelTestCase
         $this->em->flush();
     }
 
-    public function test_booking_night_unique_per_booking_and_date(): void
+    public function testBookingNightUniquePerBookingAndDate(): void
     {
         $booking = BookingFactory::createOne([
             'checkin' => new \DateTimeImmutable('+50 days'),

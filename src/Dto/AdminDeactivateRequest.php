@@ -6,7 +6,11 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use App\Entity\Lodging;
+use App\Entity\Review;
+use App\Entity\User;
 use App\State\AdminBookingsProvider;
 use App\State\AdminDeactivateUserProcessor;
 use App\State\AdminLodgingDeleteProcessor;
@@ -29,20 +33,25 @@ use App\State\AdminUsersProvider;
         ),
         new Get(
             uriTemplate: '/admin/users/{id}',
+            uriVariables: ['id' => new Link(fromClass: User::class)],
             security: "is_granted('ROLE_ADMIN')",
             provider: AdminUserProvider::class,
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Post(
             uriTemplate: '/admin/users/{id}/deactivate',
+            uriVariables: ['id' => new Link(fromClass: User::class)],
             input: false,
+            read: false,
             security: "is_granted('ROLE_ADMIN')",
             processor: AdminDeactivateUserProcessor::class,
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Post(
             uriTemplate: '/admin/users/{id}/reactivate',
+            uriVariables: ['id' => new Link(fromClass: User::class)],
             input: false,
+            read: false,
             security: "is_granted('ROLE_ADMIN')",
             processor: AdminReactivateUserProcessor::class,
             normalizationContext: ['groups' => ['user:read']],
@@ -55,6 +64,8 @@ use App\State\AdminUsersProvider;
         ),
         new Delete(
             uriTemplate: '/admin/lodgings/{id}',
+            uriVariables: ['id' => new Link(fromClass: Lodging::class)],
+            read: false,
             security: "is_granted('ROLE_ADMIN')",
             processor: AdminLodgingDeleteProcessor::class,
         ),
@@ -72,6 +83,8 @@ use App\State\AdminUsersProvider;
         ),
         new Delete(
             uriTemplate: '/admin/reviews/{id}',
+            uriVariables: ['id' => new Link(fromClass: Review::class)],
+            read: false,
             security: "is_granted('ROLE_ADMIN')",
             processor: AdminReviewDeleteProcessor::class,
         ),

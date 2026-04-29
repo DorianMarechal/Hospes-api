@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\PriceOverrideRepository;
@@ -23,11 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: '/lodgings/{lodgingId}/price-overrides',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             provider: PriceOverrideCollectionProvider::class,
         ),
         new Post(
             uriTemplate: '/lodgings/{lodgingId}/price-overrides',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             processor: PriceOverrideProcessor::class,
         ),

@@ -13,7 +13,7 @@ class AuthTest extends ApiTestCase
     use Factories;
     use ResetDatabase;
 
-    public function test_register_customer(): void
+    public function testRegisterCustomer(): void
     {
         $client = static::createClient();
 
@@ -31,7 +31,7 @@ class AuthTest extends ApiTestCase
         $this->assertJsonContains(['email' => 'customer@example.com']);
     }
 
-    public function test_register_host(): void
+    public function testRegisterHost(): void
     {
         $client = static::createClient();
 
@@ -49,7 +49,7 @@ class AuthTest extends ApiTestCase
         $this->assertJsonContains(['roles' => ['ROLE_HOST']]);
     }
 
-    public function test_register_duplicate_email_returns_409(): void
+    public function testRegisterDuplicateEmailReturns409(): void
     {
         UserFactory::createOne(['email' => 'taken@example.com']);
 
@@ -67,7 +67,7 @@ class AuthTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(409);
     }
 
-    public function test_register_weak_password_returns_422(): void
+    public function testRegisterWeakPasswordReturns422(): void
     {
         $client = static::createClient();
         $client->request('POST', '/api/auth/register', [
@@ -83,7 +83,7 @@ class AuthTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
     }
 
-    public function test_login_success(): void
+    public function testLoginSuccess(): void
     {
         UserFactory::createOne(['email' => 'login@example.com']);
 
@@ -100,7 +100,7 @@ class AuthTest extends ApiTestCase
         $this->assertArrayHasKey('token', $data);
     }
 
-    public function test_login_wrong_password_returns_401(): void
+    public function testLoginWrongPasswordReturns401(): void
     {
         UserFactory::createOne(['email' => 'login@example.com']);
 
@@ -115,7 +115,7 @@ class AuthTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(401);
     }
 
-    public function test_me_returns_authenticated_user(): void
+    public function testMeReturnsAuthenticatedUser(): void
     {
         $user = UserFactory::createOne(['email' => 'me@example.com'])->_real();
         $client = $this->authClient($user);
@@ -126,7 +126,7 @@ class AuthTest extends ApiTestCase
         $this->assertJsonContains(['email' => 'me@example.com']);
     }
 
-    public function test_me_returns_401_without_token(): void
+    public function testMeReturns401WithoutToken(): void
     {
         $client = static::createClient();
         $client->request('GET', '/api/auth/me');

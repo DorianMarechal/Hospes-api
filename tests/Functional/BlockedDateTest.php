@@ -15,7 +15,7 @@ class BlockedDateTest extends ApiTestCase
     use Factories;
     use ResetDatabase;
 
-    public function test_create_blocked_date(): void
+    public function testCreateBlockedDate(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -33,7 +33,7 @@ class BlockedDateTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(201);
     }
 
-    public function test_list_blocked_dates(): void
+    public function testListBlockedDates(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -50,10 +50,10 @@ class BlockedDateTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        $this->assertCount(1, $data['hydra:member']);
+        $this->assertCount(1, $data['member']);
     }
 
-    public function test_delete_blocked_date(): void
+    public function testDeleteBlockedDate(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -66,7 +66,7 @@ class BlockedDateTest extends ApiTestCase
         ]);
 
         $client = $this->authClient($host);
-        $client->request('DELETE', '/api/blocked-dates/'.$blocked->getId());
+        $client->request('DELETE', '/api/blocked_dates/'.$blocked->getId());
 
         $this->assertResponseStatusCodeSame(204);
     }

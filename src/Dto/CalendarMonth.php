@@ -4,6 +4,7 @@ namespace App\Dto;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\State\CalendarProvider;
@@ -13,6 +14,7 @@ use App\State\CalendarProvider;
     operations: [
         new Get(
             uriTemplate: '/lodgings/{lodgingId}/calendar',
+            uriVariables: ['lodgingId' => new Link(fromClass: \App\Entity\Lodging::class)],
             output: false,
             provider: CalendarProvider::class,
             security: "is_granted('ROLE_HOST')",

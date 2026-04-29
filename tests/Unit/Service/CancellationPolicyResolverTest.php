@@ -51,7 +51,7 @@ class CancellationPolicyResolverTest extends TestCase
         return [$booking, $customer, $host];
     }
 
-    public function test_flexible_refund_when_more_than_24h_before_checkin(): void
+    public function testFlexibleRefundWhenMoreThan24hBeforeCheckin(): void
     {
         [$booking, $customer] = $this->createBooking(CancellationPolicy::FLEXIBLE, 15000, '+3 days');
 
@@ -61,7 +61,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertSame(15000, $result['refundAmount']);
     }
 
-    public function test_flexible_no_refund_when_less_than_24h_before_checkin(): void
+    public function testFlexibleNoRefundWhenLessThan24hBeforeCheckin(): void
     {
         [$booking, $customer] = $this->createBooking(CancellationPolicy::FLEXIBLE, 15000, '+12 hours');
 
@@ -71,7 +71,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertSame(0, $result['refundAmount']);
     }
 
-    public function test_moderate_refund_when_more_than_5_days_before_checkin(): void
+    public function testModerateRefundWhenMoreThan5DaysBeforeCheckin(): void
     {
         [$booking, $customer] = $this->createBooking(CancellationPolicy::MODERATE, 20000, '+10 days');
 
@@ -81,7 +81,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertSame(20000, $result['refundAmount']);
     }
 
-    public function test_moderate_no_refund_when_less_than_5_days_before_checkin(): void
+    public function testModerateNoRefundWhenLessThan5DaysBeforeCheckin(): void
     {
         [$booking, $customer] = $this->createBooking(CancellationPolicy::MODERATE, 20000, '+3 days');
 
@@ -91,7 +91,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertSame(0, $result['refundAmount']);
     }
 
-    public function test_strict_never_refunds(): void
+    public function testStrictNeverRefunds(): void
     {
         [$booking, $customer] = $this->createBooking(CancellationPolicy::STRICT, 25000, '+30 days');
 
@@ -101,7 +101,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertSame(0, $result['refundAmount']);
     }
 
-    public function test_host_cancellation_always_refunds_with_flexible(): void
+    public function testHostCancellationAlwaysRefundsWithFlexible(): void
     {
         [$booking, $customer, $host] = $this->createBooking(CancellationPolicy::FLEXIBLE, 15000, '+1 hour');
 
@@ -111,7 +111,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertSame(15000, $result['refundAmount']);
     }
 
-    public function test_host_cancellation_always_refunds_with_strict(): void
+    public function testHostCancellationAlwaysRefundsWithStrict(): void
     {
         [$booking, $customer, $host] = $this->createBooking(CancellationPolicy::STRICT, 25000, '+1 day');
 
@@ -121,7 +121,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertSame(25000, $result['refundAmount']);
     }
 
-    public function test_flexible_exactly_24h_boundary(): void
+    public function testFlexibleExactly24hBoundary(): void
     {
         // Exactly 24h should not be eligible (must be MORE than 24h)
         $now = new \DateTimeImmutable();
@@ -133,7 +133,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertFalse($result['eligible']);
     }
 
-    public function test_moderate_exactly_5_days_boundary(): void
+    public function testModerateExactly5DaysBoundary(): void
     {
         $now = new \DateTimeImmutable();
         $checkin = $now->modify('+5 days');
@@ -144,7 +144,7 @@ class CancellationPolicyResolverTest extends TestCase
         $this->assertFalse($result['eligible']);
     }
 
-    public function test_null_checkin_returns_not_eligible(): void
+    public function testNullCheckinReturnsNotEligible(): void
     {
         $hostProfile = new HostProfile();
         $this->setId($hostProfile);

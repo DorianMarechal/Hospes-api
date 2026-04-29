@@ -66,7 +66,7 @@ class BookingAccessVoterTest extends TestCase
         return [$booking, $customer, $host];
     }
 
-    public function test_view_granted_for_customer(): void
+    public function testViewGrantedForCustomer(): void
     {
         [$booking, $customer] = $this->createBookingWithCustomerAndHost();
         $token = $this->createToken($customer);
@@ -76,7 +76,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function test_view_granted_for_host(): void
+    public function testViewGrantedForHost(): void
     {
         [$booking, $customer, $host] = $this->createBookingWithCustomerAndHost();
         $token = $this->createToken($host);
@@ -86,7 +86,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function test_view_granted_for_admin(): void
+    public function testViewGrantedForAdmin(): void
     {
         [$booking] = $this->createBookingWithCustomerAndHost();
         $admin = new User();
@@ -99,7 +99,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function test_view_denied_for_other_customer(): void
+    public function testViewDeniedForOtherCustomer(): void
     {
         [$booking] = $this->createBookingWithCustomerAndHost();
         $other = new User();
@@ -112,7 +112,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function test_view_denied_for_other_host(): void
+    public function testViewDeniedForOtherHost(): void
     {
         [$booking] = $this->createBookingWithCustomerAndHost();
         $otherHostProfile = new HostProfile();
@@ -128,7 +128,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function test_view_denied_for_anonymous(): void
+    public function testViewDeniedForAnonymous(): void
     {
         [$booking] = $this->createBookingWithCustomerAndHost();
         $token = $this->createToken(null);
@@ -138,7 +138,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function test_cancel_granted_for_customer(): void
+    public function testCancelGrantedForCustomer(): void
     {
         [$booking, $customer] = $this->createBookingWithCustomerAndHost();
         $token = $this->createToken($customer);
@@ -148,7 +148,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function test_edit_granted_for_host(): void
+    public function testEditGrantedForHost(): void
     {
         [$booking, $customer, $host] = $this->createBookingWithCustomerAndHost();
         $token = $this->createToken($host);
@@ -158,7 +158,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function test_abstains_for_wrong_attribute(): void
+    public function testAbstainsForWrongAttribute(): void
     {
         [$booking] = $this->createBookingWithCustomerAndHost();
         $token = $this->createToken(null);
@@ -168,7 +168,7 @@ class BookingAccessVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $result);
     }
 
-    public function test_abstains_for_wrong_subject(): void
+    public function testAbstainsForWrongSubject(): void
     {
         $user = new User();
         $token = $this->createToken($user);

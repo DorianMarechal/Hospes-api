@@ -14,7 +14,7 @@ class StaffTest extends ApiTestCase
     use Factories;
     use ResetDatabase;
 
-    public function test_invite_staff(): void
+    public function testInviteStaff(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -31,7 +31,7 @@ class StaffTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(201);
     }
 
-    public function test_list_staff(): void
+    public function testListStaff(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -42,7 +42,7 @@ class StaffTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function test_invite_staff_denied_for_customer(): void
+    public function testInviteStaffDeniedForCustomer(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         LodgingFactory::createOne(['host' => $hostProfile]);

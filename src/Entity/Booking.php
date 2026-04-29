@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Dto\BookingRequest;
@@ -35,6 +36,7 @@ use Symfony\Component\Uid\Uuid;
         new Post(
             uriTemplate: '/bookings',
             input: BookingRequest::class,
+            denormalizationContext: [],
             security: "is_granted('ROLE_CUSTOMER')",
             processor: BookingCreateProcessor::class,
         ),
@@ -53,6 +55,7 @@ use Symfony\Component\Uid\Uuid;
         ),
         new GetCollection(
             uriTemplate: '/lodgings/{lodgingId}/bookings',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             provider: BookingByLodgingProvider::class,
         ),
@@ -77,12 +80,14 @@ use Symfony\Component\Uid\Uuid;
         new Post(
             uriTemplate: '/bookings/{id}/cancel',
             input: CancelBookingRequest::class,
+            denormalizationContext: [],
             security: "is_granted('BOOKING_CANCEL', object)",
             processor: BookingCancelProcessor::class,
         ),
         new Put(
             uriTemplate: '/bookings/{id}/dates',
             input: ModifyBookingDatesRequest::class,
+            denormalizationContext: [],
             security: "is_granted('BOOKING_EDIT', object)",
             processor: BookingModifyDatesProcessor::class,
         ),

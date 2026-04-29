@@ -3,7 +3,9 @@
 namespace App\Dto;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use App\Entity\Lodging;
 use App\State\QuoteProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -12,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post(
             uriTemplate: '/lodgings/{lodgingId}/quote',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class)],
             output: QuoteResult::class,
             processor: QuoteProcessor::class,
         ),

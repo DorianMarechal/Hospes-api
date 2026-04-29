@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\State\LodgingAmenityProcessor;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +17,7 @@ use Symfony\Component\Uid\Uuid;
     operations: [
         new Post(
             uriTemplate: '/lodgings/{lodgingId}/amenities',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             processor: LodgingAmenityProcessor::class,
         ),

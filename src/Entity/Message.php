@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Repository\MessageRepository;
 use App\State\ConversationMessagesProvider;
@@ -19,11 +20,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: '/conversations/{conversationId}/messages',
+            uriVariables: ['conversationId' => new Link(fromClass: Conversation::class, toProperty: 'conversation')],
             security: "is_granted('ROLE_USER')",
             provider: ConversationMessagesProvider::class,
         ),
         new Post(
             uriTemplate: '/conversations/{conversationId}/messages',
+            uriVariables: ['conversationId' => new Link(fromClass: Conversation::class, toProperty: 'conversation')],
             security: "is_granted('ROLE_USER')",
             processor: MessageProcessor::class,
         ),

@@ -46,7 +46,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         return $season;
     }
 
-    public function test_no_overlap_passes(): void
+    public function testNoOverlapPasses(): void
     {
         $lodging = new Lodging();
         $existing = $this->createSeason($lodging, '2026-06-01', '2026-06-30', 'Été');
@@ -58,7 +58,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         $this->validator->validate($new, $this->constraint);
     }
 
-    public function test_overlap_fails(): void
+    public function testOverlapFails(): void
     {
         $lodging = new Lodging();
         $existing = $this->createSeason($lodging, '2026-06-01', '2026-06-30', 'Été');
@@ -78,7 +78,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         $this->validator->validate($new, $this->constraint);
     }
 
-    public function test_adjacent_seasons_pass(): void
+    public function testAdjacentSeasonsPass(): void
     {
         $lodging = new Lodging();
         $existing = $this->createSeason($lodging, '2026-06-01', '2026-06-30', 'Juin');
@@ -90,7 +90,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         $this->validator->validate($new, $this->constraint);
     }
 
-    public function test_same_season_update_does_not_conflict_with_itself(): void
+    public function testSameSeasonUpdateDoesNotConflictWithItself(): void
     {
         $lodging = new Lodging();
         $seasonId = Uuid::v7();
@@ -106,7 +106,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         $this->validator->validate($updated, $this->constraint);
     }
 
-    public function test_complete_overlap_fails(): void
+    public function testCompleteOverlapFails(): void
     {
         $lodging = new Lodging();
         $existing = $this->createSeason($lodging, '2026-06-01', '2026-08-31', 'Été');
@@ -125,7 +125,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         $this->validator->validate($new, $this->constraint);
     }
 
-    public function test_null_lodging_skips_validation(): void
+    public function testNullLodgingSkipsValidation(): void
     {
         $season = new Season();
         $this->setId($season);
@@ -138,7 +138,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         $this->validator->validate($season, $this->constraint);
     }
 
-    public function test_null_dates_skips_validation(): void
+    public function testNullDatesSkipsValidation(): void
     {
         $lodging = new Lodging();
         $season = new Season();
@@ -151,7 +151,7 @@ class NoSeasonOverlapValidatorTest extends TestCase
         $this->validator->validate($season, $this->constraint);
     }
 
-    public function test_multiple_existing_no_overlap(): void
+    public function testMultipleExistingNoOverlap(): void
     {
         $lodging = new Lodging();
         $s1 = $this->createSeason($lodging, '2026-01-01', '2026-03-31', 'Hiver');

@@ -20,7 +20,7 @@ class DepositManagerTest extends TestCase
         $this->manager = new DepositManager($this->entityManager);
     }
 
-    public function test_create_from_booking_with_deposit(): void
+    public function testCreateFromBookingWithDeposit(): void
     {
         $booking = new Booking();
         $booking->setDepositAmount(30000);
@@ -36,7 +36,7 @@ class DepositManagerTest extends TestCase
         $this->assertNotNull($deposit->getCreatedAt());
     }
 
-    public function test_create_from_booking_with_zero_deposit_returns_null(): void
+    public function testCreateFromBookingWithZeroDepositReturnsNull(): void
     {
         $booking = new Booking();
         $booking->setDepositAmount(0);
@@ -48,7 +48,7 @@ class DepositManagerTest extends TestCase
         $this->assertNull($deposit);
     }
 
-    public function test_create_from_booking_with_null_deposit_returns_null(): void
+    public function testCreateFromBookingWithNullDepositReturnsNull(): void
     {
         $booking = new Booking();
 
@@ -59,7 +59,7 @@ class DepositManagerTest extends TestCase
         $this->assertNull($deposit);
     }
 
-    public function test_release_deposit(): void
+    public function testReleaseDeposit(): void
     {
         $deposit = new Deposit();
         $deposit->setAmount(30000);
@@ -72,7 +72,7 @@ class DepositManagerTest extends TestCase
         $this->assertNotNull($deposit->getUpdatedAt());
     }
 
-    public function test_retain_full_amount(): void
+    public function testRetainFullAmount(): void
     {
         $deposit = new Deposit();
         $deposit->setAmount(30000);
@@ -87,7 +87,7 @@ class DepositManagerTest extends TestCase
         $this->assertNull($deposit->getReleasedAt());
     }
 
-    public function test_retain_partial_amount(): void
+    public function testRetainPartialAmount(): void
     {
         $deposit = new Deposit();
         $deposit->setAmount(30000);
@@ -101,7 +101,7 @@ class DepositManagerTest extends TestCase
         $this->assertNotNull($deposit->getReleasedAt());
     }
 
-    public function test_retain_more_than_amount_is_fully_retained(): void
+    public function testRetainMoreThanAmountIsFullyRetained(): void
     {
         $deposit = new Deposit();
         $deposit->setAmount(30000);

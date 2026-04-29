@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\SeasonRepository;
@@ -26,6 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: '/lodgings/{lodgingId}/seasons',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             provider: SeasonCollectionProvider::class
         ),
@@ -35,6 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post(
             security: "is_granted('ROLE_HOST')",
             uriTemplate: '/lodgings/{lodgingId}/seasons',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             processor: SeasonProcessor::class
         ),
         new Put(

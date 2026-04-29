@@ -15,7 +15,7 @@ class LodgingTest extends ApiTestCase
     use Factories;
     use ResetDatabase;
 
-    public function test_create_lodging_as_host(): void
+    public function testCreateLodgingAsHost(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -46,7 +46,7 @@ class LodgingTest extends ApiTestCase
         $this->assertJsonContains(['name' => 'Gîte du Lac']);
     }
 
-    public function test_create_lodging_denied_for_customer(): void
+    public function testCreateLodgingDeniedForCustomer(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']])->_real();
         $client = $this->authClient($customer);
@@ -71,7 +71,7 @@ class LodgingTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
-    public function test_get_my_lodgings(): void
+    public function testGetMyLodgings(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -82,10 +82,10 @@ class LodgingTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        $this->assertCount(1, $data['hydra:member']);
+        $this->assertCount(1, $data['member']);
     }
 
-    public function test_delete_lodging_as_owner(): void
+    public function testDeleteLodgingAsOwner(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -97,7 +97,7 @@ class LodgingTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(204);
     }
 
-    public function test_delete_lodging_denied_for_other_host(): void
+    public function testDeleteLodgingDeniedForOtherHost(): void
     {
         $hostProfile1 = HostProfileFactory::createOne();
         $lodging = LodgingFactory::createOne(['host' => $hostProfile1]);

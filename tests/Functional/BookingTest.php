@@ -3,7 +3,6 @@
 namespace App\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Enum\BookingStatus;
 use App\Tests\Factory\BookingFactory;
 use App\Tests\Factory\HostProfileFactory;
 use App\Tests\Factory\LodgingFactory;
@@ -17,7 +16,7 @@ class BookingTest extends ApiTestCase
     use Factories;
     use ResetDatabase;
 
-    public function test_create_booking(): void
+    public function testCreateBooking(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $lodging = LodgingFactory::createOne(['host' => $hostProfile]);
@@ -40,7 +39,7 @@ class BookingTest extends ApiTestCase
         $this->assertJsonContains(['status' => 'pending']);
     }
 
-    public function test_create_booking_denied_for_host(): void
+    public function testCreateBookingDeniedForHost(): void
     {
         $hostProfile = HostProfileFactory::createOne();
         $host = $hostProfile->getUser();
@@ -59,7 +58,7 @@ class BookingTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
-    public function test_get_booking_as_customer(): void
+    public function testGetBookingAsCustomer(): void
     {
         $fixture = $this->createBookingFixture();
         $client = $this->authClient($fixture['customer']);
@@ -70,7 +69,7 @@ class BookingTest extends ApiTestCase
         $this->assertJsonContains(['reference' => $fixture['booking']->getReference()]);
     }
 
-    public function test_get_booking_denied_for_other_customer(): void
+    public function testGetBookingDeniedForOtherCustomer(): void
     {
         $fixture = $this->createBookingFixture();
         $other = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']])->_real();
@@ -81,7 +80,7 @@ class BookingTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
-    public function test_get_booking_as_host(): void
+    public function testGetBookingAsHost(): void
     {
         $fixture = $this->createBookingFixture();
         $client = $this->authClient($fixture['host']);
@@ -91,7 +90,7 @@ class BookingTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function test_cancel_booking_as_customer(): void
+    public function testCancelBookingAsCustomer(): void
     {
         $fixture = $this->createBookingFixture();
         $client = $this->authClient($fixture['customer']);
@@ -104,7 +103,7 @@ class BookingTest extends ApiTestCase
         $this->assertJsonContains(['status' => 'cancelled']);
     }
 
-    public function test_list_my_bookings(): void
+    public function testListMyBookings(): void
     {
         $customer = UserFactory::createOne(['roles' => ['ROLE_CUSTOMER']])->_real();
         $hostProfile = HostProfileFactory::createOne();
@@ -118,6 +117,6 @@ class BookingTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        $this->assertCount(2, $data['hydra:member']);
+        $this->assertCount(2, $data['member']);
     }
 }

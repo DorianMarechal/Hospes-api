@@ -34,6 +34,7 @@ use Symfony\Component\Uid\Uuid;
         new Post(
             uriTemplate: '/me/staff',
             input: InviteStaffRequest::class,
+            denormalizationContext: [],
             security: "is_granted('ROLE_HOST')",
             processor: StaffInviteProcessor::class,
             normalizationContext: ['groups' => ['staff:read']],
@@ -41,6 +42,7 @@ use Symfony\Component\Uid\Uuid;
         new Put(
             uriTemplate: '/staff-assignments/{id}/permissions',
             input: UpdateStaffPermissionsRequest::class,
+            denormalizationContext: [],
             security: "is_granted('STAFF_MANAGE', object)",
             processor: StaffPermissionsProcessor::class,
             normalizationContext: ['groups' => ['staff:read']],
@@ -48,6 +50,7 @@ use Symfony\Component\Uid\Uuid;
         new Put(
             uriTemplate: '/staff-assignments/{id}/lodgings',
             input: UpdateStaffLodgingsRequest::class,
+            denormalizationContext: [],
             security: "is_granted('STAFF_MANAGE', object)",
             processor: StaffLodgingsProcessor::class,
             normalizationContext: ['groups' => ['staff:read']],

@@ -23,7 +23,7 @@ class CascadeDeleteTest extends KernelTestCase
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
     }
 
-    public function test_deleting_lodging_cascades_to_seasons(): void
+    public function testDeletingLodgingCascadesToSeasons(): void
     {
         $lodging = LodgingFactory::createOne();
         $season = SeasonFactory::createOne([

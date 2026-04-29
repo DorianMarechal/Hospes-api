@@ -4,6 +4,8 @@ namespace App\Dto;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
+use App\Entity\Lodging;
 use App\State\LodgingStatsProvider;
 use App\State\MyStatsProvider;
 
@@ -17,6 +19,7 @@ use App\State\MyStatsProvider;
         ),
         new Get(
             uriTemplate: '/me/lodgings/{lodgingId}/stats',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class)],
             security: "is_granted('ROLE_HOST')",
             provider: LodgingStatsProvider::class,
         ),

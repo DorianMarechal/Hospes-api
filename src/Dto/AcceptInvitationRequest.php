@@ -3,7 +3,9 @@
 namespace App\Dto;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use App\Entity\StaffAssignment;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -11,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post(
             uriTemplate: '/staff-invitations/{token}/accept',
+            uriVariables: ['token' => new Link(fromClass: StaffAssignment::class, identifiers: ['invitationToken'])],
             processor: 'App\State\AcceptInvitationProcessor',
             normalizationContext: ['groups' => ['user:read']],
         ),

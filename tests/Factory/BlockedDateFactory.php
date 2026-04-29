@@ -27,6 +27,7 @@ final class BlockedDateFactory extends PersistentProxyObjectFactory
             'reason' => 'Maintenance',
             'source' => 'manual',
             'createdAt' => new \DateTimeImmutable(),
+            'updatedAt' => new \DateTimeImmutable(),
         ];
     }
 }

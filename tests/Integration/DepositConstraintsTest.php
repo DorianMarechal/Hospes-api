@@ -24,7 +24,7 @@ class DepositConstraintsTest extends KernelTestCase
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
     }
 
-    public function test_one_deposit_per_booking(): void
+    public function testOneDepositPerBooking(): void
     {
         $booking = BookingFactory::createOne();
         $now = new \DateTimeImmutable();

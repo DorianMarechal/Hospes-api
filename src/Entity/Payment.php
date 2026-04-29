@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Dto\CreatePaymentRequest;
 use App\Dto\RefundPaymentRequest;
@@ -26,12 +27,15 @@ use Symfony\Component\Uid\Uuid;
     operations: [
         new Post(
             uriTemplate: '/bookings/{bookingId}/payments',
+            uriVariables: ['bookingId' => new Link(fromClass: Booking::class, toProperty: 'booking')],
             input: CreatePaymentRequest::class,
+            denormalizationContext: [],
             security: "is_granted('ROLE_CUSTOMER')",
             processor: PaymentCreateProcessor::class,
         ),
         new GetCollection(
             uriTemplate: '/bookings/{bookingId}/payments',
+            uriVariables: ['bookingId' => new Link(fromClass: Booking::class, toProperty: 'booking')],
             security: "is_granted('ROLE_USER')",
             provider: BookingPaymentsProvider::class,
         ),
@@ -43,6 +47,7 @@ use Symfony\Component\Uid\Uuid;
         new Post(
             uriTemplate: '/payments/{id}/refund',
             input: RefundPaymentRequest::class,
+            denormalizationContext: [],
             security: "is_granted('ROLE_HOST') or is_granted('ROLE_ADMIN')",
             processor: PaymentRefundProcessor::class,
         ),

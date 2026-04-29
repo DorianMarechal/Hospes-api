@@ -33,7 +33,7 @@ class StaffVoterTest extends TestCase
         $reflection->setValue($entity, $id ?? Uuid::v7());
     }
 
-    public function test_manage_granted_for_assignment_host(): void
+    public function testManageGrantedForAssignmentHost(): void
     {
         $host = new User();
         $this->setId($host);
@@ -49,7 +49,7 @@ class StaffVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function test_manage_denied_for_other_host(): void
+    public function testManageDeniedForOtherHost(): void
     {
         $host = new User();
         $this->setId($host);
@@ -68,7 +68,7 @@ class StaffVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function test_manage_denied_for_anonymous(): void
+    public function testManageDeniedForAnonymous(): void
     {
         $host = new User();
         $this->setId($host);
@@ -83,7 +83,7 @@ class StaffVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function test_abstains_for_wrong_attribute(): void
+    public function testAbstainsForWrongAttribute(): void
     {
         $assignment = new StaffAssignment();
         $token = $this->createToken(null);
@@ -93,7 +93,7 @@ class StaffVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $result);
     }
 
-    public function test_abstains_for_wrong_subject(): void
+    public function testAbstainsForWrongSubject(): void
     {
         $user = new User();
         $token = $this->createToken($user);

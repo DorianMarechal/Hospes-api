@@ -27,6 +27,8 @@ final class SeasonFactory extends PersistentProxyObjectFactory
             'endDate' => new \DateTimeImmutable('+3 months'),
             'priceWeek' => 12000,
             'priceWeekend' => 15000,
+            'createdAt' => new \DateTimeImmutable(),
+            'updatedAt' => new \DateTimeImmutable(),
         ];
     }
 }

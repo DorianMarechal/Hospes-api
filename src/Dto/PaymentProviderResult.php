@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Post(
             uriTemplate: '/me/payment-provider/connect',
             input: ConnectPaymentProviderRequest::class,
+            denormalizationContext: [],
             security: "is_granted('ROLE_HOST')",
             processor: PaymentProviderConnectProcessor::class,
         ),

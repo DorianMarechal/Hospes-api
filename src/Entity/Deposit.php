@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Dto\RetainDepositRequest;
 use App\Enum\DepositStatus;
@@ -21,17 +22,21 @@ use Symfony\Component\Uid\Uuid;
     operations: [
         new Get(
             uriTemplate: '/bookings/{bookingId}/deposit',
+            uriVariables: ['bookingId' => new Link(fromClass: Booking::class, toProperty: 'booking')],
             security: "is_granted('ROLE_USER')",
             provider: BookingDepositProvider::class,
         ),
         new Post(
             uriTemplate: '/bookings/{bookingId}/deposit/retain',
+            uriVariables: ['bookingId' => new Link(fromClass: Booking::class, toProperty: 'booking')],
             input: RetainDepositRequest::class,
+            denormalizationContext: [],
             security: "is_granted('ROLE_HOST')",
             processor: DepositRetainProcessor::class,
         ),
         new Post(
             uriTemplate: '/bookings/{bookingId}/deposit/release',
+            uriVariables: ['bookingId' => new Link(fromClass: Booking::class, toProperty: 'booking')],
             input: false,
             security: "is_granted('ROLE_HOST')",
             processor: DepositReleaseProcessor::class,

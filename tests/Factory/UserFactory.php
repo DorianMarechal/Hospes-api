@@ -11,11 +11,10 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
  */
 final class UserFactory extends PersistentProxyObjectFactory
 {
-    private static ?UserPasswordHasherInterface $hasher = null;
-
-    public static function setPasswordHasher(UserPasswordHasherInterface $hasher): void
-    {
-        self::$hasher = $hasher;
+    public function __construct(
+        private readonly UserPasswordHasherInterface $hasher,
+    ) {
+        parent::__construct();
     }
 
     public static function class(): string
@@ -45,8 +44,8 @@ final class UserFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this->afterInstantiate(function (User $user): void {
-            if (self::$hasher && $user->getPassword()) {
-                $user->setPassword(self::$hasher->hashPassword($user, $user->getPassword()));
+            if ($user->getPassword()) {
+                $user->setPassword($this->hasher->hashPassword($user, $user->getPassword()));
             }
         });
     }

@@ -37,7 +37,7 @@ class NoSeasonOverlapValidator extends ConstraintValidator
         $existingSeasons = $this->seasonRepository->findBy(['lodging' => $lodging]);
 
         foreach ($existingSeasons as $existing) {
-            if ($existing->getId() === $value->getId()) {
+            if (null !== $value->getId() && $existing->getId()?->equals($value->getId())) {
                 continue;
             }
 
