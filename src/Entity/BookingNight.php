@@ -33,6 +33,10 @@ class BookingNight
     #[Groups(['booking_night:read', 'booking:read'])]
     private ?int $price = null;
 
+    #[ORM\Column(length: 3, options: ['default' => 'EUR'])]
+    #[Groups(['booking_night:read', 'booking:read'])]
+    private string $currency = 'EUR';
+
     #[ORM\Column(length: 80)]
     #[Groups(['booking_night:read', 'booking:read'])]
     private ?string $source = null;
@@ -74,6 +78,18 @@ class BookingNight
     public function setPrice(int $price): static
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): static
+    {
+        $this->currency = $currency;
 
         return $this;
     }

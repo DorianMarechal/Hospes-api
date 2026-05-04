@@ -110,6 +110,26 @@ class EmailSender
         );
     }
 
+    public function sendAutomatedMessage(?string $to, string $subject, string $body): void
+    {
+        if (null === $to) {
+            return;
+        }
+
+        $html = $this->twig->render('emails/automated_message.html.twig', [
+            'subject' => $subject,
+            'body' => $body,
+        ]);
+
+        $email = (new Email())
+            ->from($this->fromEmail)
+            ->to($to)
+            ->subject($subject)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
+
     /**
      * @param array<string, mixed> $context
      */

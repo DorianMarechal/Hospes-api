@@ -7,6 +7,8 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Booking;
 use App\Entity\BookingStatusHistory;
 use App\Enum\BookingStatus;
+use App\Enum\MessageTemplateTrigger;
+use App\Service\AutomatedMessageDispatcher;
 use App\Service\DepositManager;
 use App\Service\NotificationDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +22,7 @@ class BookingConfirmProcessor implements ProcessorInterface
         private Security $security,
         private NotificationDispatcher $notificationDispatcher,
         private DepositManager $depositManager,
+        private AutomatedMessageDispatcher $automatedMessageDispatcher,
     ) {
     }
 
@@ -75,6 +78,7 @@ class BookingConfirmProcessor implements ProcessorInterface
 
         $this->entityManager->flush();
         $this->notificationDispatcher->publishPendingNotifications();
+        $this->automatedMessageDispatcher->dispatchForBookingEvent($data, MessageTemplateTrigger::BOOKING_CONFIRMED);
 
         return $data;
     }

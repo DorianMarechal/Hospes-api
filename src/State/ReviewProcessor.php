@@ -7,8 +7,10 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Review;
 use App\Entity\User;
 use App\Enum\BookingStatus;
+use App\Enum\MessageTemplateTrigger;
 use App\Repository\BookingRepository;
 use App\Repository\ReviewRepository;
+use App\Service\AutomatedMessageDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -21,6 +23,7 @@ class ReviewProcessor implements ProcessorInterface
         private BookingRepository $bookingRepository,
         private ReviewRepository $reviewRepository,
         private EntityManagerInterface $em,
+        private AutomatedMessageDispatcher $automatedMessageDispatcher,
     ) {
     }
 
@@ -63,6 +66,8 @@ class ReviewProcessor implements ProcessorInterface
 
         $this->em->persist($data);
         $this->em->flush();
+
+        $this->automatedMessageDispatcher->dispatchForBookingEvent($booking, MessageTemplateTrigger::REVIEW_RECEIVED);
 
         return $data;
     }

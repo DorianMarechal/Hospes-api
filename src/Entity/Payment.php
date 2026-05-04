@@ -72,6 +72,10 @@ class Payment
     #[Groups(['payment:read'])]
     private ?int $amount = null;
 
+    #[ORM\Column(length: 3, options: ['default' => 'EUR'])]
+    #[Groups(['payment:read'])]
+    private string $currency = 'EUR';
+
     #[ORM\Column(length: 20, enumType: PaymentType::class)]
     #[Groups(['payment:read'])]
     private ?PaymentType $type = null;
@@ -136,6 +140,18 @@ class Payment
     public function setAmount(int $amount): static
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): static
+    {
+        $this->currency = $currency;
 
         return $this;
     }

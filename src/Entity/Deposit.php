@@ -62,6 +62,10 @@ class Deposit
     #[Groups(['deposit:read', 'booking:read'])]
     private ?int $amount = null;
 
+    #[ORM\Column(length: 3, options: ['default' => 'EUR'])]
+    #[Groups(['deposit:read', 'booking:read'])]
+    private string $currency = 'EUR';
+
     #[ORM\Column(length: 25, enumType: DepositStatus::class)]
     #[Groups(['deposit:read', 'booking:read'])]
     private ?DepositStatus $status = null;
@@ -111,6 +115,18 @@ class Deposit
     public function setAmount(int $amount): static
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): static
+    {
+        $this->currency = $currency;
 
         return $this;
     }

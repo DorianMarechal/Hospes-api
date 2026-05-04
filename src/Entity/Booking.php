@@ -168,6 +168,10 @@ class Booking
     #[Groups(['booking:read'])]
     private ?int $totalPrice = null;
 
+    #[ORM\Column(length: 3, options: ['default' => 'EUR'])]
+    #[Groups(['booking:read'])]
+    private string $currency = 'EUR';
+
     #[ORM\Column(length: 20, enumType: CancellationPolicy::class)]
     #[Groups(['booking:read'])]
     private ?CancellationPolicy $cancellationPolicy = null;
@@ -377,6 +381,18 @@ class Booking
     public function setTotalPrice(int $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): static
+    {
+        $this->currency = $currency;
 
         return $this;
     }

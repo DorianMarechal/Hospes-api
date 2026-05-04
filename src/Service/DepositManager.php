@@ -24,6 +24,7 @@ class DepositManager
         $deposit = new Deposit();
         $deposit->setBooking($booking);
         $deposit->setAmount($amount);
+        $deposit->setCurrency($booking->getCurrency());
         $deposit->setStatus(DepositStatus::HELD);
         $deposit->setCreatedAt(new \DateTimeImmutable());
 

@@ -39,11 +39,13 @@ class MoneyNormalizer implements NormalizerInterface
             return $result;
         }
 
+        $currency = method_exists($data, 'getCurrency') ? $data->getCurrency() : self::DEFAULT_CURRENCY;
+
         foreach (self::MONEY_FIELDS[$class] as $field) {
             if (\array_key_exists($field, $result) && \is_int($result[$field])) {
                 $result[$field] = [
                     'amount' => $result[$field],
-                    'currency' => self::DEFAULT_CURRENCY,
+                    'currency' => $currency,
                 ];
             }
         }

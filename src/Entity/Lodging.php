@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use App\Enum\CancellationPolicy;
 use App\Enum\LodgingType;
 use App\Repository\LodgingRepository;
+use App\State\GeneratePricingApiKeyProcessor;
 use App\State\LodgingProcessor;
 use App\State\MyLodgingsProvider;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -43,6 +44,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Delete(
             security: "is_granted('LODGING_DELETE', object)"
+        ),
+        new Post(
+            uriTemplate: '/lodgings/{id}/generate-pricing-api-key',
+            security: "is_granted('LODGING_EDIT', object)",
+            input: false,
+            processor: GeneratePricingApiKeyProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => ['lodging:read']],
@@ -184,6 +191,19 @@ class Lodging
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['lodging:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['lodging:read', 'lodging:write'])]
+    private ?PropertyOwner $propertyOwner = null;
+
+    #[ORM\Column(length: 3, options: ['default' => 'EUR'])]
+    #[Groups(['lodging:read', 'lodging:list', 'lodging:write'])]
+    private string $currency = 'EUR';
+
+    #[ORM\Column(length: 64, nullable: true)]
+    #[Groups(['lodging:read'])]
+    private ?string $pricingWebhookApiKey = null;
 
     /**
      * @var Collection<int, LodgingImage>
@@ -713,6 +733,42 @@ class Lodging
                 $booking->setLodging(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPropertyOwner(): ?PropertyOwner
+    {
+        return $this->propertyOwner;
+    }
+
+    public function setPropertyOwner(?PropertyOwner $propertyOwner): static
+    {
+        $this->propertyOwner = $propertyOwner;
+
+        return $this;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): static
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    public function getPricingWebhookApiKey(): ?string
+    {
+        return $this->pricingWebhookApiKey;
+    }
+
+    public function setPricingWebhookApiKey(?string $pricingWebhookApiKey): static
+    {
+        $this->pricingWebhookApiKey = $pricingWebhookApiKey;
 
         return $this;
     }

@@ -44,6 +44,7 @@ class PriceCalculator
             touristTaxTotal: $touristTaxTotal,
             depositAmount: $depositAmount,
             totalPrice: $totalPrice,
+            currency: $lodging->getCurrency(),
         );
     }
 

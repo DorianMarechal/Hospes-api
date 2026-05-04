@@ -8,7 +8,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Dto\BulkRatesRequest;
 use App\Repository\PriceOverrideRepository;
+use App\State\BulkRatesProcessor;
 use App\State\PriceOverrideCollectionProvider;
 use App\State\PriceOverrideProcessor;
 use Doctrine\DBAL\Types\Types;
@@ -33,6 +35,15 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
             security: "is_granted('ROLE_HOST')",
             processor: PriceOverrideProcessor::class,
+        ),
+        new Put(
+            uriTemplate: '/lodgings/{lodgingId}/rates',
+            uriVariables: ['lodgingId' => new Link(fromClass: Lodging::class, toProperty: 'lodging')],
+            input: BulkRatesRequest::class,
+            denormalizationContext: [],
+            security: "is_granted('ROLE_HOST')",
+            processor: BulkRatesProcessor::class,
+            read: false,
         ),
         new Put(
             security: "is_granted('LODGING_EDIT', object.getLodging())",

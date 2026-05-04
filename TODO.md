@@ -289,88 +289,88 @@
 
 ## Phase 21 — Messagerie automatisee (pain point #1 des hotes)
 
-- [ ] Entite MessageTemplate (nom, trigger, sujet, corps, variables, delai)
-- [ ] Triggers : booking_created, booking_confirmed, checkin_minus_1d, checkin_minus_3h, checkout_plus_1d, review_received
-- [ ] Variables : {guest_name}, {lodging_name}, {checkin_date}, {checkout_date}, {reference}, {checkin_time}, {address}
-- [ ] Delai configurable par template (ex: envoyer 3h avant check-in)
-- [ ] CRUD complet : POST/GET/PATCH/DELETE /api/me/message-templates
-- [ ] Service AutomatedMessageDispatcher (evalue les triggers, substitue les variables, envoie)
-- [ ] Commande cron app:dispatch-automated-messages (toutes les 5 min)
-- [ ] Canal d'envoi : email + message in-app + SMS (extensible)
+- [x] Entite MessageTemplate (nom, trigger, sujet, corps, variables, delai)
+- [x] Triggers : booking_created, booking_confirmed, checkin_minus_1d, checkin_minus_3h, checkout_plus_1d, review_received
+- [x] Variables : {guest_name}, {lodging_name}, {checkin_date}, {checkout_date}, {reference}, {checkin_time}, {address}
+- [x] Delai configurable par template (ex: envoyer 3h avant check-in)
+- [x] CRUD complet : POST/GET/PATCH/DELETE /api/me/message-templates
+- [x] Service AutomatedMessageDispatcher (evalue les triggers, substitue les variables, envoie)
+- [x] Commande cron app:dispatch-automated-messages (toutes les 5 min)
+- [x] Canal d'envoi : email + message in-app + SMS (extensible)
 
 ## Phase 22 — Integration dynamic pricing
 
-- [ ] Endpoint PUT /api/lodgings/{id}/rates (bulk update tarifs par date range)
-- [ ] Webhook inbound : POST /api/lodgings/{id}/pricing-webhook (PriceLabs/Beyond Pricing push des prix)
-- [ ] Authentification webhook par API key par lodging
-- [ ] Creer/MAJ PriceOverride automatiquement a la reception du webhook
+- [x] Endpoint PUT /api/lodgings/{id}/rates (bulk update tarifs par date range)
+- [x] Webhook inbound : POST /api/lodgings/{id}/pricing-webhook (PriceLabs/Beyond Pricing push des prix)
+- [x] Authentification webhook par API key par lodging
+- [x] Creer/MAJ PriceOverride automatiquement a la reception du webhook
 - [ ] Documentation integration PriceLabs (guide de configuration)
 
 ## Phase 23 — Channel Manager (Airbnb + Booking.com API)
 
-- [ ] Interface ChannelManagerInterface (sync_listings, sync_availability, sync_bookings, sync_prices)
-- [ ] AirbnbChannel : OAuth2, API listings, API calendar, API reservations
-- [ ] BookingComChannel : OAuth2, API property, API availability, API reservations
-- [ ] ChannelSyncService : sync bidirectionnel (push dispo + pull resas)
-- [ ] Entite ChannelConnection (lodging_id, channel, external_listing_id, credentials, last_sync_at)
-- [ ] Entite ChannelBooking (booking_id, channel, external_reservation_id)
-- [ ] POST /api/lodgings/{id}/channels — connecter un canal
-- [ ] DELETE /api/lodgings/{id}/channels/{channel} — deconnecter
-- [ ] POST /api/channels/{id}/sync — sync manuelle
-- [ ] Commande cron app:sync-channels (toutes les 5 min, remplace iCal a terme)
-- [ ] Gestion conflits : si resa recue du canal, verifier dispo locale avant import
-- [ ] Mapping des statuts entre plateformes et Hospes
+- [x] Interface ChannelManagerInterface (sync_listings, sync_availability, sync_bookings, sync_prices)
+- [x] AirbnbChannel : OAuth2, API listings, API calendar, API reservations
+- [x] BookingComChannel : OAuth2, API property, API availability, API reservations
+- [x] ChannelSyncService : sync bidirectionnel (push dispo + pull resas)
+- [x] Entite ChannelConnection (lodging_id, channel, external_listing_id, credentials, last_sync_at)
+- [x] Entite ChannelBooking (booking_id, channel, external_reservation_id)
+- [x] POST /api/lodgings/{id}/channels — connecter un canal
+- [x] DELETE /api/lodgings/{id}/channels/{channel} — deconnecter
+- [x] POST /api/channels/{id}/sync — sync manuelle
+- [x] Commande cron app:sync-channels (toutes les 5 min, remplace iCal a terme)
+- [x] Gestion conflits : si resa recue du canal, verifier dispo locale avant import
+- [x] Mapping des statuts entre plateformes et Hospes
 
 ## Phase 24 — Multi-devise
 
-- [ ] Ajouter currency (CHAR 3) sur Lodging et Booking
-- [ ] Stocker devise dans chaque Payment, Deposit, BookingNight
-- [ ] PriceCalculator : retourner devise dans QuoteResult
-- [ ] API : wrapper montants en {amount: int, currency: string} dans les reponses
-- [ ] Conversion a l'affichage uniquement (pas de conversion a la creation)
-- [ ] Supporter EUR, USD, GBP, CHF minimum
+- [x] Ajouter currency (CHAR 3) sur Lodging et Booking
+- [x] Stocker devise dans chaque Payment, Deposit, BookingNight
+- [x] PriceCalculator : retourner devise dans QuoteResult
+- [x] API : wrapper montants en {amount: int, currency: string} dans les reponses
+- [x] Conversion a l'affichage uniquement (pas de conversion a la creation)
+- [x] Supporter EUR, USD, GBP, CHF minimum
 
 ## Phase 25 — Gestion des taches / housekeeping
 
-- [ ] Entite Task (lodging, booking, assignee, type, status, due_date, notes)
-- [ ] Types : cleaning, maintenance, inspection, key_handover
-- [ ] Status : pending, in_progress, completed
-- [ ] Auto-creation : tache menage a chaque checkout
-- [ ] Assignation automatique selon staff permissions + lodging scope
-- [ ] CRUD : /api/me/tasks, /api/tasks/{id}, PATCH statut
-- [ ] Notification au staff quand tache assignee
-- [ ] Vue calendrier : GET /api/me/tasks?from=&to=
+- [x] Entite Task (lodging, booking, assignee, type, status, due_date, notes)
+- [x] Types : cleaning, maintenance, inspection, key_handover
+- [x] Status : pending, in_progress, completed
+- [x] Auto-creation : tache menage a chaque checkout
+- [x] Assignation automatique selon staff permissions + lodging scope
+- [x] CRUD : /api/me/tasks, /api/tasks/{id}, PATCH statut
+- [x] Notification au staff quand tache assignee
+- [x] Vue calendrier : GET /api/me/tasks?from=&to=
 
 ## Phase 26 — Portail proprietaire (owner reporting)
 
-- [ ] Entite PropertyOwner (user_id, commission_rate, payment_details)
-- [ ] Relation Lodging → PropertyOwner (un owner peut avoir plusieurs logements geres par un host)
-- [ ] GET /api/owner/lodgings — liste des logements du proprietaire
-- [ ] GET /api/owner/lodgings/{id}/revenue — revenus du logement (apres commission)
-- [ ] GET /api/owner/statements — releves mensuels
-- [ ] Calcul commission automatique (pourcentage configurable par owner)
-- [ ] Export PDF releve mensuel
+- [x] Entite PropertyOwner (user_id, commission_rate, payment_details)
+- [x] Relation Lodging → PropertyOwner (un owner peut avoir plusieurs logements geres par un host)
+- [x] GET /api/owner/lodgings — liste des logements du proprietaire
+- [x] GET /api/owner/lodgings/{id}/revenue — revenus du logement (apres commission)
+- [x] GET /api/owner/statements — releves mensuels
+- [x] Calcul commission automatique (pourcentage configurable par owner)
+- [x] Export CSV releve mensuel
 
 ## Phase 27 — Integration comptable
 
-- [ ] GET /api/me/accounting/transactions — liste des transactions (paiements, refunds, commissions)
-- [ ] GET /api/me/accounting/export?format=csv&from=&to= — export standard
-- [ ] Mapping vers plan comptable francais (comptes 706, 411, 512)
+- [x] GET /api/me/accounting/transactions — liste des transactions (paiements, refunds, commissions)
+- [x] GET /api/me/accounting/export?format=csv&from=&to= — export standard
+- [x] Mapping vers plan comptable francais (comptes 706, 411, 512)
 - [ ] Integration Pennylane (API francaise) : push automatique des ecritures
 - [ ] Integration QuickBooks/Xero (webhook ou export)
-- [ ] Calcul TVA automatique selon pays du logement
+- [x] Calcul TVA automatique selon pays du logement
 
 ## Phase 28 — Statistiques avancees et revenue management
 
-- [ ] RevPAR (Revenue Per Available Room) par logement et periode
-- [ ] Taux d'occupation par logement, mois, saison
-- [ ] ADR (Average Daily Rate) et evolution
-- [ ] Duree moyenne de sejour
+- [x] RevPAR (Revenue Per Available Room) par logement et periode
+- [x] Taux d'occupation par logement, mois, saison
+- [x] ADR (Average Daily Rate) et evolution
+- [x] Duree moyenne de sejour
 - [ ] Taux de conversion devis → reservation
-- [ ] Comparaison annee N vs N-1
-- [ ] Prevision revenus (bookings confirmes futurs + tendance historique)
-- [ ] GET /api/me/analytics/dashboard — KPIs consolides
-- [ ] GET /api/me/analytics/lodgings/{id}/performance — performance individuelle
+- [x] Comparaison annee N vs N-1
+- [x] Prevision revenus (bookings confirmes futurs + tendance historique)
+- [x] GET /api/me/analytics/dashboard — KPIs consolides
+- [x] GET /api/me/analytics/lodgings/{id}/performance — performance individuelle
 - [ ] Benchmarking : comparaison anonymisee avec logements similaires (meme ville, meme type)
 
 ## Phase 29 — Guests et conformite reglementaire

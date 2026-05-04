@@ -282,4 +282,24 @@ class PriceCalculatorTest extends TestCase
         $this->assertSame(20000, $result->nights[0]->price);
         $this->assertStringContainsString('Override', $result->nights[0]->source);
     }
+
+    // PC-13 : La devise du logement est propagée dans QuoteResult
+    public function testCurrencyPropagatedFromLodging(): void
+    {
+        $lodging = new Lodging();
+        $lodging->setBasePriceWeek(10000);
+        $lodging->setBasePriceWeekend(12000);
+        $lodging->setCurrency('USD');
+
+        $result = $this->calculator->calculate(
+            $lodging,
+            new \DateTimeImmutable('2026-07-06'),
+            new \DateTimeImmutable('2026-07-07'),
+            1,
+            [],
+            [],
+        );
+
+        $this->assertSame('USD', $result->currency);
+    }
 }

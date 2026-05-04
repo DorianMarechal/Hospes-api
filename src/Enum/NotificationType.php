@@ -17,4 +17,6 @@ enum NotificationType: string
     case MODIFICATION_REJECTED = 'modification_rejected';
     case MODIFICATION_EXPIRED = 'modification_expired';
     case DEPOSIT_RELEASED = 'deposit_released';
+    case AUTOMATED_MESSAGE = 'automated_message';
+    case TASK_ASSIGNED = 'task_assigned';
 }

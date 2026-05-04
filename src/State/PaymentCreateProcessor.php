@@ -73,10 +73,11 @@ class PaymentCreateProcessor implements ProcessorInterface
             throw new HttpException(422, 'The host has not configured a payment provider');
         }
 
+        $currency = strtolower($booking->getCurrency());
         $gateway = $this->gatewayFactory->get($hostProfile->getPaymentProvider());
         $result = $gateway->createPayment(
             $amount,
-            'eur',
+            $currency,
             $hostProfile->getPaymentProviderAccountId(),
             'Booking '.$booking->getReference(),
         );
@@ -86,6 +87,7 @@ class PaymentCreateProcessor implements ProcessorInterface
         $payment = new Payment();
         $payment->setBooking($booking);
         $payment->setAmount($amount);
+        $payment->setCurrency($booking->getCurrency());
         $payment->setType(PaymentType::BOOKING);
         $payment->setMethod($data->method);
         $payment->setStatus(PaymentStatus::PENDING);

@@ -1,0 +1,6 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>{{ subject }}</h2>
+    {{ body|nl2br }}
+{% endblock %}

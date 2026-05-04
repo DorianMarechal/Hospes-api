@@ -14,6 +14,7 @@ class QuoteResult
         public readonly int $touristTaxTotal,
         public readonly int $depositAmount,
         public readonly int $totalPrice,
+        public readonly string $currency = 'EUR',
     ) {
     }
 }

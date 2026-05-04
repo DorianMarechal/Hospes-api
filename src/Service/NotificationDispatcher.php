@@ -330,6 +330,35 @@ class NotificationDispatcher
         }
     }
 
+    public function taskAssigned(User $assignee, string $taskType, string $lodgingName, ?Uuid $taskId): void
+    {
+        $this->create(
+            $assignee,
+            NotificationType::TASK_ASSIGNED,
+            'Tâche assignée',
+            \sprintf('Une tâche "%s" vous a été assignée pour "%s".', $taskType, $lodgingName),
+            'task',
+            $taskId,
+            ['task_type' => $taskType, 'lodging_name' => $lodgingName],
+        );
+    }
+
+    public function automatedMessage(User $user, string $title, string $content, Booking $booking): void
+    {
+        $this->create(
+            $user,
+            NotificationType::AUTOMATED_MESSAGE,
+            $title,
+            $content,
+            'booking',
+            $booking->getId(),
+            [
+                'reference' => $booking->getReference() ?? '',
+                'lodging_name' => $booking->getLodging()?->getName() ?? '',
+            ],
+        );
+    }
+
     public function depositReleased(Deposit $deposit): void
     {
         $customer = $deposit->getBooking()?->getCustomer();

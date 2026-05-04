@@ -9,9 +9,11 @@ use App\Entity\Booking;
 use App\Entity\BookingNight;
 use App\Entity\BookingStatusHistory;
 use App\Enum\BookingStatus;
+use App\Enum\MessageTemplateTrigger;
 use App\Repository\BlockedDateRepository;
 use App\Repository\BookingRepository;
 use App\Repository\LodgingRepository;
+use App\Service\AutomatedMessageDispatcher;
 use App\Service\AvailabilityResolver;
 use App\Service\BookingReferenceGenerator;
 use App\Service\OrphanProtectionChecker;
@@ -35,6 +37,7 @@ class BookingCreateProcessor implements ProcessorInterface
         private PriceCalculator $priceCalculator,
         private BookingReferenceGenerator $referenceGenerator,
         private EntityManagerInterface $entityManager,
+        private AutomatedMessageDispatcher $automatedMessageDispatcher,
     ) {
     }
 
@@ -100,6 +103,7 @@ class BookingCreateProcessor implements ProcessorInterface
         $booking->setDepositAmount($quote->depositAmount);
         $booking->setTotalPrice($quote->totalPrice);
         $booking->setCancellationPolicy($lodging->getCancellationPolicy());
+        $booking->setCurrency($quote->currency);
         $booking->setStatus(BookingStatus::PENDING);
         $booking->setExpiresAt($now->modify('+'.self::TTL_MINUTES.' minutes'));
         $booking->setCreatedAt($now);
@@ -109,6 +113,7 @@ class BookingCreateProcessor implements ProcessorInterface
             $night = new BookingNight();
             $night->setDate($nightPrice->date);
             $night->setPrice($nightPrice->price);
+            $night->setCurrency($quote->currency);
             $night->setSource($nightPrice->source);
             $booking->addBookingNight($night);
         }
@@ -123,6 +128,8 @@ class BookingCreateProcessor implements ProcessorInterface
         $this->entityManager->persist($booking);
         $this->entityManager->persist($history);
         $this->entityManager->flush();
+
+        $this->automatedMessageDispatcher->dispatchForBookingEvent($booking, MessageTemplateTrigger::BOOKING_CREATED);
 
         return $booking;
     }
