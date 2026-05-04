@@ -238,6 +238,24 @@ class Booking
     #[Groups(['booking:read'])]
     private bool $insuranceProposed = false;
 
+    #[ORM\Column(length: 64, nullable: true, unique: true)]
+    private ?string $guestPortalToken = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['booking:read'])]
+    private ?string $guestEmail = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['booking:read'])]
+    private ?string $guestFirstName = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['booking:read'])]
+    private ?string $guestLastName = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $guestPhone = null;
+
     #[ORM\Column(length: 30)]
     #[Groups(['booking:read'])]
     private string $source = 'direct';
@@ -588,6 +606,66 @@ class Booking
     public function setSource(string $source): static
     {
         $this->source = $source;
+
+        return $this;
+    }
+
+    public function getGuestPortalToken(): ?string
+    {
+        return $this->guestPortalToken;
+    }
+
+    public function setGuestPortalToken(?string $guestPortalToken): static
+    {
+        $this->guestPortalToken = $guestPortalToken;
+
+        return $this;
+    }
+
+    public function getGuestEmail(): ?string
+    {
+        return $this->guestEmail;
+    }
+
+    public function setGuestEmail(?string $guestEmail): static
+    {
+        $this->guestEmail = $guestEmail;
+
+        return $this;
+    }
+
+    public function getGuestFirstName(): ?string
+    {
+        return $this->guestFirstName;
+    }
+
+    public function setGuestFirstName(?string $guestFirstName): static
+    {
+        $this->guestFirstName = $guestFirstName;
+
+        return $this;
+    }
+
+    public function getGuestLastName(): ?string
+    {
+        return $this->guestLastName;
+    }
+
+    public function setGuestLastName(?string $guestLastName): static
+    {
+        $this->guestLastName = $guestLastName;
+
+        return $this;
+    }
+
+    public function getGuestPhone(): ?string
+    {
+        return $this->guestPhone;
+    }
+
+    public function setGuestPhone(?string $guestPhone): static
+    {
+        $this->guestPhone = $guestPhone;
 
         return $this;
     }

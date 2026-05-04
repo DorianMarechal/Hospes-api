@@ -1,0 +1,69 @@
+<?php
+
+namespace App\State;
+
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\State\ProcessorInterface;
+use App\Entity\Guidebook;
+use App\Entity\User;
+use App\Repository\LodgingRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+class GuidebookProcessor implements ProcessorInterface
+{
+    public function __construct(
+        private Security $security,
+        private LodgingRepository $lodgingRepository,
+        private EntityManagerInterface $em,
+    ) {
+    }
+
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Guidebook
+    {
+        if (!$data instanceof Guidebook) {
+            throw new \InvalidArgumentException('Expected '.Guidebook::class);
+        }
+
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new AccessDeniedHttpException('Authentication required.');
+        }
+
+        $hostProfile = $user->getHostProfile();
+        if (null === $hostProfile) {
+            throw new AccessDeniedHttpException('Host profile required.');
+        }
+
+        $now = new \DateTimeImmutable();
+
+        if ($operation instanceof Post) {
+            $lodging = $this->lodgingRepository->find($uriVariables['lodgingId']);
+            if (null === $lodging) {
+                throw new NotFoundHttpException('Lodging not found.');
+            }
+
+            if (!$lodging->getHost()?->getId()?->equals($hostProfile->getId())) {
+                throw new AccessDeniedHttpException('You do not own this lodging.');
+            }
+
+            $data->setLodging($lodging);
+            $data->setCreatedAt($now);
+        } else {
+            $lodging = $data->getLodging();
+            if (null === $lodging || !$lodging->getHost()?->getId()?->equals($hostProfile->getId())) {
+                throw new AccessDeniedHttpException('You do not own this guidebook.');
+            }
+        }
+
+        $data->setUpdatedAt($now);
+
+        $this->em->persist($data);
+        $this->em->flush();
+
+        return $data;
+    }
+}

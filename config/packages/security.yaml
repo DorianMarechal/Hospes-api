@@ -63,6 +63,10 @@ security:
         - { path: ^/api/lodgings/[^/]+/reviews, roles: PUBLIC_ACCESS }
         - { path: ^/api/availability,       roles: PUBLIC_ACCESS }
         - { path: ^/api/lodgings/[^/]+/availability, roles: PUBLIC_ACCESS }
+        - { path: ^/api/lodgings/[^/]+/booking-widget, roles: PUBLIC_ACCESS }
+        - { path: ^/api/direct-booking,     roles: PUBLIC_ACCESS }
+        - { path: ^/api/guest-portal/,      roles: PUBLIC_ACCESS }
+        - { path: ^/api/lodgings/[^/]+/guidebook, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs,               roles: PUBLIC_ACCESS }
         - { path: ^/api,                    roles: IS_AUTHENTICATED_FULLY }
 

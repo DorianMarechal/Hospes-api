@@ -415,6 +415,32 @@
 - [x] Proposition automatique a la reservation (InsuranceClaim entity + insuranceProposed flag sur Booking)
 - [x] Tracking statut reclamation (InsuranceClaim avec status: proposed/active/claimed/resolved)
 
+---
+
+# V6 — FRONTEND-READY API (endpoints pour widget, portail guest, guidebook, upsells)
+
+## Phase 35 — Direct booking + Guest portal
+
+- [x] GET /api/lodgings/{id}/booking-widget — données widget (calendrier dispo + prix + conditions)
+- [x] POST /api/direct-booking — réservation directe sans compte (guest email + Stripe)
+- [x] GET /api/guest-portal/{token} — portail guest (trip details, guidebook, access code, extras)
+- [x] POST /api/guest-portal/{token}/register-guests — self-service check-in
+- [x] POST /api/guest-portal/{token}/extras — ajout extra/upsell à la réservation
+- [x] Champs Booking : guestPortalToken, guestEmail, guestFirstName, guestLastName, guestPhone
+
+## Phase 36 — Guidebook + Extras/Upsells
+
+- [x] Entité Guidebook (1 par lodging, sections: check-in, rules, wifi, recommandations, parking, transport, urgences)
+- [x] GET /api/lodgings/{id}/guidebook — public, sans auth
+- [x] POST /api/me/lodgings/{id}/guidebook + PATCH /api/guidebooks/{id} — CRUD host
+- [x] Entité Extra (per lodging, price, priceType: per_booking/per_night/per_person)
+- [x] Entité BookingExtra (liaison booking ↔ extra avec quantity et prix calculé)
+- [x] GET /api/lodgings/{id}/extras — liste publique
+- [x] POST/PATCH/DELETE /api/extras — CRUD host
+- [x] Recalcul automatique du total booking à l'ajout d'un extra
+
+---
+
 ## Phase 34 — Deploiement et ops
 
 - [ ] Terraform / IaC pour infra cloud (Railway, Fly.io ou AWS)
