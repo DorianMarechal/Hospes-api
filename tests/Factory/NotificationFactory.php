@@ -3,6 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\Notification;
+use App\Enum\NotificationType;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 /**
@@ -22,7 +23,7 @@ final class NotificationFactory extends PersistentProxyObjectFactory
     {
         return [
             'user' => UserFactory::new(),
-            'type' => 'booking_confirmed',
+            'type' => NotificationType::BOOKING_CONFIRMED,
             'title' => 'New booking',
             'content' => 'A new booking has been confirmed',
             'isRead' => false,
