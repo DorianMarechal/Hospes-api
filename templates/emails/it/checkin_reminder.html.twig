@@ -1,0 +1,16 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>Promemoria: il suo arrivo è domani</h2>
+    <p>Ciao {{ booking.customer.firstName }},</p>
+    <p>Il suo soggiorno presso <strong>{{ booking.lodging.name }}</strong> inizia domani!</p>
+
+    <div class="detail">
+        <p><strong>Riferimento:</strong> {{ booking.reference }}</p>
+        <p><strong>Arrivo:</strong> {{ booking.checkin|date('d/m/Y') }}</p>
+        <p><strong>Ora di arrivo:</strong> {{ booking.lodging.checkinTime|date('H:i') }}</p>
+        <p><strong>Indirizzo:</strong> {{ booking.lodging.address }}, {{ booking.lodging.postalCode }} {{ booking.lodging.city }}</p>
+    </div>
+
+    <p>Buon viaggio!</p>
+{% endblock %}

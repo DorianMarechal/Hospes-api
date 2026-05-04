@@ -304,7 +304,7 @@
 - [x] Webhook inbound : POST /api/lodgings/{id}/pricing-webhook (PriceLabs/Beyond Pricing push des prix)
 - [x] Authentification webhook par API key par lodging
 - [x] Creer/MAJ PriceOverride automatiquement a la reception du webhook
-- [ ] Documentation integration PriceLabs (guide de configuration)
+- [ ] Documentation integration PriceLabs (guide de configuration) — **ACCES PARTENAIRE REQUIS**
 
 ## Phase 23 — Channel Manager (Airbnb + Booking.com API)
 
@@ -356,8 +356,8 @@
 - [x] GET /api/me/accounting/transactions — liste des transactions (paiements, refunds, commissions)
 - [x] GET /api/me/accounting/export?format=csv&from=&to= — export standard
 - [x] Mapping vers plan comptable francais (comptes 706, 411, 512)
-- [ ] Integration Pennylane (API francaise) : push automatique des ecritures
-- [ ] Integration QuickBooks/Xero (webhook ou export)
+- [ ] Integration Pennylane (API francaise) : push automatique des ecritures — **ACCES PARTENAIRE REQUIS** (voir docs/PARTNER_ACCESS_REQUIRED.md)
+- [ ] Integration QuickBooks/Xero (webhook ou export) — **ACCES PARTENAIRE REQUIS**
 - [x] Calcul TVA automatique selon pays du logement
 
 ## Phase 28 — Statistiques avancees et revenue management
@@ -371,7 +371,7 @@
 - [x] Prevision revenus (bookings confirmes futurs + tendance historique)
 - [x] GET /api/me/analytics/dashboard — KPIs consolides
 - [x] GET /api/me/analytics/lodgings/{id}/performance — performance individuelle
-- [ ] Benchmarking : comparaison anonymisee avec logements similaires (meme ville, meme type)
+- [x] Benchmarking : comparaison anonymisee avec logements similaires (meme ville, meme type)
 
 ## Phase 29 — Guests et conformite reglementaire
 
@@ -402,18 +402,18 @@
 
 ## Phase 32 — Multi-langue API
 
-- [ ] Accept-Language header pour les reponses (messages d'erreur, notifications)
+- [x] Accept-Language header pour les reponses (messages d'erreur, notifications)
 - [x] Entite LodgingTranslation (lodging_id, locale, name, description)
 - [x] Notifications : notification_type + params au lieu de texte hardcode
-- [ ] Emails : templates Twig multilingues (fr, en, de, es, it)
+- [x] Emails : templates Twig multilingues (fr, en, de, es, it)
 - [x] Preference de langue sur User entity
 
 ## Phase 33 — Assurance et protection
 
 - [x] Integration protection voyageur (Swikly, Superhog) — placeholders
 - [x] Interface InsuranceProviderInterface (create_policy, cancel_policy, file_claim)
-- [ ] Proposition automatique a la reservation
-- [ ] Tracking statut reclamation
+- [x] Proposition automatique a la reservation (InsuranceClaim entity + insuranceProposed flag sur Booking)
+- [x] Tracking statut reclamation (InsuranceClaim avec status: proposed/active/claimed/resolved)
 
 ## Phase 34 — Deploiement et ops
 

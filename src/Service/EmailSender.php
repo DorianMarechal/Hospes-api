@@ -25,10 +25,19 @@ class EmailSender
             return;
         }
 
+        $locale = $customer->getPreferredLocale();
+        $template = $this->resolveTemplate('booking_confirmation', $locale);
+
         $this->send(
             $customer->getEmail(),
-            'Confirmation de votre réservation '.$booking->getReference(),
-            'emails/booking_confirmation.html.twig',
+            $this->localizedSubject($locale, [
+                'fr' => 'Confirmation de votre réservation '.$booking->getReference(),
+                'en' => 'Booking confirmation '.$booking->getReference(),
+                'de' => 'Buchungsbestätigung '.$booking->getReference(),
+                'es' => 'Confirmación de reserva '.$booking->getReference(),
+                'it' => 'Conferma prenotazione '.$booking->getReference(),
+            ]),
+            $template,
             ['booking' => $booking],
         );
     }
@@ -87,10 +96,20 @@ class EmailSender
             return;
         }
 
+        $locale = $customer->getPreferredLocale();
+        $template = $this->resolveTemplate('checkin_reminder', $locale);
+        $lodgingName = $booking->getLodging()?->getName() ?? '';
+
         $this->send(
             $customer->getEmail(),
-            'Rappel : votre arrivée demain pour '.$booking->getLodging()?->getName(),
-            'emails/checkin_reminder.html.twig',
+            $this->localizedSubject($locale, [
+                'fr' => 'Rappel : votre arrivée demain pour '.$lodgingName,
+                'en' => 'Reminder: your arrival tomorrow at '.$lodgingName,
+                'de' => 'Erinnerung: Ihre Anreise morgen bei '.$lodgingName,
+                'es' => 'Recordatorio: su llegada mañana en '.$lodgingName,
+                'it' => 'Promemoria: il suo arrivo domani a '.$lodgingName,
+            ]),
+            $template,
             ['booking' => $booking],
         );
     }
@@ -102,10 +121,19 @@ class EmailSender
             return;
         }
 
+        $locale = $customer->getPreferredLocale();
+        $template = $this->resolveTemplate('review_request', $locale);
+
         $this->send(
             $customer->getEmail(),
-            'Comment s\'est passé votre séjour ?',
-            'emails/review_request.html.twig',
+            $this->localizedSubject($locale, [
+                'fr' => 'Comment s\'est passé votre séjour ?',
+                'en' => 'How was your stay?',
+                'de' => 'Wie war Ihr Aufenthalt?',
+                'es' => '¿Cómo fue su estancia?',
+                'it' => 'Com\'è stato il suo soggiorno?',
+            ]),
+            $template,
             ['booking' => $booking],
         );
     }
@@ -148,5 +176,23 @@ class EmailSender
             ->html($html);
 
         $this->mailer->send($email);
+    }
+
+    private function resolveTemplate(string $name, string $locale): string
+    {
+        $localized = \sprintf('emails/%s/%s.html.twig', $locale, $name);
+        if ($this->twig->getLoader()->exists($localized)) {
+            return $localized;
+        }
+
+        return \sprintf('emails/%s.html.twig', $name);
+    }
+
+    /**
+     * @param array<string, string> $subjects
+     */
+    private function localizedSubject(string $locale, array $subjects): string
+    {
+        return $subjects[$locale] ?? $subjects['fr'] ?? '';
     }
 }

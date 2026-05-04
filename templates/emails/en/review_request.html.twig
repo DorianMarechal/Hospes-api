@@ -1,0 +1,8 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>How was your stay?</h2>
+    <p>Hello {{ booking.customer.firstName }},</p>
+    <p>We hope you enjoyed your stay at <strong>{{ booking.lodging.name }}</strong>.</p>
+    <p>Your feedback is valuable! Please take a moment to leave a review.</p>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>Wie war Ihr Aufenthalt?</h2>
+    <p>Hallo {{ booking.customer.firstName }},</p>
+    <p>Wir hoffen, Ihr Aufenthalt in <strong>{{ booking.lodging.name }}</strong> hat Ihnen gefallen.</p>
+    <p>Ihre Meinung ist uns wichtig! Bitte hinterlassen Sie eine Bewertung.</p>
+{% endblock %}

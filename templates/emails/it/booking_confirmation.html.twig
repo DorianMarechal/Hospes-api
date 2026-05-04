@@ -1,0 +1,18 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>Prenotazione confermata</h2>
+    <p>Ciao {{ booking.customer.firstName }},</p>
+    <p>La sua prenotazione è stata confermata.</p>
+
+    <div class="detail">
+        <p><strong>Riferimento:</strong> {{ booking.reference }}</p>
+        <p><strong>Alloggio:</strong> {{ booking.lodging.name }}</p>
+        <p><strong>Arrivo:</strong> {{ booking.checkin|date('d/m/Y') }}</p>
+        <p><strong>Partenza:</strong> {{ booking.checkout|date('d/m/Y') }}</p>
+        <p><strong>Ospiti:</strong> {{ booking.guestsCount }}</p>
+        <p><strong>Totale:</strong> {{ (booking.totalPrice / 100)|number_format(2, ',', '.') }} {{ booking.currency }}</p>
+    </div>
+
+    <p>Le auguriamo un ottimo soggiorno!</p>
+{% endblock %}

@@ -234,6 +234,10 @@ class Booking
     #[Groups(['booking:read'])]
     private ?string $promotionCode = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    #[Groups(['booking:read'])]
+    private bool $insuranceProposed = false;
+
     #[ORM\Column(length: 30)]
     #[Groups(['booking:read'])]
     private string $source = 'direct';
@@ -584,6 +588,18 @@ class Booking
     public function setSource(string $source): static
     {
         $this->source = $source;
+
+        return $this;
+    }
+
+    public function isInsuranceProposed(): bool
+    {
+        return $this->insuranceProposed;
+    }
+
+    public function setInsuranceProposed(bool $insuranceProposed): static
+    {
+        $this->insuranceProposed = $insuranceProposed;
 
         return $this;
     }
