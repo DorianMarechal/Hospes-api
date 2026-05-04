@@ -226,6 +226,14 @@ class Booking
     #[Groups(['booking:read'])]
     private ?Deposit $deposit = null;
 
+    #[ORM\Column(options: ['default' => 0])]
+    #[Groups(['booking:read'])]
+    private int $discountAmount = 0;
+
+    #[ORM\Column(length: 30, nullable: true)]
+    #[Groups(['booking:read'])]
+    private ?string $promotionCode = null;
+
     #[ORM\Column(length: 30)]
     #[Groups(['booking:read'])]
     private string $source = 'direct';
@@ -576,6 +584,30 @@ class Booking
     public function setSource(string $source): static
     {
         $this->source = $source;
+
+        return $this;
+    }
+
+    public function getDiscountAmount(): int
+    {
+        return $this->discountAmount;
+    }
+
+    public function setDiscountAmount(int $discountAmount): static
+    {
+        $this->discountAmount = $discountAmount;
+
+        return $this;
+    }
+
+    public function getPromotionCode(): ?string
+    {
+        return $this->promotionCode;
+    }
+
+    public function setPromotionCode(?string $promotionCode): static
+    {
+        $this->promotionCode = $promotionCode;
 
         return $this;
     }

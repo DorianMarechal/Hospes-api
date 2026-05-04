@@ -21,4 +21,6 @@ class BookingRequest
     #[Assert\NotNull]
     #[Assert\Positive]
     public ?int $guestsCount = null;
+
+    public ?string $promotionCode = null;
 }

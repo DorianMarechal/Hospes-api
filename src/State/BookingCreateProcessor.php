@@ -13,6 +13,7 @@ use App\Enum\MessageTemplateTrigger;
 use App\Repository\BlockedDateRepository;
 use App\Repository\BookingRepository;
 use App\Repository\LodgingRepository;
+use App\Repository\PromotionCodeRepository;
 use App\Service\AutomatedMessageDispatcher;
 use App\Service\AvailabilityResolver;
 use App\Service\BookingReferenceGenerator;
@@ -38,6 +39,7 @@ class BookingCreateProcessor implements ProcessorInterface
         private BookingReferenceGenerator $referenceGenerator,
         private EntityManagerInterface $entityManager,
         private AutomatedMessageDispatcher $automatedMessageDispatcher,
+        private PromotionCodeRepository $promotionCodeRepository,
     ) {
     }
 
@@ -104,6 +106,22 @@ class BookingCreateProcessor implements ProcessorInterface
         $booking->setTotalPrice($quote->totalPrice);
         $booking->setCancellationPolicy($lodging->getCancellationPolicy());
         $booking->setCurrency($quote->currency);
+
+        // Apply promotion code if provided
+        if (null !== $data->promotionCode) {
+            $promo = $this->promotionCodeRepository->findByCode($data->promotionCode);
+            if (null !== $promo && $promo->isUsable()) {
+                $promoLodging = $promo->getLodging();
+                if (null === $promoLodging || $promoLodging->getId()?->equals($lodging->getId())) {
+                    $discount = $promo->calculateDiscount($quote->totalPrice);
+                    $booking->setDiscountAmount($discount);
+                    $booking->setPromotionCode($promo->getCode());
+                    $booking->setTotalPrice($quote->totalPrice - $discount);
+                    $promo->incrementUsesCount();
+                }
+            }
+        }
+
         $booking->setStatus(BookingStatus::PENDING);
         $booking->setExpiresAt($now->modify('+'.self::TTL_MINUTES.' minutes'));
         $booking->setCreatedAt($now);

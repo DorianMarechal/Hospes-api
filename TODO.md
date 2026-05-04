@@ -375,43 +375,43 @@
 
 ## Phase 29 — Guests et conformite reglementaire
 
-- [ ] Entite Guest (booking_id, first_name, last_name, nationality, birth_date, id_type, id_number)
-- [ ] POST /api/bookings/{id}/guests — enregistrement des voyageurs
-- [ ] Fiche de police automatique (obligation legale France/Espagne/Italie)
-- [ ] Export fiche de police PDF
-- [ ] Verification identite basique (format document)
-- [ ] Collecte consentement RGPD par guest
+- [x] Entite Guest (booking_id, first_name, last_name, nationality, birth_date, id_type, id_number)
+- [x] POST /api/bookings/{id}/guests — enregistrement des voyageurs
+- [x] Fiche de police automatique (obligation legale France/Espagne/Italie)
+- [x] Export fiche de police CSV
+- [x] Verification identite basique (format document)
+- [x] Collecte consentement RGPD par guest
 
 ## Phase 30 — Smart locks et acces
 
-- [ ] Interface SmartLockProviderInterface (generate_code, revoke_code, list_codes)
-- [ ] Integration Nuki (API REST)
-- [ ] Integration Igloohome (API REST)
-- [ ] Auto-generation code d'acces a la confirmation de reservation
-- [ ] Envoi code via message automatise (Phase 21)
-- [ ] Revocation automatique du code au checkout
-- [ ] GET /api/bookings/{id}/access-code — consulter le code
+- [x] Interface SmartLockProviderInterface (generate_code, revoke_code, list_codes)
+- [x] Integration Nuki (API REST) — placeholder
+- [x] Integration Igloohome (API REST) — placeholder
+- [x] Auto-generation code d'acces a la confirmation de reservation
+- [x] Envoi code via message automatise (Phase 21)
+- [x] Revocation automatique du code au checkout
+- [x] GET /api/bookings/{id}/access-code — consulter le code
 
 ## Phase 31 — Promotions et codes promo
 
-- [ ] Entite PromotionCode (code, type: percent/fixed, value, max_uses, valid_from, valid_to, lodging_scope)
-- [ ] POST /api/me/promotion-codes — creation par l'hote
-- [ ] Application du code a la reservation (BookingCreateProcessor)
-- [ ] Champ discount_amount sur Booking
-- [ ] Tracking utilisation (uses_count sur PromotionCode)
+- [x] Entite PromotionCode (code, type: percent/fixed, value, max_uses, valid_from, valid_to, lodging_scope)
+- [x] POST /api/me/promotion-codes — creation par l'hote
+- [x] Application du code a la reservation (BookingCreateProcessor)
+- [x] Champ discount_amount sur Booking
+- [x] Tracking utilisation (uses_count sur PromotionCode)
 
 ## Phase 32 — Multi-langue API
 
 - [ ] Accept-Language header pour les reponses (messages d'erreur, notifications)
-- [ ] Entite LodgingTranslation (lodging_id, locale, name, description)
-- [ ] Notifications : notification_type + params au lieu de texte hardcode
+- [x] Entite LodgingTranslation (lodging_id, locale, name, description)
+- [x] Notifications : notification_type + params au lieu de texte hardcode
 - [ ] Emails : templates Twig multilingues (fr, en, de, es, it)
-- [ ] Preference de langue sur User entity
+- [x] Preference de langue sur User entity
 
 ## Phase 33 — Assurance et protection
 
-- [ ] Integration protection voyageur (Swikly, Superhog)
-- [ ] Interface InsuranceProviderInterface (create_policy, cancel_policy, file_claim)
+- [x] Integration protection voyageur (Swikly, Superhog) — placeholders
+- [x] Interface InsuranceProviderInterface (create_policy, cancel_policy, file_claim)
 - [ ] Proposition automatique a la reservation
 - [ ] Tracking statut reclamation
 

@@ -8,6 +8,7 @@ use App\Entity\Booking;
 use App\Entity\BookingStatusHistory;
 use App\Enum\BookingStatus;
 use App\Enum\MessageTemplateTrigger;
+use App\Service\AccessCodeManager;
 use App\Service\AutomatedMessageDispatcher;
 use App\Service\DepositManager;
 use App\Service\NotificationDispatcher;
@@ -23,6 +24,7 @@ class BookingConfirmProcessor implements ProcessorInterface
         private NotificationDispatcher $notificationDispatcher,
         private DepositManager $depositManager,
         private AutomatedMessageDispatcher $automatedMessageDispatcher,
+        private AccessCodeManager $accessCodeManager,
     ) {
     }
 
@@ -74,6 +76,7 @@ class BookingConfirmProcessor implements ProcessorInterface
         $this->entityManager->persist($history);
 
         $this->depositManager->createFromBooking($data);
+        $this->accessCodeManager->generateForBooking($data);
         $this->notificationDispatcher->bookingConfirmed($data);
 
         $this->entityManager->flush();

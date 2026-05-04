@@ -85,6 +85,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     private ?bool $isActive = null;
 
+    #[ORM\Column(length: 5, options: ['default' => 'fr'])]
+    #[Groups(['user:read', 'user:write'])]
+    private string $preferredLocale = 'fr';
+
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
@@ -350,6 +354,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $booking->setCustomer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPreferredLocale(): string
+    {
+        return $this->preferredLocale;
+    }
+
+    public function setPreferredLocale(string $preferredLocale): static
+    {
+        $this->preferredLocale = $preferredLocale;
 
         return $this;
     }
