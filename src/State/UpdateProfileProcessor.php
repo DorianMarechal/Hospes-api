@@ -18,10 +18,14 @@ class UpdateProfileProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        assert($data instanceof UpdateProfileRequest);
+        if (!$data instanceof UpdateProfileRequest) {
+            throw new \InvalidArgumentException('Expected '.UpdateProfileRequest::class);
+        }
 
         $user = $this->security->getUser();
-        \assert($user instanceof \App\Entity\User);
+        if (!$user instanceof \App\Entity\User) {
+            throw new \RuntimeException('Expected authenticated user');
+        }
 
         $user->setFirstName($data->firstName);
         $user->setLastName($data->lastName);

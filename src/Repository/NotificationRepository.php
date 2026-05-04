@@ -30,6 +30,18 @@ class NotificationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function countUnread(User $user): int
+    {
+        return (int) $this->createQueryBuilder('n')
+            ->select('COUNT(n.id)')
+            ->andWhere('n.user = :user')
+            ->andWhere('n.isRead = :false')
+            ->setParameter('user', $user)
+            ->setParameter('false', false)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function markAllRead(User $user): void
     {
         $this->createQueryBuilder('n')

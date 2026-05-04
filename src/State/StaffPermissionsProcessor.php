@@ -19,10 +19,14 @@ class StaffPermissionsProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): StaffAssignment
     {
-        assert($data instanceof UpdateStaffPermissionsRequest);
+        if (!$data instanceof UpdateStaffPermissionsRequest) {
+            throw new \InvalidArgumentException('Expected '.UpdateStaffPermissionsRequest::class);
+        }
 
         $assignment = $context['previous_data'];
-        \assert($assignment instanceof StaffAssignment);
+        if (!$assignment instanceof StaffAssignment) {
+            throw new \InvalidArgumentException('Expected '.StaffAssignment::class);
+        }
 
         $assignment->clearPermissions();
         $this->em->flush();

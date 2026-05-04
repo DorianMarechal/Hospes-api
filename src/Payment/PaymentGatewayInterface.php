@@ -21,7 +21,7 @@ interface PaymentGatewayInterface
     /**
      * Verify a webhook signature and return the parsed event payload.
      *
-     * @return array{type: string, transactionId: string}
+     * @return array{type: string, transactionId: string, eventId: string}
      */
     public function verifyWebhook(string $payload, string $signature): array;
 

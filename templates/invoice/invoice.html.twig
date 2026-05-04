@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #333; margin: 40px; }
+        h1 { font-size: 24px; margin-bottom: 5px; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .invoice-number { font-size: 14px; color: #666; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-weight: bold; font-size: 13px; margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #f5f5f5; text-align: left; padding: 8px; border: 1px solid #ddd; font-size: 11px; }
+        td { padding: 8px; border: 1px solid #ddd; font-size: 11px; }
+        .text-right { text-align: right; }
+        .totals { margin-top: 15px; }
+        .totals table { width: 300px; float: right; }
+        .totals td { border: none; padding: 4px 8px; }
+        .totals .total-row { font-weight: bold; font-size: 14px; border-top: 2px solid #333; }
+        .footer { margin-top: 60px; font-size: 10px; color: #999; text-align: center; clear: both; }
+        .clearfix::after { content: ""; display: table; clear: both; }
+    </style>
+</head>
+<body>
+    <h1>FACTURE</h1>
+    <p class="invoice-number">N° {{ invoice_number }}</p>
+    <p>Date : {{ invoice_date }}</p>
+
+    <table style="border: none; margin-bottom: 30px;">
+        <tr>
+            <td style="border: none; width: 50%; vertical-align: top;">
+                <div class="section">
+                    <div class="section-title">Hébergeur</div>
+                    {% if host_profile.businessName %}
+                        <strong>{{ host_profile.businessName }}</strong><br>
+                    {% endif %}
+                    {% if host_profile.legalForm %}{{ host_profile.legalForm }}<br>{% endif %}
+                    {% if host_profile.billingAddress %}{{ host_profile.billingAddress }}<br>{% endif %}
+                    {% if host_profile.billingPostalCode or host_profile.billingCity %}
+                        {{ host_profile.billingPostalCode }} {{ host_profile.billingCity }}<br>
+                    {% endif %}
+                    {% if host_profile.billingCountry %}{{ host_profile.billingCountry }}{% endif %}
+                    {% for identifier in host_legal_identifiers %}
+                        <br>{{ identifier.type }} : {{ identifier.value }}
+                    {% endfor %}
+                </div>
+            </td>
+            <td style="border: none; width: 50%; vertical-align: top;">
+                <div class="section">
+                    <div class="section-title">Client</div>
+                    <strong>{{ customer.firstName }} {{ customer.lastName }}</strong><br>
+                    {{ customer.email }}
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="section">
+        <div class="section-title">Réservation {{ booking.reference }}</div>
+        <table>
+            <tr>
+                <td><strong>Logement</strong></td>
+                <td>{{ lodging_name }}</td>
+            </tr>
+            <tr>
+                <td><strong>Arrivée</strong></td>
+                <td>{{ booking.checkin|date('d/m/Y') }}</td>
+            </tr>
+            <tr>
+                <td><strong>Départ</strong></td>
+                <td>{{ booking.checkout|date('d/m/Y') }}</td>
+            </tr>
+            <tr>
+                <td><strong>Voyageurs</strong></td>
+                <td>{{ booking.guestsCount }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Détail des nuitées</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Source tarif</th>
+                    <th class="text-right">Prix (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for night in booking_nights %}
+                <tr>
+                    <td>{{ night.date|date('d/m/Y') }}</td>
+                    <td>{{ night.source }}</td>
+                    <td class="text-right">{{ (night.price / 100)|number_format(2, ',', ' ') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="totals clearfix">
+        <table>
+            <tr>
+                <td>Sous-total nuitées</td>
+                <td class="text-right">{{ (booking.nightsTotal / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+            <tr>
+                <td>Frais de ménage</td>
+                <td class="text-right">{{ (booking.cleaningFee / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+            <tr>
+                <td>Taxe de séjour</td>
+                <td class="text-right">{{ (booking.touristTaxTotal / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+            <tr class="total-row">
+                <td>TOTAL TTC</td>
+                <td class="text-right">{{ (booking.totalPrice / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        Facture générée le {{ 'now'|date('d/m/Y à H:i') }} — Hospes
+    </div>
+</body>
+</html>

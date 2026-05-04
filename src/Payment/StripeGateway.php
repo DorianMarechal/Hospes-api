@@ -67,6 +67,7 @@ class StripeGateway implements PaymentGatewayInterface
         return [
             'type' => $type,
             'transactionId' => $object->id,
+            'eventId' => $event->id,
         ];
     }
 

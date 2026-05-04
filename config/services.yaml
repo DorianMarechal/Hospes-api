@@ -19,6 +19,15 @@ services:
     App\:
         resource: '../src/'
 
+    # App secret binding for CSRF state signing
+    App\State\PaymentProviderConnectProcessor:
+        arguments:
+            $appSecret: '%env(APP_SECRET)%'
+
+    App\Controller\PaymentProviderCallbackController:
+        arguments:
+            $appSecret: '%env(APP_SECRET)%'
+
     # Payment gateways
     App\Payment\StripeGateway:
         arguments:
@@ -34,6 +43,12 @@ services:
             $paypalWebhookId: '%env(PAYPAL_WEBHOOK_ID)%'
             $appBaseUrl: '%env(APP_BASE_URL)%'
             $sandbox: '%env(bool:PAYPAL_SANDBOX)%'
+
+    # OpenAPI decorator for manual endpoints (login, refresh, webhooks) + descriptions
+    App\OpenApi\OpenApiDecorator:
+        decorates: 'api_platform.openapi.factory'
+        arguments:
+            $decorated: '@.inner'
 
 when@test:
     services:

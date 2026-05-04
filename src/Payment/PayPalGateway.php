@@ -107,10 +107,15 @@ class PayPalGateway implements PaymentGatewayInterface
             throw new \RuntimeException('Invalid PayPal webhook payload');
         }
 
-        // Verify signature via PayPal API
-        if ($this->paypalWebhookId && $signature) {
-            $this->verifyWebhookSignature($payload, $signature, $event['id'] ?? '');
+        if (!$signature) {
+            throw new \RuntimeException('Missing PayPal webhook signature');
         }
+
+        if (!$this->paypalWebhookId) {
+            throw new \RuntimeException('PayPal webhook ID not configured');
+        }
+
+        $this->verifyWebhookSignature($payload, $signature, $event['id'] ?? '');
 
         $type = match ($event['event_type'] ?? '') {
             'PAYMENT.CAPTURE.COMPLETED' => 'payment.succeeded',
@@ -124,6 +129,7 @@ class PayPalGateway implements PaymentGatewayInterface
         return [
             'type' => $type,
             'transactionId' => $transactionId,
+            'eventId' => $event['id'] ?? '',
         ];
     }
 
@@ -131,7 +137,7 @@ class PayPalGateway implements PaymentGatewayInterface
     {
         $params = http_build_query([
             'partnerId' => $this->paypalClientId,
-            'returnToPartnerUrl' => $this->appBaseUrl.'/api/payment-provider/paypal/callback?state='.$hostProfileId,
+            'returnToPartnerUrl' => $this->appBaseUrl.'/api/payment-provider/paypal/callback?state='.rawurlencode($hostProfileId),
             'product' => 'PPCP',
         ]);
 
@@ -144,6 +150,12 @@ class PayPalGateway implements PaymentGatewayInterface
 
     public function completeOnboarding(string $authorizationCode): string
     {
+        // PayPal Partner Referrals: the merchantIdInPayPal is passed directly
+        // as the callback parameter, no token exchange needed
+        if ('' === $authorizationCode) {
+            throw new \RuntimeException('Missing PayPal merchant ID');
+        }
+
         return $authorizationCode;
     }
 

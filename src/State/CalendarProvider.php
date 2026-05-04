@@ -47,8 +47,8 @@ class CalendarProvider implements ProviderInterface
         $lastDay = $firstDay->modify('last day of this month');
         $monthEnd = $lastDay->modify('+1 day');
 
-        $bookings = $this->bookingRepository->findByLodging($lodging);
-        $blockedDates = $this->blockedDateRepository->findByLodging($lodging);
+        $bookings = $this->bookingRepository->findActiveInPeriod($lodging, $firstDay, $monthEnd);
+        $blockedDates = $this->blockedDateRepository->findByLodgingInPeriod($lodging, $firstDay, $monthEnd);
 
         $calendar = [];
         $current = $firstDay;
@@ -83,7 +83,8 @@ class CalendarProvider implements ProviderInterface
                 continue;
             }
 
-            if (BookingStatus::PENDING === $booking->getStatus() && $booking->getExpiresAt() < new \DateTimeImmutable()) {
+            $expiresAt = $booking->getExpiresAt();
+            if (BookingStatus::PENDING === $booking->getStatus() && null !== $expiresAt && $expiresAt < new \DateTimeImmutable()) {
                 continue;
             }
 

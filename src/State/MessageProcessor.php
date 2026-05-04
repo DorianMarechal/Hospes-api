@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Message;
 use App\Repository\ConversationRepository;
+use App\Service\MercurePublisher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -17,12 +18,15 @@ class MessageProcessor implements ProcessorInterface
         private Security $security,
         private ConversationRepository $conversationRepository,
         private EntityManagerInterface $entityManager,
+        private MercurePublisher $mercurePublisher,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof Message);
+        if (!$data instanceof Message) {
+            throw new \InvalidArgumentException('Expected '.Message::class);
+        }
 
         /** @var \App\Entity\User $user */
         $user = $this->security->getUser();
@@ -47,6 +51,8 @@ class MessageProcessor implements ProcessorInterface
 
         $this->entityManager->persist($data);
         $this->entityManager->flush();
+
+        $this->mercurePublisher->publishMessage($data);
 
         return $data;
     }

@@ -14,10 +14,13 @@ use Symfony\Component\Uid\Uuid;
 
 class PaymentProviderCallbackController
 {
+    private const int STATE_MAX_AGE_SECONDS = 1800; // 30 minutes
+
     public function __construct(
         private PaymentGatewayFactory $gatewayFactory,
         private HostProfileRepository $hostProfileRepository,
         private EntityManagerInterface $em,
+        private string $appSecret,
     ) {
     }
 
@@ -42,7 +45,9 @@ class PaymentProviderCallbackController
             throw new BadRequestHttpException('Missing required parameters');
         }
 
-        $hostProfile = $this->hostProfileRepository->find(Uuid::fromString($state));
+        $hostProfileId = $this->verifyAndExtractState($state);
+
+        $hostProfile = $this->hostProfileRepository->find(Uuid::fromString($hostProfileId));
         if (!$hostProfile) {
             throw new BadRequestHttpException('Invalid state parameter');
         }
@@ -58,7 +63,32 @@ class PaymentProviderCallbackController
         return new JsonResponse([
             'status' => 'connected',
             'provider' => $provider->value,
-            'accountId' => $accountId,
         ]);
+    }
+
+    private function verifyAndExtractState(string $state): string
+    {
+        $decoded = base64_decode($state, true);
+        if (false === $decoded) {
+            throw new BadRequestHttpException('Invalid state parameter');
+        }
+
+        $parts = explode('|', $decoded);
+        if (3 !== \count($parts)) {
+            throw new BadRequestHttpException('Invalid state parameter');
+        }
+
+        [$hostProfileId, $timestamp, $signature] = $parts;
+
+        $expectedSignature = hash_hmac('sha256', $hostProfileId.'|'.$timestamp, $this->appSecret);
+        if (!hash_equals($expectedSignature, $signature)) {
+            throw new BadRequestHttpException('Invalid state signature');
+        }
+
+        if (time() - (int) $timestamp > self::STATE_MAX_AGE_SECONDS) {
+            throw new BadRequestHttpException('State parameter has expired');
+        }
+
+        return $hostProfileId;
     }
 }

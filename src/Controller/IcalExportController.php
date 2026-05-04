@@ -62,7 +62,7 @@ class IcalExportController extends AbstractController
 
         return new Response($ics, 200, [
             'Content-Type' => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => sprintf('attachment; filename="%s.ics"', $lodging->getName()),
+            'Content-Disposition' => sprintf('attachment; filename="%s.ics"', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $lodging->getName() ?? 'calendar')),
         ]);
     }
 }

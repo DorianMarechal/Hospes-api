@@ -75,7 +75,10 @@ class AvailabilityResolver
                 continue;
             }
 
-            if (BookingStatus::PENDING === $booking->getStatus() && $booking->getExpiresAt() < new \DateTimeImmutable()) {
+            if (BookingStatus::PENDING === $booking->getStatus()
+                && null !== $booking->getExpiresAt()
+                && $booking->getExpiresAt() < new \DateTimeImmutable()
+            ) {
                 continue;
             }
 

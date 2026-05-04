@@ -21,7 +21,9 @@ class IcalSyncProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): IcalFeed
     {
         $feed = $context['previous_data'];
-        \assert($feed instanceof IcalFeed);
+        if (!$feed instanceof IcalFeed) {
+            throw new \InvalidArgumentException('Expected '.IcalFeed::class);
+        }
 
         if (IcalDirection::IMPORT !== $feed->getDirection()) {
             throw new BadRequestHttpException('Only import feeds can be synced');

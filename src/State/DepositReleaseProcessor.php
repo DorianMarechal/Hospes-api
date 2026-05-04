@@ -58,6 +58,7 @@ class DepositReleaseProcessor implements ProcessorInterface
         $this->depositManager->release($deposit);
         $this->notificationDispatcher->depositReleased($deposit);
         $this->entityManager->flush();
+        $this->notificationDispatcher->publishPendingNotifications();
 
         return $deposit;
     }

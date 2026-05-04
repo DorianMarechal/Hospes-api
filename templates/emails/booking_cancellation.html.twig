@@ -1,0 +1,14 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>Réservation annulée</h2>
+    <p>La réservation <strong>{{ booking.reference }}</strong> pour le logement <strong>{{ booking.lodging.name }}</strong> a été annulée.</p>
+
+    <div class="detail">
+        <p><strong>Arrivée prévue :</strong> {{ booking.checkin|date('d/m/Y') }}</p>
+        <p><strong>Départ prévu :</strong> {{ booking.checkout|date('d/m/Y') }}</p>
+        {% if booking.cancellationReason %}
+            <p><strong>Motif :</strong> {{ booking.cancellationReason }}</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -62,7 +62,7 @@ class Deposit
     #[Groups(['deposit:read', 'booking:read'])]
     private ?int $amount = null;
 
-    #[ORM\Column(enumType: DepositStatus::class)]
+    #[ORM\Column(length: 25, enumType: DepositStatus::class)]
     #[Groups(['deposit:read', 'booking:read'])]
     private ?DepositStatus $status = null;
 

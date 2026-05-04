@@ -29,7 +29,9 @@ class BlockedDateProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof BlockedDate);
+        if (!$data instanceof BlockedDate) {
+            throw new \InvalidArgumentException('Expected '.BlockedDate::class);
+        }
 
         /** @var \App\Entity\User $user */
         $user = $this->security->getUser();

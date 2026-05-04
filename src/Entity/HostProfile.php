@@ -62,12 +62,11 @@ class HostProfile
     #[Groups(['host-profile:read'])]
     private ?string $timezone = null;
 
-    #[ORM\Column(enumType: PaymentProvider::class, nullable: true)]
+    #[ORM\Column(length: 20, enumType: PaymentProvider::class, nullable: true)]
     #[Groups(['host-profile:read'])]
     private ?PaymentProvider $paymentProvider = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['host-profile:read'])]
     private ?string $paymentProviderAccountId = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]

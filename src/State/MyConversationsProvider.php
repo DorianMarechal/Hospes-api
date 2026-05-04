@@ -20,13 +20,6 @@ class MyConversationsProvider implements ProviderInterface
         /** @var \App\Entity\User $user */
         $user = $this->security->getUser();
 
-        $asCustomer = $this->conversationRepository->findByCustomer($user);
-        $asHost = $this->conversationRepository->findByHost($user);
-
-        $conversations = array_merge($asCustomer, $asHost);
-
-        usort($conversations, fn ($a, $b) => $b->getUpdatedAt() <=> $a->getUpdatedAt());
-
-        return array_values(array_unique($conversations, \SORT_REGULAR));
+        return $this->conversationRepository->findByParticipant($user);
     }
 }

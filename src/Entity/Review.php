@@ -6,11 +6,13 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Dto\ReviewResponseRequest;
 use App\Repository\ReviewRepository;
 use App\State\LodgingReviewsProvider;
 use App\State\MyReviewsProvider;
+use App\State\ReviewEditProcessor;
 use App\State\ReviewProcessor;
 use App\State\ReviewResponseProcessor;
 use Doctrine\DBAL\Types\Types;
@@ -44,6 +46,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             input: ReviewResponseRequest::class,
             denormalizationContext: [],
             processor: ReviewResponseProcessor::class,
+        ),
+        new Patch(
+            uriTemplate: '/reviews/{id}',
+            security: "is_granted('ROLE_CUSTOMER')",
+            denormalizationContext: ['groups' => ['review:write']],
+            processor: ReviewEditProcessor::class,
         ),
         new Delete(
             uriTemplate: '/reviews/{id}',
@@ -99,6 +107,16 @@ class Review
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['review:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    #[Groups(['review:read'])]
+    private ?\DateTimeImmutable $hostResponseAt = null;
+
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $moderatedAt = null;
+
+    #[ORM\ManyToOne]
+    private ?User $moderatedBy = null;
 
     public function getId(): ?Uuid
     {
@@ -197,6 +215,42 @@ class Review
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getHostResponseAt(): ?\DateTimeImmutable
+    {
+        return $this->hostResponseAt;
+    }
+
+    public function setHostResponseAt(?\DateTimeImmutable $hostResponseAt): static
+    {
+        $this->hostResponseAt = $hostResponseAt;
+
+        return $this;
+    }
+
+    public function getModeratedAt(): ?\DateTimeImmutable
+    {
+        return $this->moderatedAt;
+    }
+
+    public function setModeratedAt(?\DateTimeImmutable $moderatedAt): static
+    {
+        $this->moderatedAt = $moderatedAt;
+
+        return $this;
+    }
+
+    public function getModeratedBy(): ?User
+    {
+        return $this->moderatedBy;
+    }
+
+    public function setModeratedBy(?User $moderatedBy): static
+    {
+        $this->moderatedBy = $moderatedBy;
 
         return $this;
     }

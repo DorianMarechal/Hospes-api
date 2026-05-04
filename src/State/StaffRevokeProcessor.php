@@ -17,7 +17,9 @@ class StaffRevokeProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): StaffAssignment
     {
         $assignment = $context['previous_data'];
-        \assert($assignment instanceof StaffAssignment);
+        if (!$assignment instanceof StaffAssignment) {
+            throw new \InvalidArgumentException('Expected '.StaffAssignment::class);
+        }
 
         $assignment->setIsRevoked(true);
         $assignment->setUpdatedAt(new \DateTimeImmutable());

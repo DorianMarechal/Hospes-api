@@ -22,7 +22,9 @@ class MyLodgingsProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $user = $this->security->getUser();
-        \assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw new \RuntimeException('Expected authenticated user');
+        }
 
         $hostProfile = $user->getHostProfile();
         if (!$hostProfile) {

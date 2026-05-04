@@ -5,6 +5,9 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-port']
+
     #esi: true
     #fragments: true
 
@@ -13,10 +16,30 @@ framework:
             policy: sliding_window
             limit: 5
             interval: '1 minute'
-        api_global:
+        api_read:
+            policy: sliding_window
+            limit: 200
+            interval: '1 minute'
+        api_write:
             policy: sliding_window
             limit: 60
             interval: '1 minute'
+        api_user:
+            policy: sliding_window
+            limit: 300
+            interval: '1 minute'
+        forgot_password:
+            policy: sliding_window
+            limit: 3
+            interval: '15 minutes'
+        register:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
+        accept_invitation:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
 
 when@test:
     framework:
@@ -28,7 +51,27 @@ when@test:
                 policy: sliding_window
                 limit: 1000
                 interval: '1 minute'
-            api_global:
+            api_read:
                 policy: sliding_window
-                limit: 10000
+                limit: 100000
+                interval: '1 minute'
+            api_write:
+                policy: sliding_window
+                limit: 100000
+                interval: '1 minute'
+            api_user:
+                policy: sliding_window
+                limit: 100000
+                interval: '1 minute'
+            forgot_password:
+                policy: sliding_window
+                limit: 1000
+                interval: '1 minute'
+            register:
+                policy: sliding_window
+                limit: 1000
+                interval: '1 minute'
+            accept_invitation:
+                policy: sliding_window
+                limit: 1000
                 interval: '1 minute'

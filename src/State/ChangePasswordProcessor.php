@@ -5,9 +5,12 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\ChangePasswordRequest;
+use App\Entity\RefreshToken;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ChangePasswordProcessor implements ProcessorInterface
@@ -21,10 +24,14 @@ class ChangePasswordProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): null
     {
-        assert($data instanceof ChangePasswordRequest);
+        if (!$data instanceof ChangePasswordRequest) {
+            throw new \InvalidArgumentException('Expected '.ChangePasswordRequest::class);
+        }
 
         $user = $this->security->getUser();
-        \assert($user instanceof \App\Entity\User);
+        if (!$user instanceof User) {
+            throw new HttpException(401, 'Authentication required');
+        }
 
         if (!$this->passwordHasher->isPasswordValid($user, $data->currentPassword)) {
             throw new BadRequestHttpException('Current password is incorrect');
@@ -32,6 +39,11 @@ class ChangePasswordProcessor implements ProcessorInterface
 
         $user->setPassword($this->passwordHasher->hashPassword($user, $data->newPassword));
         $user->setUpdatedAt(new \DateTimeImmutable());
+
+        // Invalidate all refresh tokens on password change
+        $this->em->createQuery('DELETE FROM '.RefreshToken::class.' rt WHERE rt.username = :username')
+            ->setParameter('username', $user->getUserIdentifier())
+            ->execute();
 
         $this->em->flush();
 

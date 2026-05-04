@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Enum\NotificationType;
 use App\Repository\NotificationRepository;
 use App\State\MyNotificationsProvider;
 use App\State\NotificationReadAllProcessor;
@@ -23,10 +25,10 @@ use Symfony\Component\Uid\Uuid;
             security: "is_granted('ROLE_USER')",
             provider: MyNotificationsProvider::class,
         ),
-        new Post(
-            uriTemplate: '/notifications/{id}/read',
+        new Patch(
+            uriTemplate: '/notifications/{id}',
             security: "is_granted('ROLE_USER')",
-            input: false,
+            denormalizationContext: ['groups' => ['notification:write']],
             processor: NotificationReadProcessor::class,
         ),
         new Post(
@@ -51,9 +53,9 @@ class Notification
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 30, enumType: NotificationType::class)]
     #[Groups(['notification:read'])]
-    private ?string $type = null;
+    private ?NotificationType $type = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['notification:read'])]
@@ -62,6 +64,11 @@ class Notification
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['notification:read'])]
     private ?string $content = null;
+
+    /** @var array<string, string> */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups(['notification:read'])]
+    private ?array $params = null;
 
     #[ORM\Column(length: 30, nullable: true)]
     #[Groups(['notification:read'])]
@@ -72,7 +79,7 @@ class Notification
     private ?Uuid $relatedEntityId = null;
 
     #[ORM\Column(options: ['default' => false])]
-    #[Groups(['notification:read'])]
+    #[Groups(['notification:read', 'notification:write'])]
     private bool $isRead = false;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
@@ -100,14 +107,32 @@ class Notification
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): ?NotificationType
     {
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(NotificationType $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, string>|null
+     */
+    public function getParams(): ?array
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param array<string, string>|null $params
+     */
+    public function setParams(?array $params): static
+    {
+        $this->params = $params;
 
         return $this;
     }

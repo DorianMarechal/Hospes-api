@@ -51,6 +51,9 @@ class BookingModifyDatesProcessor implements ProcessorInterface
         }
 
         $lodging = $booking->getLodging();
+        if (null === $lodging) {
+            throw new HttpException(422, 'Booking has no associated lodging');
+        }
         $existingBookings = $this->bookingRepository->findByLodging($lodging);
         $blockedDates = $this->blockedDateRepository->findByLodging($lodging);
         $seasons = $lodging->getSeasons()->toArray();
@@ -67,7 +70,7 @@ class BookingModifyDatesProcessor implements ProcessorInterface
             $lodging,
             $checkin,
             $checkout,
-            $booking->getGuestsCount(),
+            $booking->getGuestsCount() ?? 1,
             $seasons,
             $lodging->getPriceOverrides()->toArray(),
         );
@@ -111,6 +114,7 @@ class BookingModifyDatesProcessor implements ProcessorInterface
         $this->entityManager->persist($history);
         $this->notificationDispatcher->bookingModified($booking);
         $this->entityManager->flush();
+        $this->notificationDispatcher->publishPendingNotifications();
 
         return $booking;
     }

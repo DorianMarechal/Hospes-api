@@ -12,8 +12,10 @@ use App\Enum\PaymentStatus;
 use App\Enum\PaymentType;
 use App\Payment\PaymentGatewayFactory;
 use App\Repository\BookingRepository;
+use App\Repository\DepositRepository;
 use App\Repository\PaymentRepository;
 use App\Service\CancellationPolicyResolver;
+use App\Service\DepositManager;
 use App\Service\NotificationDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -27,10 +29,12 @@ class BookingCancelProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private BookingRepository $bookingRepository,
         private PaymentRepository $paymentRepository,
+        private DepositRepository $depositRepository,
         private Security $security,
         private NotificationDispatcher $notificationDispatcher,
         private CancellationPolicyResolver $cancellationPolicyResolver,
         private PaymentGatewayFactory $gatewayFactory,
+        private DepositManager $depositManager,
         private LoggerInterface $logger,
     ) {
     }
@@ -67,10 +71,18 @@ class BookingCancelProcessor implements ProcessorInterface
         $this->entityManager->persist($history);
         $this->notificationDispatcher->bookingCancelled($booking);
 
+        // Release/void any held deposit
+        $deposit = $this->depositRepository->findByBooking($booking);
+        if (null !== $deposit && \App\Enum\DepositStatus::HELD === $deposit->getStatus()) {
+            $this->depositManager->release($deposit);
+            $this->notificationDispatcher->depositReleased($deposit);
+        }
+
         // Auto-refund based on cancellation policy
         $this->processAutoRefund($booking, $user, $now);
 
         $this->entityManager->flush();
+        $this->notificationDispatcher->publishPendingNotifications();
 
         return $booking;
     }

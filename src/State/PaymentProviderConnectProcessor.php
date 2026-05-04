@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\ConnectPaymentProviderRequest;
 use App\Dto\PaymentProviderResult;
+use App\Entity\User;
 use App\Payment\PaymentGatewayFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -17,15 +18,20 @@ class PaymentProviderConnectProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private Security $security,
         private PaymentGatewayFactory $gatewayFactory,
+        private string $appSecret,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): PaymentProviderResult
     {
-        assert($data instanceof ConnectPaymentProviderRequest);
+        if (!$data instanceof ConnectPaymentProviderRequest) {
+            throw new \InvalidArgumentException('Expected '.ConnectPaymentProviderRequest::class);
+        }
 
-        /** @var \App\Entity\User $user */
         $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new HttpException(401, 'Authentication required');
+        }
         $hostProfile = $user->getHostProfile();
 
         if (!$hostProfile) {
@@ -41,8 +47,14 @@ class PaymentProviderConnectProcessor implements ProcessorInterface
 
         $this->entityManager->flush();
 
+        $hostProfileId = $hostProfile->getId()?->toRfc4122() ?? '';
+        $timestamp = time();
+        $payload = $hostProfileId.'|'.$timestamp;
+        $signature = hash_hmac('sha256', $payload, $this->appSecret);
+        $state = base64_encode($payload.'|'.$signature);
+
         $gateway = $this->gatewayFactory->get($data->provider);
-        $connectUrl = $gateway->buildOnboardingUrl($hostProfile->getId()?->toRfc4122());
+        $connectUrl = $gateway->buildOnboardingUrl($state);
 
         $result = new PaymentProviderResult();
         $result->provider = $data->provider;

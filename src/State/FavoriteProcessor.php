@@ -25,10 +25,14 @@ class FavoriteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Favorite
     {
-        assert($data instanceof Favorite);
+        if (!$data instanceof Favorite) {
+            throw new \InvalidArgumentException('Expected '.Favorite::class);
+        }
 
-        /** @var User $user */
         $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \RuntimeException('Expected authenticated user');
+        }
 
         $lodging = $this->lodgingRepository->find($data->getLodgingId());
         if (!$lodging) {

@@ -21,10 +21,14 @@ class StaffLodgingsProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): StaffAssignment
     {
-        assert($data instanceof UpdateStaffLodgingsRequest);
+        if (!$data instanceof UpdateStaffLodgingsRequest) {
+            throw new \InvalidArgumentException('Expected '.UpdateStaffLodgingsRequest::class);
+        }
 
         $assignment = $context['previous_data'];
-        \assert($assignment instanceof StaffAssignment);
+        if (!$assignment instanceof StaffAssignment) {
+            throw new \InvalidArgumentException('Expected '.StaffAssignment::class);
+        }
 
         $host = $assignment->getHost();
         $hostProfile = $host?->getHostProfile();

@@ -21,7 +21,9 @@ class MyPermissionsProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): MyPermissionsResult
     {
         $user = $this->security->getUser();
-        \assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw new \RuntimeException('Expected authenticated user');
+        }
 
         $assignment = $this->staffAssignmentRepository->findActiveByStaff($user);
         if (!$assignment) {

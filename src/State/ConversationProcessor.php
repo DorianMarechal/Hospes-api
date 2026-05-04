@@ -24,7 +24,9 @@ class ConversationProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof Conversation);
+        if (!$data instanceof Conversation) {
+            throw new \InvalidArgumentException('Expected '.Conversation::class);
+        }
 
         /** @var \App\Entity\User $user */
         $user = $this->security->getUser();

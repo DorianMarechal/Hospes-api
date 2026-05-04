@@ -24,7 +24,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: LodgingRepository::class)]
 #[ApiResource(
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['lodging:list']],
+        ),
         new Get(),
         new GetCollection(
             uriTemplate: '/me/lodgings',
@@ -52,7 +54,7 @@ class Lodging
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    #[Groups(['lodging:read'])]
+    #[Groups(['lodging:read', 'lodging:list'])]
     private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'lodgings')]
@@ -60,13 +62,13 @@ class Lodging
     private ?HostProfile $host = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['lodging:read', 'lodging:write'])]
+    #[Groups(['lodging:read', 'lodging:list', 'lodging:write'])]
     #[Assert\NotBlank]
     #[Assert\Length(max: 150)]
     private ?string $name = null;
 
-    #[ORM\Column(enumType: LodgingType::class)]
-    #[Groups(['lodging:read', 'lodging:write'])]
+    #[ORM\Column(length: 20, enumType: LodgingType::class)]
+    #[Groups(['lodging:read', 'lodging:list', 'lodging:write'])]
     #[Assert\NotNull]
     private ?LodgingType $type = null;
 
@@ -75,19 +77,19 @@ class Lodging
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['lodging:read', 'lodging:write'])]
+    #[Groups(['lodging:read', 'lodging:list', 'lodging:write'])]
     #[Assert\NotNull]
     #[Assert\Positive]
     private ?int $capacity = null;
 
     #[ORM\Column]
-    #[Groups(['lodging:read', 'lodging:write'])]
+    #[Groups(['lodging:read', 'lodging:list', 'lodging:write'])]
     #[Assert\NotNull]
     #[Assert\PositiveOrZero]
     private ?int $basePriceWeek = null;
 
     #[ORM\Column]
-    #[Groups(['lodging:read', 'lodging:write'])]
+    #[Groups(['lodging:read', 'lodging:list', 'lodging:write'])]
     #[Assert\NotNull]
     #[Assert\PositiveOrZero]
     private ?int $basePriceWeekend = null;
@@ -107,7 +109,7 @@ class Lodging
     #[Assert\PositiveOrZero]
     private ?int $depositAmount = null;
 
-    #[ORM\Column(enumType: CancellationPolicy::class)]
+    #[ORM\Column(length: 20, enumType: CancellationPolicy::class)]
     #[Groups(['lodging:read', 'lodging:write'])]
     #[Assert\NotNull]
     private ?CancellationPolicy $cancellationPolicy = null;
@@ -140,7 +142,7 @@ class Lodging
     private ?string $address = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['lodging:read', 'lodging:write'])]
+    #[Groups(['lodging:read', 'lodging:list', 'lodging:write'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -164,11 +166,11 @@ class Lodging
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
-    #[Groups(['lodging:read'])]
+    #[Groups(['lodging:read', 'lodging:list'])]
     private ?string $averageRating = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['lodging:read'])]
+    #[Groups(['lodging:read', 'lodging:list'])]
     private ?int $reviewCount = null;
 
     #[ORM\Column]

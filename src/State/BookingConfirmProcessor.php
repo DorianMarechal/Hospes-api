@@ -25,20 +25,36 @@ class BookingConfirmProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof Booking);
+        if (!$data instanceof Booking) {
+            throw new \InvalidArgumentException('Expected '.Booking::class);
+        }
 
         if (BookingStatus::PENDING !== $data->getStatus()) {
             throw new HttpException(422, 'Only pending bookings can be confirmed');
         }
 
-        if ($data->getExpiresAt() < new \DateTimeImmutable()) {
+        $expiresAt = $data->getExpiresAt();
+        if (null !== $expiresAt && $expiresAt < new \DateTimeImmutable()) {
+            $now = new \DateTimeImmutable();
             $data->setStatus(BookingStatus::CANCELLED);
+            $data->setUpdatedAt($now);
+
+            $expireHistory = new BookingStatusHistory();
+            $expireHistory->setBooking($data);
+            $expireHistory->setPreviousStatus(BookingStatus::PENDING);
+            $expireHistory->setNewStatus(BookingStatus::CANCELLED);
+            $expireHistory->setReason('Booking expired (TTL exceeded)');
+            $expireHistory->setCreatedAt($now);
+            $this->entityManager->persist($expireHistory);
+
             $this->entityManager->flush();
             throw new HttpException(410, 'This booking has expired');
         }
 
-        /** @var \App\Entity\User $user */
         $user = $this->security->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            throw new HttpException(401, 'Authentication required');
+        }
         $now = new \DateTimeImmutable();
 
         $history = new BookingStatusHistory();
@@ -58,6 +74,7 @@ class BookingConfirmProcessor implements ProcessorInterface
         $this->notificationDispatcher->bookingConfirmed($data);
 
         $this->entityManager->flush();
+        $this->notificationDispatcher->publishPendingNotifications();
 
         return $data;
     }

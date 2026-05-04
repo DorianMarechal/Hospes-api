@@ -11,9 +11,11 @@ use App\Entity\StaffPermission;
 use App\Entity\User;
 use App\Enum\StaffPermission as StaffPermissionEnum;
 use App\Repository\LodgingRepository;
+use App\Service\EmailSender;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class StaffInviteProcessor implements ProcessorInterface
 {
@@ -21,15 +23,20 @@ class StaffInviteProcessor implements ProcessorInterface
         private Security $security,
         private EntityManagerInterface $em,
         private LodgingRepository $lodgingRepository,
+        private EmailSender $emailSender,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): StaffAssignment
     {
-        assert($data instanceof InviteStaffRequest);
+        if (!$data instanceof InviteStaffRequest) {
+            throw new \InvalidArgumentException('Expected '.InviteStaffRequest::class);
+        }
 
         $host = $this->security->getUser();
-        \assert($host instanceof User);
+        if (!$host instanceof User) {
+            throw new HttpException(401, 'Authentication required');
+        }
 
         $assignment = new StaffAssignment();
         $assignment->setHost($host);
@@ -63,7 +70,7 @@ class StaffInviteProcessor implements ProcessorInterface
         $this->em->persist($assignment);
         $this->em->flush();
 
-        // TODO: send invitation email with token
+        $this->emailSender->sendStaffInvitation($assignment, $data->email);
 
         return $assignment;
     }

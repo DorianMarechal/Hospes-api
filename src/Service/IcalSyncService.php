@@ -27,29 +27,54 @@ class IcalSyncService
             return 0;
         }
 
-        $response = $this->httpClient->request('GET', $feed->getUrl());
+        $url = $feed->getUrl();
+        $this->validateUrl($url);
+
+        $response = $this->httpClient->request('GET', $url, [
+            'max_redirects' => 3,
+            'timeout' => 10,
+            'headers' => ['Accept' => 'text/calendar'],
+        ]);
         $icsContent = $response->getContent();
 
         $events = $this->parseIcs($icsContent);
         $existingBookings = $this->bookingRepository->findByLodging($lodging);
 
-        // Remove existing ical-sourced blocked dates for this lodging
         $existingBlocked = $this->blockedDateRepository->findBy([
             'lodging' => $lodging,
             'source' => 'ical',
         ]);
+
+        // Build lookup of existing blocked dates by start+end for diff
+        $existingMap = [];
         foreach ($existingBlocked as $blocked) {
-            $this->em->remove($blocked);
+            $key = $blocked->getStartDate()->format('Y-m-d').'|'.$blocked->getEndDate()->format('Y-m-d');
+            $existingMap[$key] = $blocked;
         }
 
+        $incomingKeys = [];
         $created = 0;
+
         foreach ($events as $event) {
             if (!$event['start'] || !$event['end']) {
                 continue;
             }
 
-            // Skip if conflicts with an existing booking
             if ($this->conflictsWithBooking($event['start'], $event['end'], $existingBookings)) {
+                continue;
+            }
+
+            $key = $event['start']->format('Y-m-d').'|'.$event['end']->format('Y-m-d');
+            $incomingKeys[$key] = true;
+
+            if (isset($existingMap[$key])) {
+                // Already exists, update reason if changed
+                $existing = $existingMap[$key];
+                $newReason = $event['summary'] ?? 'iCal import';
+                if ($existing->getReason() !== $newReason) {
+                    $existing->setReason($newReason);
+                    $existing->setUpdatedAt(new \DateTimeImmutable());
+                }
                 continue;
             }
 
@@ -64,6 +89,13 @@ class IcalSyncService
 
             $this->em->persist($blocked);
             ++$created;
+        }
+
+        // Remove blocked dates no longer in the feed
+        foreach ($existingMap as $key => $blocked) {
+            if (!isset($incomingKeys[$key])) {
+                $this->em->remove($blocked);
+            }
         }
 
         $this->em->flush();
@@ -130,6 +162,35 @@ class IcalSyncService
         }
 
         return \DateTimeImmutable::createFromFormat('Ymd\THis', $value) ?: null;
+    }
+
+    private function validateUrl(?string $url): void
+    {
+        if (null === $url || '' === $url) {
+            throw new \InvalidArgumentException('iCal feed URL is empty');
+        }
+
+        $parsed = parse_url($url);
+        if (false === $parsed || !isset($parsed['scheme'], $parsed['host'])) {
+            throw new \InvalidArgumentException('Invalid iCal feed URL');
+        }
+
+        if (!\in_array(strtolower($parsed['scheme']), ['https'], true)) {
+            throw new \InvalidArgumentException('iCal feed URL must use HTTPS');
+        }
+
+        $host = strtolower($parsed['host']);
+
+        if ('localhost' === $host || str_ends_with($host, '.local') || str_ends_with($host, '.internal')) {
+            throw new \InvalidArgumentException('iCal feed URL must not point to a local address');
+        }
+
+        $ip = gethostbyname($host);
+        if ($ip !== $host) {
+            if (false === filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE)) {
+                throw new \InvalidArgumentException('iCal feed URL must not resolve to a private or reserved IP address');
+            }
+        }
     }
 
     /**

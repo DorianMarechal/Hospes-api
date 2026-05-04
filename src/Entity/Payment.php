@@ -72,15 +72,15 @@ class Payment
     #[Groups(['payment:read'])]
     private ?int $amount = null;
 
-    #[ORM\Column(enumType: PaymentType::class)]
+    #[ORM\Column(length: 20, enumType: PaymentType::class)]
     #[Groups(['payment:read'])]
     private ?PaymentType $type = null;
 
-    #[ORM\Column(enumType: PaymentMethod::class)]
+    #[ORM\Column(length: 20, enumType: PaymentMethod::class)]
     #[Groups(['payment:read'])]
     private ?PaymentMethod $method = null;
 
-    #[ORM\Column(enumType: PaymentStatus::class)]
+    #[ORM\Column(length: 20, enumType: PaymentStatus::class)]
     #[Groups(['payment:read'])]
     private ?PaymentStatus $status = null;
 
@@ -103,6 +103,13 @@ class Payment
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     #[Groups(['payment:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
+    private ?string $idempotencyKey = null;
+
+    #[ORM\ManyToOne(targetEntity: Payment::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Payment $originalPayment = null;
 
     public function getId(): ?Uuid
     {
@@ -225,6 +232,30 @@ class Payment
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getIdempotencyKey(): ?string
+    {
+        return $this->idempotencyKey;
+    }
+
+    public function setIdempotencyKey(?string $idempotencyKey): static
+    {
+        $this->idempotencyKey = $idempotencyKey;
+
+        return $this;
+    }
+
+    public function getOriginalPayment(): ?Payment
+    {
+        return $this->originalPayment;
+    }
+
+    public function setOriginalPayment(?Payment $originalPayment): static
+    {
+        $this->originalPayment = $originalPayment;
 
         return $this;
     }

@@ -24,11 +24,11 @@ class BookingStatusHistory
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Booking $booking = null;
 
-    #[ORM\Column(enumType: BookingStatus::class, nullable: true)]
+    #[ORM\Column(length: 20, enumType: BookingStatus::class, nullable: true)]
     #[Groups(['booking_history:read'])]
     private ?BookingStatus $previousStatus = null;
 
-    #[ORM\Column(enumType: BookingStatus::class)]
+    #[ORM\Column(length: 20, enumType: BookingStatus::class)]
     #[Groups(['booking_history:read'])]
     private ?BookingStatus $newStatus = null;
 

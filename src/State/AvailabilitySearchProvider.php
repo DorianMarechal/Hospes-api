@@ -47,7 +47,7 @@ class AvailabilitySearchProvider implements ProviderInterface
             throw new BadRequestHttpException('Checkout must be after checkin');
         }
 
-        $criteria = ['isActive' => true];
+        $criteria = [];
 
         if (!empty($filters['type'])) {
             $type = LodgingType::tryFrom($filters['type']);
@@ -61,18 +61,56 @@ class AvailabilitySearchProvider implements ProviderInterface
             $criteria['city'] = $filters['city'];
         }
 
-        $lodgings = $this->lodgingRepository->findBy($criteria);
-
         if (!empty($filters['capacity'])) {
-            $minCapacity = (int) $filters['capacity'];
-            $lodgings = array_filter($lodgings, fn ($l) => $l->getCapacity() >= $minCapacity);
+            $criteria['capacity'] = (int) $filters['capacity'];
         }
 
+        if (!empty($filters['price_min'])) {
+            $criteria['priceMin'] = (int) $filters['price_min'];
+        }
+
+        if (!empty($filters['price_max'])) {
+            $criteria['priceMax'] = (int) $filters['price_max'];
+        }
+
+        if (!empty($filters['rating_min'])) {
+            $criteria['ratingMin'] = (float) $filters['rating_min'];
+        }
+
+        if (!empty($filters['amenities'])) {
+            $criteria['amenities'] = explode(',', $filters['amenities']);
+        }
+
+        if (!empty($filters['cursor'])) {
+            $criteria['cursor'] = $filters['cursor'];
+        }
+
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $criteria['limit'] = $limit;
+
+        // Géospatial : intégré dans advancedSearch si lat/lng fournis
+        $hasGeo = !empty($filters['latitude']) && !empty($filters['longitude']);
+
+        if ($hasGeo) {
+            $criteria['latitude'] = (float) $filters['latitude'];
+            $criteria['longitude'] = (float) $filters['longitude'];
+            $criteria['radiusKm'] = (float) ($filters['radius'] ?? 30);
+        }
+
+        $lodgings = $this->lodgingRepository->advancedSearch($criteria);
+
         $results = [];
+        $searchLat = $hasGeo ? (float) $filters['latitude'] : null;
+        $searchLng = $hasGeo ? (float) $filters['longitude'] : null;
+
+        // Batch: fetch all overlapping bookings/blocked dates for candidate lodgings
+        $bookingsByLodging = $this->bookingRepository->findActiveOverlappingForLodgings($lodgings, $checkin, $checkout);
+        $blockedByLodging = $this->blockedDateRepository->findOverlappingForLodgings($lodgings, $checkin, $checkout);
 
         foreach ($lodgings as $lodging) {
-            $bookings = $this->bookingRepository->findByLodging($lodging);
-            $blockedDates = $this->blockedDateRepository->findByLodging($lodging);
+            $lodgingId = $lodging->getId()?->toRfc4122() ?? '';
+            $bookings = $bookingsByLodging[$lodgingId] ?? [];
+            $blockedDates = $blockedByLodging[$lodgingId] ?? [];
 
             $available = $this->availabilityResolver->isAvailable(
                 $lodging,
@@ -83,23 +121,77 @@ class AvailabilitySearchProvider implements ProviderInterface
                 null,
             );
 
-            if ($available) {
-                $results[] = new AvailabilitySearchResult(
-                    lodgingId: $lodging->getId(),
-                    name: $lodging->getName(),
-                    type: $lodging->getType()->value,
-                    city: $lodging->getCity(),
-                    region: $lodging->getRegion(),
-                    country: $lodging->getCountry(),
-                    capacity: $lodging->getCapacity(),
-                    basePriceWeek: $lodging->getBasePriceWeek(),
-                    basePriceWeekend: $lodging->getBasePriceWeekend(),
-                    averageRating: $lodging->getAverageRating(),
-                    reviewCount: $lodging->getReviewCount(),
+            if (!$available) {
+                continue;
+            }
+
+            $distanceKm = null;
+            if (null !== $searchLat && null !== $searchLng
+                && null !== $lodging->getLatitude() && null !== $lodging->getLongitude()) {
+                $distanceKm = $this->haversine(
+                    $searchLat, $searchLng,
+                    (float) $lodging->getLatitude(), (float) $lodging->getLongitude(),
                 );
             }
+
+            $results[] = new AvailabilitySearchResult(
+                lodgingId: $lodging->getId(),
+                name: $lodging->getName(),
+                type: $lodging->getType()->value,
+                city: $lodging->getCity(),
+                region: $lodging->getRegion(),
+                country: $lodging->getCountry(),
+                capacity: $lodging->getCapacity(),
+                basePriceWeek: $lodging->getBasePriceWeek(),
+                basePriceWeekend: $lodging->getBasePriceWeekend(),
+                averageRating: $lodging->getAverageRating(),
+                reviewCount: $lodging->getReviewCount(),
+                latitude: $lodging->getLatitude(),
+                longitude: $lodging->getLongitude(),
+                distanceKm: $distanceKm,
+            );
         }
 
+        // Tri par pertinence : distance + note + prix
+        usort($results, function (AvailabilitySearchResult $a, AvailabilitySearchResult $b) use ($hasGeo): int {
+            $scoreA = $this->relevanceScore($a, $hasGeo);
+            $scoreB = $this->relevanceScore($b, $hasGeo);
+
+            return $scoreB <=> $scoreA;
+        });
+
         return $results;
+    }
+
+    private function relevanceScore(AvailabilitySearchResult $r, bool $hasGeo): float
+    {
+        $score = 0.0;
+
+        // Note : 0-5 → 0-40 points
+        $rating = (float) ($r->averageRating ?? 0);
+        $score += $rating * 8;
+
+        // Nombre d'avis : log scale, max ~20 points
+        $reviews = $r->reviewCount ?? 0;
+        if ($reviews > 0) {
+            $score += min(log($reviews + 1, 2) * 4, 20);
+        }
+
+        // Distance : plus c'est proche, plus le score est haut (max 40 points)
+        if ($hasGeo && null !== $r->distanceKm) {
+            $score += max(0, 40 - $r->distanceKm);
+        }
+
+        return $score;
+    }
+
+    private function haversine(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $r = 6371.0;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return $r * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 }

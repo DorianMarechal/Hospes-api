@@ -1,0 +1,16 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>Nouvelle réservation</h2>
+    <p>Bonjour,</p>
+    <p>Vous avez reçu une nouvelle réservation pour <strong>{{ booking.lodging.name }}</strong>.</p>
+
+    <div class="detail">
+        <p><strong>Référence :</strong> {{ booking.reference }}</p>
+        <p><strong>Client :</strong> {{ booking.customer.firstName }} {{ booking.customer.lastName }}</p>
+        <p><strong>Arrivée :</strong> {{ booking.checkin|date('d/m/Y') }}</p>
+        <p><strong>Départ :</strong> {{ booking.checkout|date('d/m/Y') }}</p>
+        <p><strong>Voyageurs :</strong> {{ booking.guestsCount }}</p>
+        <p><strong>Total :</strong> {{ (booking.totalPrice / 100)|number_format(2, ',', ' ') }} €</p>
+    </div>
+{% endblock %}

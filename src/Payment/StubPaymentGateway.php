@@ -25,6 +25,7 @@ class StubPaymentGateway implements PaymentGatewayInterface
         return [
             'type' => $event['type'] ?? 'payment.succeeded',
             'transactionId' => $event['transactionId'] ?? 'stub_txn',
+            'eventId' => $event['eventId'] ?? 'stub_evt_'.bin2hex(random_bytes(8)),
         ];
     }
 

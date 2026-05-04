@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\ForgotPasswordRequest;
 use App\Repository\UserRepository;
+use App\Service\EmailSender;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ForgotPasswordProcessor implements ProcessorInterface
@@ -13,12 +14,15 @@ class ForgotPasswordProcessor implements ProcessorInterface
     public function __construct(
         private UserRepository $userRepository,
         private EntityManagerInterface $em,
+        private EmailSender $emailSender,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): null
     {
-        assert($data instanceof ForgotPasswordRequest);
+        if (!$data instanceof ForgotPasswordRequest) {
+            throw new \InvalidArgumentException('Expected '.ForgotPasswordRequest::class);
+        }
 
         $user = $this->userRepository->findOneBy(['email' => $data->email]);
 
@@ -28,12 +32,12 @@ class ForgotPasswordProcessor implements ProcessorInterface
         }
 
         $token = bin2hex(random_bytes(32));
-        $user->setResetToken($token);
+        $user->setResetToken(hash('sha256', $token));
         $user->setResetTokenExpiresAt(new \DateTimeImmutable('+1 hour'));
 
         $this->em->flush();
 
-        // TODO: send email with reset link containing $token
+        $this->emailSender->sendPasswordReset($user);
 
         return null;
     }

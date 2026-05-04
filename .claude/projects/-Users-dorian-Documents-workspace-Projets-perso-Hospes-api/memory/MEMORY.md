@@ -1,0 +1,2 @@
+- [No learning mode](feedback_learning.md) — Skip guided learning, implement everything directly
+- [Read TODO.md first](feedback_todo.md) — Always read TODO.md before starting any work in a session

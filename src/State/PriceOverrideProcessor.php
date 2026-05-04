@@ -23,7 +23,9 @@ class PriceOverrideProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): PriceOverride
     {
-        assert($data instanceof PriceOverride);
+        if (!$data instanceof PriceOverride) {
+            throw new \InvalidArgumentException('Expected '.PriceOverride::class);
+        }
 
         $lodging = $this->lodgingRepository->find($uriVariables['lodgingId']);
         if (!$lodging) {
@@ -31,7 +33,9 @@ class PriceOverrideProcessor implements ProcessorInterface
         }
 
         $user = $this->security->getUser();
-        \assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw new \RuntimeException('Expected authenticated user');
+        }
 
         $hostProfile = $user->getHostProfile();
         if (!$hostProfile || !$lodging->getHost()?->getId()?->equals($hostProfile->getId())) {

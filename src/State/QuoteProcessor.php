@@ -19,7 +19,9 @@ class QuoteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof QuoteRequest);
+        if (!$data instanceof QuoteRequest) {
+            throw new \InvalidArgumentException('Expected '.QuoteRequest::class);
+        }
 
         $lodging = $this->lodgingRepository->find($uriVariables['lodgingId']);
         if (!$lodging) {

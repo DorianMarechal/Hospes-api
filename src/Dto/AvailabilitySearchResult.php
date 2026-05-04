@@ -18,6 +18,9 @@ class AvailabilitySearchResult
         public readonly int $basePriceWeekend,
         public readonly ?string $averageRating,
         public readonly ?int $reviewCount,
+        public readonly ?string $latitude = null,
+        public readonly ?string $longitude = null,
+        public readonly ?float $distanceKm = null,
     ) {
     }
 }

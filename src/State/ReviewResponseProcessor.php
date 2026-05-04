@@ -25,10 +25,14 @@ class ReviewResponseProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Review
     {
-        assert($data instanceof ReviewResponseRequest);
+        if (!$data instanceof ReviewResponseRequest) {
+            throw new \InvalidArgumentException('Expected '.ReviewResponseRequest::class);
+        }
 
-        /** @var User $user */
         $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \RuntimeException('Expected authenticated user');
+        }
 
         $review = $this->reviewRepository->find($uriVariables['id']);
         if (!$review) {

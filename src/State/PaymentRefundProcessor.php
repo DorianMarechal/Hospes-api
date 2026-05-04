@@ -30,7 +30,9 @@ class PaymentRefundProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof RefundPaymentRequest);
+        if (!$data instanceof RefundPaymentRequest) {
+            throw new \InvalidArgumentException('Expected '.RefundPaymentRequest::class);
+        }
 
         $payment = $this->paymentRepository->find($uriVariables['id']);
         if (!$payment) {

@@ -72,7 +72,7 @@ class Conversation
     #[Groups(['conversation:read'])]
     private ?Booking $booking = null;
 
-    #[ORM\Column(enumType: ConversationStatus::class)]
+    #[ORM\Column(length: 20, enumType: ConversationStatus::class)]
     #[Groups(['conversation:read', 'conversation:write'])]
     private ConversationStatus $status = ConversationStatus::OPEN;
 

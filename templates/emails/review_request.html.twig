@@ -1,0 +1,8 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block content %}
+    <h2>Comment s'est passé votre séjour ?</h2>
+    <p>Bonjour {{ booking.customer.firstName }},</p>
+    <p>Votre séjour à <strong>{{ booking.lodging.name }}</strong> est terminé. Nous espérons que tout s'est bien passé !</p>
+    <p>Partagez votre expérience en laissant un avis — cela aide les autres voyageurs et l'hôte à s'améliorer.</p>
+{% endblock %}

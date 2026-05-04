@@ -6,8 +6,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use App\Dto\BookingRequest;
 use App\Dto\CancelBookingRequest;
 use App\Dto\ModifyBookingDatesRequest;
@@ -17,6 +17,8 @@ use App\Repository\BookingRepository;
 use App\State\BookingByLodgingProvider;
 use App\State\BookingByReferenceProvider;
 use App\State\BookingCancelProcessor;
+use App\State\BookingCheckInProcessor;
+use App\State\BookingCheckOutProcessor;
 use App\State\BookingConfirmProcessor;
 use App\State\BookingCreateProcessor;
 use App\State\BookingHistoryProvider;
@@ -84,12 +86,24 @@ use Symfony\Component\Uid\Uuid;
             security: "is_granted('BOOKING_CANCEL', object)",
             processor: BookingCancelProcessor::class,
         ),
-        new Put(
+        new Patch(
             uriTemplate: '/bookings/{id}/dates',
             input: ModifyBookingDatesRequest::class,
             denormalizationContext: [],
             security: "is_granted('BOOKING_EDIT', object)",
             processor: BookingModifyDatesProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/bookings/{id}/check-in',
+            input: false,
+            security: "is_granted('BOOKING_EDIT', object)",
+            processor: BookingCheckInProcessor::class,
+        ),
+        new Post(
+            uriTemplate: '/bookings/{id}/check-out',
+            input: false,
+            security: "is_granted('BOOKING_EDIT', object)",
+            processor: BookingCheckOutProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => ['booking:read']],
@@ -154,7 +168,7 @@ class Booking
     #[Groups(['booking:read'])]
     private ?int $totalPrice = null;
 
-    #[ORM\Column(enumType: CancellationPolicy::class)]
+    #[ORM\Column(length: 20, enumType: CancellationPolicy::class)]
     #[Groups(['booking:read'])]
     private ?CancellationPolicy $cancellationPolicy = null;
 
@@ -163,7 +177,7 @@ class Booking
     #[Groups(['booking:read'])]
     private ?User $cancelledBy = null;
 
-    #[ORM\Column(enumType: BookingStatus::class)]
+    #[ORM\Column(length: 20, enumType: BookingStatus::class)]
     #[Groups(['booking:read'])]
     private ?BookingStatus $status = null;
 
@@ -183,6 +197,14 @@ class Booking
     #[Groups(['booking:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    #[Groups(['booking:read'])]
+    private ?\DateTimeImmutable $checkedInAt = null;
+
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    #[Groups(['booking:read'])]
+    private ?\DateTimeImmutable $checkedOutAt = null;
+
     /**
      * @var Collection<int, BookingNight>
      */
@@ -199,6 +221,10 @@ class Booking
     #[ORM\OneToOne(mappedBy: 'booking', cascade: ['persist'])]
     #[Groups(['booking:read'])]
     private ?Deposit $deposit = null;
+
+    #[ORM\Column(length: 30)]
+    #[Groups(['booking:read'])]
+    private string $source = 'direct';
 
     public function __construct()
     {
@@ -498,6 +524,42 @@ class Booking
             $deposit->setBooking($this);
         }
         $this->deposit = $deposit;
+
+        return $this;
+    }
+
+    public function getCheckedInAt(): ?\DateTimeImmutable
+    {
+        return $this->checkedInAt;
+    }
+
+    public function setCheckedInAt(?\DateTimeImmutable $checkedInAt): static
+    {
+        $this->checkedInAt = $checkedInAt;
+
+        return $this;
+    }
+
+    public function getCheckedOutAt(): ?\DateTimeImmutable
+    {
+        return $this->checkedOutAt;
+    }
+
+    public function setCheckedOutAt(?\DateTimeImmutable $checkedOutAt): static
+    {
+        $this->checkedOutAt = $checkedOutAt;
+
+        return $this;
+    }
+
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
+    public function setSource(string $source): static
+    {
+        $this->source = $source;
 
         return $this;
     }

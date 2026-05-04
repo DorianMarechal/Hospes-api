@@ -31,7 +31,9 @@ class PriceOverrideCollectionProvider implements ProviderInterface
         }
 
         $user = $this->security->getUser();
-        \assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw new \RuntimeException('Expected authenticated user');
+        }
 
         $hostProfile = $user->getHostProfile();
         if (!$hostProfile || !$lodging->getHost()?->getId()?->equals($hostProfile->getId())) {

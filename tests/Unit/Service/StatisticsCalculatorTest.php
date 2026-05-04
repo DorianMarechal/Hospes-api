@@ -2,12 +2,11 @@
 
 namespace App\Tests\Unit\Service;
 
-use App\Entity\Booking;
 use App\Entity\Lodging;
-use App\Enum\BookingStatus;
 use App\Repository\BookingRepository;
 use App\Service\StatisticsCalculator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Uuid;
 
 class StatisticsCalculatorTest extends TestCase
 {
@@ -20,10 +19,24 @@ class StatisticsCalculatorTest extends TestCase
         $this->calculator = new StatisticsCalculator($this->bookingRepo);
     }
 
-    public function testCalculateWithNoBookings(): void
+    private function createLodgingWithId(): Lodging
     {
         $lodging = new Lodging();
-        $this->bookingRepo->method('findByLodging')->willReturn([]);
+        $ref = new \ReflectionProperty(Lodging::class, 'id');
+        $ref->setValue($lodging, Uuid::v7());
+
+        return $lodging;
+    }
+
+    public function testCalculateWithNoBookings(): void
+    {
+        $lodging = $this->createLodgingWithId();
+
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 0,
+            'bookingsCount' => 0,
+            'occupiedNights' => 0,
+        ]);
 
         $result = $this->calculator->calculate(
             [$lodging],
@@ -41,15 +54,13 @@ class StatisticsCalculatorTest extends TestCase
 
     public function testCalculateWithConfirmedBooking(): void
     {
-        $lodging = new Lodging();
+        $lodging = $this->createLodgingWithId();
 
-        $booking = new Booking();
-        $booking->setCheckin(new \DateTimeImmutable('2026-05-05'));
-        $booking->setCheckout(new \DateTimeImmutable('2026-05-10'));
-        $booking->setStatus(BookingStatus::CONFIRMED);
-        $booking->setTotalPrice(50000);
-
-        $this->bookingRepo->method('findByLodging')->willReturn([$booking]);
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 50000,
+            'bookingsCount' => 1,
+            'occupiedNights' => 5,
+        ]);
 
         $result = $this->calculator->calculate(
             [$lodging],
@@ -65,15 +76,14 @@ class StatisticsCalculatorTest extends TestCase
 
     public function testCalculateExcludesCancelledBookings(): void
     {
-        $lodging = new Lodging();
+        $lodging = $this->createLodgingWithId();
 
-        $booking = new Booking();
-        $booking->setCheckin(new \DateTimeImmutable('2026-05-05'));
-        $booking->setCheckout(new \DateTimeImmutable('2026-05-10'));
-        $booking->setStatus(BookingStatus::CANCELLED);
-        $booking->setTotalPrice(50000);
-
-        $this->bookingRepo->method('findByLodging')->willReturn([$booking]);
+        // aggregateStats already excludes cancelled/pending in SQL
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 0,
+            'bookingsCount' => 0,
+            'occupiedNights' => 0,
+        ]);
 
         $result = $this->calculator->calculate(
             [$lodging],
@@ -87,15 +97,13 @@ class StatisticsCalculatorTest extends TestCase
 
     public function testCalculateExcludesPendingBookings(): void
     {
-        $lodging = new Lodging();
+        $lodging = $this->createLodgingWithId();
 
-        $booking = new Booking();
-        $booking->setCheckin(new \DateTimeImmutable('2026-05-05'));
-        $booking->setCheckout(new \DateTimeImmutable('2026-05-10'));
-        $booking->setStatus(BookingStatus::PENDING);
-        $booking->setTotalPrice(30000);
-
-        $this->bookingRepo->method('findByLodging')->willReturn([$booking]);
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 0,
+            'bookingsCount' => 0,
+            'occupiedNights' => 0,
+        ]);
 
         $result = $this->calculator->calculate(
             [$lodging],
@@ -109,15 +117,14 @@ class StatisticsCalculatorTest extends TestCase
 
     public function testCalculateExcludesBookingsOutsidePeriod(): void
     {
-        $lodging = new Lodging();
+        $lodging = $this->createLodgingWithId();
 
-        $booking = new Booking();
-        $booking->setCheckin(new \DateTimeImmutable('2026-04-01'));
-        $booking->setCheckout(new \DateTimeImmutable('2026-04-05'));
-        $booking->setStatus(BookingStatus::CONFIRMED);
-        $booking->setTotalPrice(40000);
-
-        $this->bookingRepo->method('findByLodging')->willReturn([$booking]);
+        // aggregateStats already filters by date range in SQL
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 0,
+            'bookingsCount' => 0,
+            'occupiedNights' => 0,
+        ]);
 
         $result = $this->calculator->calculate(
             [$lodging],
@@ -131,16 +138,14 @@ class StatisticsCalculatorTest extends TestCase
 
     public function testCalculateClipsOverlapToPeriod(): void
     {
-        $lodging = new Lodging();
+        $lodging = $this->createLodgingWithId();
 
-        // Booking spans 2026-04-28 to 2026-05-05 but period starts 2026-05-01
-        $booking = new Booking();
-        $booking->setCheckin(new \DateTimeImmutable('2026-04-28'));
-        $booking->setCheckout(new \DateTimeImmutable('2026-05-05'));
-        $booking->setStatus(BookingStatus::CONFIRMED);
-        $booking->setTotalPrice(70000);
-
-        $this->bookingRepo->method('findByLodging')->willReturn([$booking]);
+        // Booking 04-28 to 05-05 clipped to May 1-5 = 4 nights (done in SQL)
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 70000,
+            'bookingsCount' => 1,
+            'occupiedNights' => 4,
+        ]);
 
         $result = $this->calculator->calculate(
             [$lodging],
@@ -149,30 +154,18 @@ class StatisticsCalculatorTest extends TestCase
         );
 
         $this->assertSame(1, $result['bookingsCount']);
-        // Only nights within period: May 1-5 = 4 nights
         $this->assertSame(4, $result['occupiedNights']);
     }
 
     public function testCalculateWithMultipleLodgings(): void
     {
-        $lodging1 = new Lodging();
-        $lodging2 = new Lodging();
+        $lodging1 = $this->createLodgingWithId();
+        $lodging2 = $this->createLodgingWithId();
 
-        $booking1 = new Booking();
-        $booking1->setCheckin(new \DateTimeImmutable('2026-05-01'));
-        $booking1->setCheckout(new \DateTimeImmutable('2026-05-04'));
-        $booking1->setStatus(BookingStatus::CONFIRMED);
-        $booking1->setTotalPrice(30000);
-
-        $booking2 = new Booking();
-        $booking2->setCheckin(new \DateTimeImmutable('2026-05-10'));
-        $booking2->setCheckout(new \DateTimeImmutable('2026-05-15'));
-        $booking2->setStatus(BookingStatus::CONFIRMED);
-        $booking2->setTotalPrice(50000);
-
-        $this->bookingRepo->method('findByLodging')->willReturnMap([
-            [$lodging1, [$booking1]],
-            [$lodging2, [$booking2]],
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 80000,
+            'bookingsCount' => 2,
+            'occupiedNights' => 8,
         ]);
 
         $result = $this->calculator->calculate(
@@ -184,21 +177,18 @@ class StatisticsCalculatorTest extends TestCase
         $this->assertSame(80000, $result['revenue']);
         $this->assertSame(2, $result['bookingsCount']);
         $this->assertSame(8, $result['occupiedNights']);
-        // 30 days * 2 lodgings = 60 total nights
         $this->assertSame(60, $result['totalNights']);
     }
 
     public function testCalculateOccupancyRateAndRevpar(): void
     {
-        $lodging = new Lodging();
+        $lodging = $this->createLodgingWithId();
 
-        $booking = new Booking();
-        $booking->setCheckin(new \DateTimeImmutable('2026-05-01'));
-        $booking->setCheckout(new \DateTimeImmutable('2026-05-11'));
-        $booking->setStatus(BookingStatus::CONFIRMED);
-        $booking->setTotalPrice(100000);
-
-        $this->bookingRepo->method('findByLodging')->willReturn([$booking]);
+        $this->bookingRepo->method('aggregateStats')->willReturn([
+            'revenue' => 100000,
+            'bookingsCount' => 1,
+            'occupiedNights' => 10,
+        ]);
 
         $result = $this->calculator->calculate(
             [$lodging],

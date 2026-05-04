@@ -37,8 +37,10 @@ class RegisterProcessor implements ProcessorInterface
         }
 
         $user->setPassword($this->passwordHasher->hashPassword($user, $data->password));
-        $user->setCreatedAt(new \DateTimeImmutable());
-        $user->setUpdatedAt(new \DateTimeImmutable());
+        $now = new \DateTimeImmutable();
+        $user->setCreatedAt($now);
+        $user->setUpdatedAt($now);
+        $user->setConsentedAt($now);
         $user->setIsActive(true);
 
         $this->entityManager->persist($user);

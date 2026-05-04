@@ -40,12 +40,14 @@ class BookingCreateProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof BookingRequest);
+        if (!$data instanceof BookingRequest) {
+            throw new \InvalidArgumentException('Expected '.BookingRequest::class);
+        }
 
         /** @var \App\Entity\User $user */
         $user = $this->security->getUser();
 
-        $lodging = $this->lodgingRepository->find($data->lodgingId);
+        $lodging = $this->lodgingRepository->findWithPricing($data->lodgingId);
         if (!$lodging) {
             throw new NotFoundHttpException('Lodging not found');
         }

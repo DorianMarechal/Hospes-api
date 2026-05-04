@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use App\Repository\UserRepository;
+use App\State\AccountDeletionProcessor;
+use App\State\DataExportProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -25,6 +28,17 @@ use Symfony\Component\Uid\Uuid;
             uriTemplate: '/auth/me',
             provider: 'App\State\MeProvider',
             security: "is_granted('ROLE_USER')",
+        ),
+        new Get(
+            uriTemplate: '/me/data-export',
+            provider: DataExportProvider::class,
+            security: "is_granted('ROLE_USER')",
+            normalizationContext: ['groups' => ['data_export']],
+        ),
+        new Delete(
+            uriTemplate: '/me/account',
+            security: "is_granted('ROLE_USER')",
+            processor: AccountDeletionProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => ['user:read']],
@@ -78,6 +92,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
     #[Groups(['user:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    #[Groups(['user:read'])]
+    private ?\DateTimeImmutable $consentedAt = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $resetToken = null;
@@ -249,6 +267,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getConsentedAt(): ?\DateTimeImmutable
+    {
+        return $this->consentedAt;
+    }
+
+    public function setConsentedAt(?\DateTimeImmutable $consentedAt): static
+    {
+        $this->consentedAt = $consentedAt;
 
         return $this;
     }

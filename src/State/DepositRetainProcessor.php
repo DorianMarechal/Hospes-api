@@ -28,7 +28,9 @@ class DepositRetainProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof RetainDepositRequest);
+        if (!$data instanceof RetainDepositRequest) {
+            throw new \InvalidArgumentException('Expected '.RetainDepositRequest::class);
+        }
 
         $booking = $this->bookingRepository->find($uriVariables['bookingId']);
         if (!$booking) {

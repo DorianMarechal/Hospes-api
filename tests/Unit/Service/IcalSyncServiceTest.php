@@ -94,6 +94,8 @@ class IcalSyncServiceTest extends TestCase
         $this->bookingRepo->method('findByLodging')->willReturn([]);
 
         $existingBlocked = new BlockedDate();
+        $existingBlocked->setStartDate(new \DateTimeImmutable('2026-04-01'));
+        $existingBlocked->setEndDate(new \DateTimeImmutable('2026-04-05'));
         $this->blockedDateRepo->method('findBy')
             ->with(['lodging' => $lodging, 'source' => 'ical'])
             ->willReturn([$existingBlocked]);

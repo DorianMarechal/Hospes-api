@@ -37,11 +37,26 @@ class LodgingIsActiveExtension implements QueryCollectionExtensionInterface, Que
 
         $user = $this->security->getUser();
 
-        // Authenticated users with host/admin role see all lodgings
         if (null !== $user) {
             /** @var \App\Entity\User $user */
             $reachableRoles = $this->roleHierarchy->getReachableRoleNames($user->getRoles());
-            if (\in_array('ROLE_HOST', $reachableRoles, true) || \in_array('ROLE_ADMIN', $reachableRoles, true)) {
+
+            if (\in_array('ROLE_ADMIN', $reachableRoles, true)) {
+                return;
+            }
+
+            if (\in_array('ROLE_HOST', $reachableRoles, true)) {
+                $rootAlias = $queryBuilder->getRootAliases()[0];
+                $hostProfile = $user->getHostProfile();
+                if (null !== $hostProfile) {
+                    $queryBuilder->andWhere(\sprintf('%s.isActive = :active OR %s.host = :hostProfile', $rootAlias, $rootAlias));
+                    $queryBuilder->setParameter('active', true);
+                    $queryBuilder->setParameter('hostProfile', $hostProfile->getId(), 'uuid');
+                } else {
+                    $queryBuilder->andWhere(\sprintf('%s.isActive = :active', $rootAlias));
+                    $queryBuilder->setParameter('active', true);
+                }
+
                 return;
             }
         }

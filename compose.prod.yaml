@@ -1,0 +1,116 @@
+services:
+  database:
+    image: postgis/postgis:17-3.5-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  php:
+    build:
+      context: .
+      target: prod
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=17&charset=utf8"
+      REDIS_URL: "redis://redis:6379"
+      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
+      MERCURE_URL: "http://mercure/.well-known/mercure"
+      MERCURE_PUBLIC_URL: "${MERCURE_PUBLIC_URL}"
+      MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET}"
+      MAILER_DSN: "${MAILER_DSN}"
+    volumes:
+      - jwt-keys:/app/config/jwt
+    restart: unless-stopped
+
+  messenger-worker:
+    build:
+      context: .
+      target: prod
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?serverVersion=17&charset=utf8"
+      REDIS_URL: "redis://redis:6379"
+      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
+      MERCURE_URL: "http://mercure/.well-known/mercure"
+      MERCURE_PUBLIC_URL: "${MERCURE_PUBLIC_URL}"
+      MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET}"
+      MAILER_DSN: "${MAILER_DSN}"
+    command: php bin/console messenger:consume async --time-limit=3600 --memory-limit=128M
+    volumes:
+      - jwt-keys:/app/config/jwt
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./public:/app/public:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - php
+    restart: unless-stopped
+
+  mercure:
+    image: dunglas/mercure
+    environment:
+      SERVER_NAME: ':80'
+      MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins ${CORS_ALLOW_ORIGIN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - mercure_data:/data
+      - mercure_config:/config
+    restart: unless-stopped
+
+volumes:
+  database_data:
+  redis_data:
+  jwt-keys:
+  caddy_data:
+  caddy_config:
+  mercure_data:
+  mercure_config:

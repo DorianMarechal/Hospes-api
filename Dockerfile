@@ -4,6 +4,7 @@ RUN apk add --no-cache \
         icu-libs \
         libpq \
         libzip \
+        curl \
     && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         icu-dev \
@@ -21,6 +22,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 
 COPY docker/php/php.ini "$PHP_INI_DIR/conf.d/app.ini"
+
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+    CMD curl -f http://localhost:9000/ping || exit 1
 
 # ---- Dependencies ----
 FROM base AS deps

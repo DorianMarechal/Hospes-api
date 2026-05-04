@@ -21,15 +21,19 @@ class ResetPasswordProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): null
     {
-        assert($data instanceof ResetPasswordRequest);
+        if (!$data instanceof ResetPasswordRequest) {
+            throw new \InvalidArgumentException('Expected '.ResetPasswordRequest::class);
+        }
 
-        $user = $this->userRepository->findOneBy(['resetToken' => $data->token]);
+        $hashedToken = hash('sha256', $data->token);
+        $user = $this->userRepository->findOneBy(['resetToken' => $hashedToken]);
 
         if (!$user) {
             throw new BadRequestHttpException('Invalid or expired reset token');
         }
 
-        if ($user->getResetTokenExpiresAt() < new \DateTimeImmutable()) {
+        $expiresAt = $user->getResetTokenExpiresAt();
+        if (null === $expiresAt || $expiresAt < new \DateTimeImmutable()) {
             throw new BadRequestHttpException('Invalid or expired reset token');
         }
 

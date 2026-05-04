@@ -1,6 +1,14 @@
 api_platform:
     title: Hospes API
-    version: 0.0.1
+    version: 1.0.0
+    description: |
+        REST API for independent lodging hosts.
+
+        ## Versioning
+        This API uses URI-based versioning. All endpoints are served under /api/ (current: v1).
+        When breaking changes are introduced, a new version prefix (/api/v2/) will be added
+        while maintaining the previous version for a deprecation period.
+        The current version is also available via the X-API-Version response header.
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']
@@ -15,6 +23,7 @@ api_platform:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+        pagination_maximum_items_per_page: 100
 
 when@prod:
     api_platform:

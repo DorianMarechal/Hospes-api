@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use App\Repository\LodgingRepository;
-use App\Repository\SeasonRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -18,7 +17,6 @@ class SeasonProcessor implements ProcessorInterface
         private ProcessorInterface $persistProcessor,
         private Security $security,
         private LodgingRepository $lodgingRepository,
-        private SeasonRepository $seasonRepository,
     ) {
     }
 
@@ -40,13 +38,6 @@ class SeasonProcessor implements ProcessorInterface
 
             $data->setLodging($lodging);
             $data->setCreatedAt(new \DateTimeImmutable());
-
-            $existingSeasons = $this->seasonRepository->findBy(['lodging' => $lodging]);
-            foreach ($existingSeasons as $existing) {
-                if ($data->getStartDate() < $existing->getEndDate() && $data->getEndDate() > $existing->getStartDate()) {
-                    throw new HttpException(422, 'The selected dates overlap with an existing season');
-                }
-            }
         }
 
         $data->setUpdatedAt(new \DateTimeImmutable());

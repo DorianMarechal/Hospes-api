@@ -9,36 +9,52 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class PendingBookingCleanerTest extends TestCase
 {
     private PendingBookingCleaner $cleaner;
     private EntityManagerInterface $em;
+    private MessageBusInterface $messageBus;
 
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->cleaner = new PendingBookingCleaner($this->em);
+        $this->messageBus = $this->createMock(MessageBusInterface::class);
+        $this->messageBus->method('dispatch')->willReturnCallback(fn ($msg) => new Envelope($msg));
+        $this->cleaner = new PendingBookingCleaner($this->em, $this->messageBus);
     }
 
     public function testCleanExpiredBuildsCorrectQuery(): void
     {
-        $query = $this->createMock(Query::class);
-        $query->expects($this->once())
-            ->method('execute')
-            ->willReturn(3);
+        // First call: SELECT query for notification dispatch
+        $selectQuery = $this->createMock(Query::class);
+        $selectQuery->method('getResult')->willReturn([]);
 
-        $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->once())->method('update')->with(Booking::class, 'b')->willReturnSelf();
-        $qb->method('set')->willReturnSelf();
-        $qb->method('where')->willReturnSelf();
-        $qb->method('andWhere')->willReturnSelf();
-        $qb->method('setParameter')->willReturnSelf();
-        $qb->expects($this->once())->method('getQuery')->willReturn($query);
+        $selectQb = $this->createMock(QueryBuilder::class);
+        $selectQb->method('select')->willReturnSelf();
+        $selectQb->method('from')->willReturnSelf();
+        $selectQb->method('where')->willReturnSelf();
+        $selectQb->method('andWhere')->willReturnSelf();
+        $selectQb->method('setParameter')->willReturnSelf();
+        $selectQb->method('getQuery')->willReturn($selectQuery);
 
-        $this->em->expects($this->once())
+        // Second call: UPDATE query for bulk status change
+        $updateQuery = $this->createMock(Query::class);
+        $updateQuery->method('execute')->willReturn(3);
+
+        $updateQb = $this->createMock(QueryBuilder::class);
+        $updateQb->method('update')->with(Booking::class, 'b')->willReturnSelf();
+        $updateQb->method('set')->willReturnSelf();
+        $updateQb->method('where')->willReturnSelf();
+        $updateQb->method('andWhere')->willReturnSelf();
+        $updateQb->method('setParameter')->willReturnSelf();
+        $updateQb->method('getQuery')->willReturn($updateQuery);
+
+        $this->em->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->willReturn($qb);
+            ->willReturnOnConsecutiveCalls($selectQb, $updateQb);
 
         $result = $this->cleaner->cleanExpired();
 
@@ -47,43 +63,65 @@ class PendingBookingCleanerTest extends TestCase
 
     public function testCleanExpiredReturnsZeroWhenNoExpired(): void
     {
-        $query = $this->createMock(Query::class);
-        $query->expects($this->once())
-            ->method('execute')
-            ->willReturn(0);
+        $selectQuery = $this->createMock(Query::class);
+        $selectQuery->method('getResult')->willReturn([]);
 
-        $qb = $this->createMock(QueryBuilder::class);
-        $qb->method('update')->willReturnSelf();
-        $qb->method('set')->willReturnSelf();
-        $qb->method('where')->willReturnSelf();
-        $qb->method('andWhere')->willReturnSelf();
-        $qb->method('setParameter')->willReturnSelf();
-        $qb->method('getQuery')->willReturn($query);
+        $selectQb = $this->createMock(QueryBuilder::class);
+        $selectQb->method('select')->willReturnSelf();
+        $selectQb->method('from')->willReturnSelf();
+        $selectQb->method('where')->willReturnSelf();
+        $selectQb->method('andWhere')->willReturnSelf();
+        $selectQb->method('setParameter')->willReturnSelf();
+        $selectQb->method('getQuery')->willReturn($selectQuery);
 
-        $this->em->method('createQueryBuilder')->willReturn($qb);
+        $updateQuery = $this->createMock(Query::class);
+        $updateQuery->method('execute')->willReturn(0);
+
+        $updateQb = $this->createMock(QueryBuilder::class);
+        $updateQb->method('update')->willReturnSelf();
+        $updateQb->method('set')->willReturnSelf();
+        $updateQb->method('where')->willReturnSelf();
+        $updateQb->method('andWhere')->willReturnSelf();
+        $updateQb->method('setParameter')->willReturnSelf();
+        $updateQb->method('getQuery')->willReturn($updateQuery);
+
+        $this->em->method('createQueryBuilder')
+            ->willReturnOnConsecutiveCalls($selectQb, $updateQb);
 
         $this->assertSame(0, $this->cleaner->cleanExpired());
     }
 
     public function testCleanExpiredSetsCancelledStatusAndNow(): void
     {
-        $query = $this->createMock(Query::class);
-        $query->method('execute')->willReturn(1);
+        $selectQuery = $this->createMock(Query::class);
+        $selectQuery->method('getResult')->willReturn([]);
+
+        $selectQb = $this->createMock(QueryBuilder::class);
+        $selectQb->method('select')->willReturnSelf();
+        $selectQb->method('from')->willReturnSelf();
+        $selectQb->method('where')->willReturnSelf();
+        $selectQb->method('andWhere')->willReturnSelf();
+        $selectQb->method('setParameter')->willReturnSelf();
+        $selectQb->method('getQuery')->willReturn($selectQuery);
+
+        $updateQuery = $this->createMock(Query::class);
+        $updateQuery->method('execute')->willReturn(1);
 
         $setParams = [];
-        $qb = $this->createMock(QueryBuilder::class);
-        $qb->method('update')->willReturnSelf();
-        $qb->method('set')->willReturnSelf();
-        $qb->method('where')->willReturnSelf();
-        $qb->method('andWhere')->willReturnSelf();
-        $qb->method('setParameter')->willReturnCallback(function (string $key, mixed $value) use ($qb, &$setParams) {
+        $updateQb = $this->createMock(QueryBuilder::class);
+        $updateQb->method('update')->willReturnSelf();
+        $updateQb->method('set')->willReturnSelf();
+        $updateQb->method('where')->willReturnSelf();
+        $updateQb->method('andWhere')->willReturnSelf();
+        $updateQb->method('setParameter')->willReturnCallback(function (string $key, mixed $value) use ($updateQb, &$setParams) {
             $setParams[$key] = $value;
 
-            return $qb;
+            return $updateQb;
         });
-        $qb->method('getQuery')->willReturn($query);
+        $updateQb->method('getQuery')->willReturn($updateQuery);
 
-        $this->em->method('createQueryBuilder')->willReturn($qb);
+        $this->em->method('createQueryBuilder')
+            ->willReturnOnConsecutiveCalls($selectQb, $updateQb);
 
         $this->cleaner->cleanExpired();
 

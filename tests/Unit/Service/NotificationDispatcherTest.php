@@ -11,6 +11,8 @@ use App\Entity\Payment;
 use App\Entity\Review;
 use App\Entity\StaffAssignment;
 use App\Entity\User;
+use App\Enum\NotificationType;
+use App\Service\MercurePublisher;
 use App\Service\NotificationDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -29,7 +31,8 @@ class NotificationDispatcherTest extends TestCase
         $this->em->method('persist')->willReturnCallback(function ($entity) {
             $this->persisted[] = $entity;
         });
-        $this->dispatcher = new NotificationDispatcher($this->em);
+        $mercure = $this->createMock(MercurePublisher::class);
+        $this->dispatcher = new NotificationDispatcher($this->em, $mercure);
         $this->persisted = [];
     }
 
@@ -59,9 +62,12 @@ class NotificationDispatcherTest extends TestCase
         $this->assertCount(1, $this->persisted);
         $notif = $this->persisted[0];
         $this->assertInstanceOf(Notification::class, $notif);
-        $this->assertSame('booking_confirmed', $notif->getType());
+        $this->assertSame(NotificationType::BOOKING_CONFIRMED, $notif->getType());
         $this->assertStringContains('HOS-ABC12345-26', $notif->getContent());
         $this->assertStringContains('Chalet Montagne', $notif->getContent());
+        $this->assertNotNull($notif->getParams());
+        $this->assertSame('HOS-ABC12345-26', $notif->getParams()['reference']);
+        $this->assertSame('Chalet Montagne', $notif->getParams()['lodging_name']);
     }
 
     public function testBookingConfirmedDoesNothingWhenNoHost(): void
@@ -84,7 +90,6 @@ class NotificationDispatcherTest extends TestCase
 
         $this->dispatcher->bookingCancelled($booking);
 
-        // Customer should be notified (not host since host cancelled)
         $customerNotifs = array_filter($this->persisted, fn (Notification $n) => $n->getUser() === $customer);
         $this->assertCount(1, $customerNotifs);
     }
@@ -111,7 +116,6 @@ class NotificationDispatcherTest extends TestCase
 
         $this->dispatcher->bookingCancelled($booking);
 
-        // Both host and customer notified
         $this->assertCount(2, $this->persisted);
     }
 
@@ -122,7 +126,7 @@ class NotificationDispatcherTest extends TestCase
         $this->dispatcher->bookingModified($booking);
 
         $this->assertCount(1, $this->persisted);
-        $this->assertSame('booking_modified', $this->persisted[0]->getType());
+        $this->assertSame(NotificationType::BOOKING_MODIFIED, $this->persisted[0]->getType());
     }
 
     public function testBookingExpiredCreatesNotificationForCustomer(): void
@@ -134,7 +138,7 @@ class NotificationDispatcherTest extends TestCase
         $this->dispatcher->bookingExpired($booking);
 
         $this->assertCount(1, $this->persisted);
-        $this->assertSame('booking_expired', $this->persisted[0]->getType());
+        $this->assertSame(NotificationType::BOOKING_EXPIRED, $this->persisted[0]->getType());
         $this->assertSame($customer, $this->persisted[0]->getUser());
         $this->assertStringContains('15 minutes', $this->persisted[0]->getContent());
     }
@@ -157,8 +161,9 @@ class NotificationDispatcherTest extends TestCase
         $this->dispatcher->staffInvited($assignment, 'staff@example.com');
 
         $this->assertCount(1, $this->persisted);
-        $this->assertSame('staff_invited', $this->persisted[0]->getType());
+        $this->assertSame(NotificationType::STAFF_INVITED, $this->persisted[0]->getType());
         $this->assertStringContains('staff@example.com', $this->persisted[0]->getContent());
+        $this->assertSame('staff@example.com', $this->persisted[0]->getParams()['email']);
     }
 
     public function testReviewReceivedCreatesNotificationForHost(): void
@@ -178,7 +183,7 @@ class NotificationDispatcherTest extends TestCase
         $this->dispatcher->reviewReceived($review);
 
         $this->assertCount(1, $this->persisted);
-        $this->assertSame('review_received', $this->persisted[0]->getType());
+        $this->assertSame(NotificationType::REVIEW_RECEIVED, $this->persisted[0]->getType());
         $this->assertStringContains('4/5', $this->persisted[0]->getContent());
         $this->assertStringContains('Villa Soleil', $this->persisted[0]->getContent());
     }
@@ -190,7 +195,7 @@ class NotificationDispatcherTest extends TestCase
         $this->dispatcher->messageReceived($user, 'Chalet Neige');
 
         $this->assertCount(1, $this->persisted);
-        $this->assertSame('message_received', $this->persisted[0]->getType());
+        $this->assertSame(NotificationType::MESSAGE_RECEIVED, $this->persisted[0]->getType());
         $this->assertStringContains('Chalet Neige', $this->persisted[0]->getContent());
     }
 
@@ -205,8 +210,10 @@ class NotificationDispatcherTest extends TestCase
         $this->dispatcher->paymentReceived($payment);
 
         $this->assertCount(1, $this->persisted);
-        $this->assertSame('payment_received', $this->persisted[0]->getType());
+        $this->assertSame(NotificationType::PAYMENT_RECEIVED, $this->persisted[0]->getType());
         $this->assertStringContains('150,00', $this->persisted[0]->getContent());
+        $this->assertSame('15000', $this->persisted[0]->getParams()['amount']);
+        $this->assertSame('EUR', $this->persisted[0]->getParams()['currency']);
     }
 
     public function testDepositReleasedCreatesNotificationForCustomer(): void
@@ -221,7 +228,7 @@ class NotificationDispatcherTest extends TestCase
         $this->dispatcher->depositReleased($deposit);
 
         $this->assertCount(1, $this->persisted);
-        $this->assertSame('deposit_released', $this->persisted[0]->getType());
+        $this->assertSame(NotificationType::DEPOSIT_RELEASED, $this->persisted[0]->getType());
         $this->assertSame($customer, $this->persisted[0]->getUser());
     }
 

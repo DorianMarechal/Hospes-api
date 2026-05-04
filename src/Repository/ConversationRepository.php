@@ -42,4 +42,17 @@ class ConversationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return Conversation[]
+     */
+    public function findByParticipant(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.customer = :user OR c.host = :user')
+            ->setParameter('user', $user)
+            ->orderBy('c.updatedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

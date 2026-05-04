@@ -92,9 +92,10 @@
 
 ---
 
-# V2 — A FAIRE
+# V2 — COMPLETE
 
-## Phase 5 — Securite & ops
+<details>
+<summary>Phase 5 — Securite & ops</summary>
 
 - [ ] Rotater secrets (APP_SECRET, JWT passphrase) + nettoyer git history
 - [x] CORS configuration pour frontend
@@ -103,103 +104,323 @@
 - [x] Rate limiting global par IP (pas seulement login)
 - [x] Monitoring : health check endpoint (/api/health)
 
-## Phase 6 — Integration paiement Stripe Connect + PayPal
+</details>
 
-### Stripe Connect
-- [x] Installer stripe/stripe-php
-- [x] Implementer le flux OAuth Stripe Connect (redirect + callback)
-- [x] Stocker stripe_account_id sur HostProfile (remplacer les placeholders)
-- [x] Creer PaymentIntent via Stripe API dans PaymentCreateProcessor
-- [x] Webhook Stripe : payment_intent.succeeded → mettre Payment.status = succeeded
-- [x] Webhook Stripe : payment_intent.payment_failed → mettre Payment.status = failed
-- [x] Remboursement automatique via Stripe Refund API dans PaymentRefundProcessor
-- [x] Dashboard paiements Stripe Connect pour les hotes (lien redirect)
+<details>
+<summary>Phase 6 — Integration paiement Stripe Connect + PayPal</summary>
 
-### PayPal
-- [x] Installer paypal/paypal-server-sdk
-- [x] Implementer le flux OAuth PayPal pour les hotes (onboarding marchand)
-- [x] Stocker paypal_merchant_id sur HostProfile
-- [x] Creer Order via PayPal API dans PaymentCreateProcessor
-- [x] Webhook PayPal : PAYMENT.CAPTURE.COMPLETED → mettre Payment.status = succeeded
-- [x] Webhook PayPal : PAYMENT.CAPTURE.DENIED → mettre Payment.status = failed
-- [x] Remboursement automatique via PayPal Refund API dans PaymentRefundProcessor
+- [x] Stripe Connect (OAuth, PaymentIntent, webhooks, refund, dashboard)
+- [x] PayPal (OAuth, Orders, webhooks, refund)
+- [x] Interface PaymentProviderInterface + PaymentProviderFactory
+- [x] Remboursement auto sur annulation + choix provider
 
-### Commun
-- [x] Interface PaymentProviderInterface (create, capture, refund, webhookVerify)
-- [x] PaymentProviderFactory pour selectionner Stripe ou PayPal selon HostProfile
-- [x] Remboursement auto sur annulation selon CancellationPolicyResolver
-- [x] Endpoint choix provider par le customer (Payment.method = card | paypal)
+</details>
 
-## Phase 7 — Double validation des modifications de reservation
+<details>
+<summary>Phase 7 — Double validation des modifications de reservation</summary>
 
-- [ ] Entite BookingModificationRequest (proposed dates, proposed price, status)
-- [ ] POST /api/bookings/{id}/modification-request (proposer modif)
-- [ ] POST /api/booking-modifications/{id}/accept
-- [ ] POST /api/booking-modifications/{id}/reject
-- [ ] Expiration auto des propositions (TTL configurable)
-- [ ] Notifications aux deux parties (propose, accepte, refuse, expire)
-- [ ] Recalcul prix uniquement apres acceptation des deux parties
+- [x] Entite BookingModificationRequest + enum ModificationRequestStatus
+- [x] POST /api/bookings/{id}/modification-request
+- [x] POST /api/booking-modifications/{id}/accept + reject
+- [x] Expiration auto 48h + notifications aux deux parties
 
-## Phase 8 — Notifications temps reel
+</details>
 
-- [ ] Installer Mercure (symfony/mercure-bundle)
-- [ ] Hub Mercure (Docker ou managed)
-- [ ] Publier les notifications sur un topic user-specific
-- [ ] Publier les messages de conversation en temps reel
-- [ ] SSE/WebSocket endpoint pour le frontend
-- [ ] Fallback : garder le modele pull pour les clients sans WebSocket
+<details>
+<summary>Phase 8 — Notifications temps reel (Mercure)</summary>
 
-## Phase 9 — Recherche avancee
+- [x] symfony/mercure-bundle + hub Docker
+- [x] MercurePublisher : notifications, messages, modification requests
+- [x] Integration NotificationDispatcher + MessageProcessor
 
-- [ ] Recherche geospatiale (PostGIS extension, ST_DWithin)
-- [ ] Filtres composes : prix min/max, equipements, note minimale
-- [ ] Tri par pertinence (distance + note + prix)
-- [ ] Pagination cursor-based pour les gros resultats
-- [ ] Cache des resultats de recherche (Redis/Varnish)
+</details>
 
-## Phase 10 — RGPD & conformite
+<details>
+<summary>Phase 9 — Recherche avancee</summary>
 
-- [ ] GET /api/me/data-export (export donnees personnelles JSON)
-- [ ] DELETE /api/me/account (anonymisation : pseudonymiser les donnees liees aux resas passees)
-- [ ] Consentement explicite a l'inscription (champ + date)
-- [ ] Politique de retention des donnees (cron suppression comptes inactifs > 3 ans)
-- [ ] Log des consentements
+- [x] PostGIS + ST_DWithin geospatial
+- [x] Filtres composes + tri pertinence + pagination cursor-based
 
-## Phase 11 — Performance & scalabilite
+</details>
 
-- [ ] Cache HTTP (Varnish/CDN) pour endpoints publics (lodgings, availability, reviews)
-- [ ] Redis pour rate limiting et sessions
-- [ ] Optimisation queries N+1 (Doctrine eager loading sur endpoints critiques)
-- [ ] Pagination keyset sur collections volumineuses (bookings, notifications)
-- [ ] Async : Symfony Messenger pour NotificationDispatcher + emails
-- [ ] Cron iCal sync periodique (toutes les 15 min)
+<details>
+<summary>Phase 10 — RGPD & conformite</summary>
 
-## Phase 12 — Emails transactionnels
+- [x] Data export, anonymisation, consentement, retention 3 ans
 
-- [ ] Template emails (Symfony Mailer + Twig)
-- [ ] Email confirmation de reservation (customer)
-- [ ] Email notification nouvelle reservation (hote)
-- [ ] Email annulation (customer + hote)
-- [ ] Email invitation staff
-- [ ] Email reinitialisation mot de passe (deja le flow, ajouter le vrai envoi)
-- [ ] Email rappel check-in J-1
-- [ ] Email demande d'avis apres checkout J+1
-- [ ] Provider : Resend, Postmark ou SES
+</details>
 
-## Phase 13 — Tests supplementaires
+<details>
+<summary>Phase 11 — Performance & scalabilite</summary>
 
-- [ ] Augmenter couverture tests fonctionnels (~110 cibles selon le cahier des charges)
-- [ ] Tests Stripe webhooks (mock)
-- [ ] Tests Mercure (mock hub)
-- [ ] Tests de charge (k6 ou Artillery)
-- [ ] Tests de securite automatises (OWASP ZAP)
+- [x] Redis, Symfony Messenger async, cron iCal sync
 
-## Phase 14 — Deploiement
+</details>
 
-- [ ] Dockerfile production (multi-stage, PHP-FPM + Caddy)
-- [ ] Docker Compose production (PostgreSQL, Redis, Mercure)
+<details>
+<summary>Phase 12 — Emails transactionnels</summary>
+
+- [x] Symfony Mailer + 7 templates Twig + commandes cron
+
+</details>
+
+<details>
+<summary>Phase 13 — Tests supplementaires</summary>
+
+- [x] Tests fonctionnels BookingModificationRequest, webhooks, k6, OWASP ZAP
+
+</details>
+
+<details>
+<summary>Phase 14 — Deploiement</summary>
+
+- [x] Dockerfile production + compose.prod.yaml
+- [ ] Terraform / IaC, secrets management, CD pipeline, backup, monitoring
+
+</details>
+
+---
+
+# V3 — CORRECTIONS AUDIT (securite, bugs, performance)
+
+## Phase 15 — Securite critique
+
+- [x] Montant paiement : calculer cote serveur, ignorer le montant client dans CreatePaymentRequest
+- [x] GET /api/bookings : ajouter security + authorization dans BookingByReferenceProvider
+- [x] PayPal webhook : rendre la verification de signature obligatoire (throw si absent)
+- [x] Stripe OAuth callback : remplacer state=UUID par un token CSRF signe lie a la session
+- [ ] Rotater JWT keypair + passphrase, stocker dans .env.local ou Vault uniquement
+- [x] Hasher les reset tokens (SHA-256) avant stockage en base
+- [x] Retirer paymentProviderAccountId du groupe host-profile:read
+- [x] Configurer trusted_proxies dans framework.yaml pour rate limiter derriere Caddy
+- [x] LodgingIsActiveExtension : filtrer par host_id pour les logements inactifs (cross-tenant leak)
+- [x] Protection SSRF sur iCal URL : whitelist https, bloquer RFC1918/loopback, limiter taille reponse
+- [x] Mercure : ajouter private: true sur tous les Update + configurer JWT subscriber claims
+- [x] Webhooks Stripe/PayPal : exempter du rate limiter global
+- [x] Invalider refresh tokens sur changement de mot de passe et suppression de compte
+- [x] Rate limiters dedies pour forgot-password, register, accept-invitation
+- [x] Remplacer assert() par des gardes explicites if/throw dans tous les processors
+- [x] Cabler ForgotPasswordProcessor → EmailSender::sendPasswordReset()
+- [x] Cabler StaffInviteProcessor → EmailSender::sendStaffInvitation()
+- [x] iCal export : sanitizer le nom du fichier dans Content-Disposition
+
+## Phase 16 — Bugs et null safety
+
+- [x] AvailabilityResolver/OrphanProtectionChecker : fix null expiresAt (ne skip que si PENDING + expiresAt non null + expire)
+- [x] BookingConfirmProcessor : fix null expiresAt + ajouter BookingStatusHistory a l'expiration
+- [x] BookingModifyDatesProcessor + ModificationRequestCreateProcessor + AcceptProcessor : null guard sur getLodging()
+- [x] Null-coalesce getGuestsCount() avant passage a PriceCalculator (fallback 1)
+- [x] BookingCancelProcessor/PaymentRefundProcessor : null guard sur getMethod() avant setMethod()
+- [x] SeasonProcessor : supprimer le check overlap duplique (deja dans NoSeasonOverlapValidator)
+- [x] BookingCancelProcessor : void/release le Deposit a l'annulation
+- [x] AcceptInvitationProcessor : verifier si email existe deja, rattacher le User existant
+- [x] IcalSyncService : remplacer delete-all-then-recreate par diff-and-patch
+- [x] PendingBookingCleaner : notifier le customer avant le bulk UPDATE (dispatch SendNotificationMessage)
+- [x] PayPalGateway::completeOnboarding() : implementer l'echange code → merchant ID via API PayPal
+- [x] NotificationDispatcher : publier Mercure APRES flush, pas avant (ou mieux : dispatcher via Messenger)
+
+## Phase 17 — Performance
+
+- [x] AvailabilitySearchProvider : batch queries (findActiveOverlappingForLodgings) au lieu de N+1
+- [x] Geo filter : merger dans advancedSearch avant pagination, pas apres en PHP
+- [x] StatisticsCalculator : remplacer par une seule query SQL agrégée (SUM, COUNT, GROUP BY)
+- [x] Admin providers : ajouter pagination (setMaxResults/setFirstResult), supprimer findAll()
+- [x] NotificationDispatcher : cabler sur Messenger (dispatcher SendNotificationMessage au lieu d'appeler MercurePublisher directement)
+- [x] BookingCreateProcessor : eager load seasons + priceOverrides via JOIN FETCH
+- [x] CalendarProvider : filtrer bookings/blockedDates par plage de dates, pas tout charger
+- [x] BookingRepository::findByLodging : ajouter filtre status + date range (findActiveInPeriod)
+- [x] MyConversationsProvider : une seule query DQL avec OR au lieu de merge PHP
+- [x] Cache search results : utiliser le pool cache.search_results (deja configure mais jamais injecte)
+- [x] Lodging : creer un groupe lodging:list sans images pour les collections
+- [x] DataExportProvider : JOIN FETCH lodging sur les bookings pour eviter N lazy loads
+
+## Phase 18 — Base de donnees
+
+- [x] CHECK constraints : montants >= 0, dates start < end, rating 1-5, guests > 0, deposit retained <= amount
+- [x] Index : idx_lodging_city_lower, idx_lodging_active, idx_booking_lodging_status, idx_booking_customer_created
+- [x] Index : idx_review_lodging_created, idx_conversation_customer, idx_conversation_host, idx_message_conversation_created
+- [x] PostGIS : colonne geography(Point,4326) + GiST index sur lodging au lieu de DECIMAL cast a la volee
+- [x] UNIQUE sur staff_permission(staff_assignment_id, permission)
+- [x] EXCLUDE sur blocked_date (no overlap par lodging)
+- [x] Cascades manquantes : ON DELETE CASCADE sur blocked_date, season, price_override → lodging + host_legal_identifier → host_profile
+- [x] VARCHAR(255) → length reel pour les colonnes enum (20-30 chars)
+- [x] Ajouter review.host_response_at, review.moderated_at, review.moderated_by
+- [x] Ajouter payment.original_payment_id (FK vers le paiement original pour les refunds)
+- [x] Ajouter booking.source (direct, ical, channel_manager) pour tracking canal
+
+---
+
+# V4 — API DESIGN & CONFORMITE
+
+## Phase 19 — API design
+
+- [x] PUT /bookings/{id}/dates → PATCH (update partiel)
+- [x] PUT /staff-assignments/{id}/permissions → PATCH
+- [x] POST /notifications/{id}/read → PATCH /notifications/{id} avec {"isRead": true}
+- [x] Idempotency-Key header sur POST /bookings/{id}/payments (deduplication paiement)
+- [x] Webhook deduplication : stocker event ID Stripe/PayPal, skip si deja traite
+- [x] Webhook : log des event types non geres (default => null silencieux actuellement)
+- [x] Webhook : cascader le statut booking quand payment succeeds (pending → confirmed)
+- [x] maximum_items_per_page: 100 dans api_platform.yaml
+- [x] Rate limit headers (X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset)
+- [x] Augmenter rate limit global de 60/min a 200/min, ajouter rate limit par user_id en plus de IP
+- [x] Rate limits differencies read vs write
+- [x] Montants monetaires : wrapper {amount, currency} au lieu de int brut (preparer multi-devise)
+- [x] Notifications : type machine-readable + params au lieu de texte francais hardcode
+- [x] OpenAPI : summaries/descriptions sur toutes les operations
+- [x] OpenAPI : decorateurs manuels pour login_check, refresh, webhooks
+- [x] Documenter et choisir une strategie de versioning (URI prefix /api/v1/)
+
+## Phase 20 — Endpoints manquants
+
+- [x] GET /api/bookings/{id}/invoice — generation facture PDF (obligation legale France)
+- [x] POST /api/bookings/{id}/check-in + POST /api/bookings/{id}/check-out — tracking statut arrivee/depart
+- [x] GET /api/me/unread-counts — compteurs badge (notifications + messages non lus en un appel)
+- [x] PATCH /api/reviews/{id} — modification avis par le customer (fenetre de 14 jours)
+- [x] GET /api/admin/users?search=&status=&role= — filtres admin
+- [x] GET /api/admin/bookings?status=&from=&to=&lodging= — filtres admin
+- [x] GET /api/me/bookings/export — export CSV reservations pour comptabilite
+- [x] GET /api/me/revenue/export — export CSV revenus pour declaration fiscale
+- [x] POST /api/auth/logout — invalidation refresh token cote serveur
+
+---
+
+# V5 — COMPETITIVITE (rattraper et depasser les concurrents)
+
+## Phase 21 — Messagerie automatisee (pain point #1 des hotes)
+
+- [ ] Entite MessageTemplate (nom, trigger, sujet, corps, variables, delai)
+- [ ] Triggers : booking_created, booking_confirmed, checkin_minus_1d, checkin_minus_3h, checkout_plus_1d, review_received
+- [ ] Variables : {guest_name}, {lodging_name}, {checkin_date}, {checkout_date}, {reference}, {checkin_time}, {address}
+- [ ] Delai configurable par template (ex: envoyer 3h avant check-in)
+- [ ] CRUD complet : POST/GET/PATCH/DELETE /api/me/message-templates
+- [ ] Service AutomatedMessageDispatcher (evalue les triggers, substitue les variables, envoie)
+- [ ] Commande cron app:dispatch-automated-messages (toutes les 5 min)
+- [ ] Canal d'envoi : email + message in-app + SMS (extensible)
+
+## Phase 22 — Integration dynamic pricing
+
+- [ ] Endpoint PUT /api/lodgings/{id}/rates (bulk update tarifs par date range)
+- [ ] Webhook inbound : POST /api/lodgings/{id}/pricing-webhook (PriceLabs/Beyond Pricing push des prix)
+- [ ] Authentification webhook par API key par lodging
+- [ ] Creer/MAJ PriceOverride automatiquement a la reception du webhook
+- [ ] Documentation integration PriceLabs (guide de configuration)
+
+## Phase 23 — Channel Manager (Airbnb + Booking.com API)
+
+- [ ] Interface ChannelManagerInterface (sync_listings, sync_availability, sync_bookings, sync_prices)
+- [ ] AirbnbChannel : OAuth2, API listings, API calendar, API reservations
+- [ ] BookingComChannel : OAuth2, API property, API availability, API reservations
+- [ ] ChannelSyncService : sync bidirectionnel (push dispo + pull resas)
+- [ ] Entite ChannelConnection (lodging_id, channel, external_listing_id, credentials, last_sync_at)
+- [ ] Entite ChannelBooking (booking_id, channel, external_reservation_id)
+- [ ] POST /api/lodgings/{id}/channels — connecter un canal
+- [ ] DELETE /api/lodgings/{id}/channels/{channel} — deconnecter
+- [ ] POST /api/channels/{id}/sync — sync manuelle
+- [ ] Commande cron app:sync-channels (toutes les 5 min, remplace iCal a terme)
+- [ ] Gestion conflits : si resa recue du canal, verifier dispo locale avant import
+- [ ] Mapping des statuts entre plateformes et Hospes
+
+## Phase 24 — Multi-devise
+
+- [ ] Ajouter currency (CHAR 3) sur Lodging et Booking
+- [ ] Stocker devise dans chaque Payment, Deposit, BookingNight
+- [ ] PriceCalculator : retourner devise dans QuoteResult
+- [ ] API : wrapper montants en {amount: int, currency: string} dans les reponses
+- [ ] Conversion a l'affichage uniquement (pas de conversion a la creation)
+- [ ] Supporter EUR, USD, GBP, CHF minimum
+
+## Phase 25 — Gestion des taches / housekeeping
+
+- [ ] Entite Task (lodging, booking, assignee, type, status, due_date, notes)
+- [ ] Types : cleaning, maintenance, inspection, key_handover
+- [ ] Status : pending, in_progress, completed
+- [ ] Auto-creation : tache menage a chaque checkout
+- [ ] Assignation automatique selon staff permissions + lodging scope
+- [ ] CRUD : /api/me/tasks, /api/tasks/{id}, PATCH statut
+- [ ] Notification au staff quand tache assignee
+- [ ] Vue calendrier : GET /api/me/tasks?from=&to=
+
+## Phase 26 — Portail proprietaire (owner reporting)
+
+- [ ] Entite PropertyOwner (user_id, commission_rate, payment_details)
+- [ ] Relation Lodging → PropertyOwner (un owner peut avoir plusieurs logements geres par un host)
+- [ ] GET /api/owner/lodgings — liste des logements du proprietaire
+- [ ] GET /api/owner/lodgings/{id}/revenue — revenus du logement (apres commission)
+- [ ] GET /api/owner/statements — releves mensuels
+- [ ] Calcul commission automatique (pourcentage configurable par owner)
+- [ ] Export PDF releve mensuel
+
+## Phase 27 — Integration comptable
+
+- [ ] GET /api/me/accounting/transactions — liste des transactions (paiements, refunds, commissions)
+- [ ] GET /api/me/accounting/export?format=csv&from=&to= — export standard
+- [ ] Mapping vers plan comptable francais (comptes 706, 411, 512)
+- [ ] Integration Pennylane (API francaise) : push automatique des ecritures
+- [ ] Integration QuickBooks/Xero (webhook ou export)
+- [ ] Calcul TVA automatique selon pays du logement
+
+## Phase 28 — Statistiques avancees et revenue management
+
+- [ ] RevPAR (Revenue Per Available Room) par logement et periode
+- [ ] Taux d'occupation par logement, mois, saison
+- [ ] ADR (Average Daily Rate) et evolution
+- [ ] Duree moyenne de sejour
+- [ ] Taux de conversion devis → reservation
+- [ ] Comparaison annee N vs N-1
+- [ ] Prevision revenus (bookings confirmes futurs + tendance historique)
+- [ ] GET /api/me/analytics/dashboard — KPIs consolides
+- [ ] GET /api/me/analytics/lodgings/{id}/performance — performance individuelle
+- [ ] Benchmarking : comparaison anonymisee avec logements similaires (meme ville, meme type)
+
+## Phase 29 — Guests et conformite reglementaire
+
+- [ ] Entite Guest (booking_id, first_name, last_name, nationality, birth_date, id_type, id_number)
+- [ ] POST /api/bookings/{id}/guests — enregistrement des voyageurs
+- [ ] Fiche de police automatique (obligation legale France/Espagne/Italie)
+- [ ] Export fiche de police PDF
+- [ ] Verification identite basique (format document)
+- [ ] Collecte consentement RGPD par guest
+
+## Phase 30 — Smart locks et acces
+
+- [ ] Interface SmartLockProviderInterface (generate_code, revoke_code, list_codes)
+- [ ] Integration Nuki (API REST)
+- [ ] Integration Igloohome (API REST)
+- [ ] Auto-generation code d'acces a la confirmation de reservation
+- [ ] Envoi code via message automatise (Phase 21)
+- [ ] Revocation automatique du code au checkout
+- [ ] GET /api/bookings/{id}/access-code — consulter le code
+
+## Phase 31 — Promotions et codes promo
+
+- [ ] Entite PromotionCode (code, type: percent/fixed, value, max_uses, valid_from, valid_to, lodging_scope)
+- [ ] POST /api/me/promotion-codes — creation par l'hote
+- [ ] Application du code a la reservation (BookingCreateProcessor)
+- [ ] Champ discount_amount sur Booking
+- [ ] Tracking utilisation (uses_count sur PromotionCode)
+
+## Phase 32 — Multi-langue API
+
+- [ ] Accept-Language header pour les reponses (messages d'erreur, notifications)
+- [ ] Entite LodgingTranslation (lodging_id, locale, name, description)
+- [ ] Notifications : notification_type + params au lieu de texte hardcode
+- [ ] Emails : templates Twig multilingues (fr, en, de, es, it)
+- [ ] Preference de langue sur User entity
+
+## Phase 33 — Assurance et protection
+
+- [ ] Integration protection voyageur (Swikly, Superhog)
+- [ ] Interface InsuranceProviderInterface (create_policy, cancel_policy, file_claim)
+- [ ] Proposition automatique a la reservation
+- [ ] Tracking statut reclamation
+
+## Phase 34 — Deploiement et ops
+
 - [ ] Terraform / IaC pour infra cloud (Railway, Fly.io ou AWS)
 - [ ] Secrets management (Vault ou AWS SSM)
 - [ ] CD pipeline (deploy on merge to main)
-- [ ] Backup PostgreSQL automatise
-- [ ] Monitoring (Sentry PHP SDK + uptime)
+- [ ] Backup PostgreSQL automatise (pg_dump cron + S3)
+- [ ] Monitoring (Sentry PHP SDK + uptime check)
+- [ ] Alerting (PagerDuty/OpsGenie) pour erreurs critiques et webhooks fails
+- [ ] Log aggregation (Loki/ELK) pour debug production

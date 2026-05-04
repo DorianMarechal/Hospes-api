@@ -1,0 +1,54 @@
+---
+env:
+  contexts:
+    - name: "Hospes API"
+      urls:
+        - "http://localhost:8000/api"
+      includePaths:
+        - "http://localhost:8000/api/.*"
+      excludePaths:
+        - "http://localhost:8000/api/docs.*"
+      authentication:
+        method: "json"
+        parameters:
+          loginPageUrl: "http://localhost:8000/api/login_check"
+          loginRequestUrl: "http://localhost:8000/api/login_check"
+          loginRequestBody: '{"username":"{%username%}","password":"{%password%}"}'
+        verification:
+          method: "response"
+          loggedInRegex: "\\Qtoken\\E"
+      users:
+        - name: "customer"
+          credentials:
+            username: "zaptest-customer@hospes.io"
+            password: "ZapTest!2026"
+        - name: "host"
+          credentials:
+            username: "zaptest-host@hospes.io"
+            password: "ZapTest!2026"
+
+jobs:
+  - type: spider
+    parameters:
+      context: "Hospes API"
+      user: "customer"
+      maxDuration: 5
+      maxDepth: 5
+
+  - type: activeScan
+    parameters:
+      context: "Hospes API"
+      user: "customer"
+      policy: "API-Scan"
+      maxRuleDurationInMins: 2
+      maxScanDurationInMins: 30
+
+  - type: report
+    parameters:
+      template: "traditional-json"
+      reportDir: "/zap/reports"
+      reportFile: "hospes-api-zap-report"
+
+  - type: passiveScan-wait
+    parameters:
+      maxDuration: 5

@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use App\Dto\InviteStaffRequest;
 use App\Dto\UpdateStaffLodgingsRequest;
 use App\Dto\UpdateStaffPermissionsRequest;
@@ -39,7 +39,7 @@ use Symfony\Component\Uid\Uuid;
             processor: StaffInviteProcessor::class,
             normalizationContext: ['groups' => ['staff:read']],
         ),
-        new Put(
+        new Patch(
             uriTemplate: '/staff-assignments/{id}/permissions',
             input: UpdateStaffPermissionsRequest::class,
             denormalizationContext: [],
@@ -47,7 +47,7 @@ use Symfony\Component\Uid\Uuid;
             processor: StaffPermissionsProcessor::class,
             normalizationContext: ['groups' => ['staff:read']],
         ),
-        new Put(
+        new Patch(
             uriTemplate: '/staff-assignments/{id}/lodgings',
             input: UpdateStaffLodgingsRequest::class,
             denormalizationContext: [],
