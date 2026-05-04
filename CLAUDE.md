@@ -62,12 +62,13 @@ php bin/console app:purge-inactive-accounts  # GDPR retention (weekly)
 
 Follow standard Symfony + API Platform conventions as spec'd in the documentation files.
 
-- **Entities** (Doctrine ORM): 25+ entities with UUID PKs. Key entities: User, Lodging, Booking, Season, BlockedDate, StaffAssignment, Conversation, Review, Notification, BookingModificationRequest, Payment, Deposit.
-- **API Platform resources**: endpoints exposed via PHP attributes on entities/DTOs, not manual controllers. Only exceptions: WebhookController, IcalExportController, PaymentProviderCallbackController, HealthCheckController.
+- **Entities** (Doctrine ORM): 30+ entities with UUID PKs. Key entities: User, Lodging, Booking, Season, BlockedDate, StaffAssignment, Conversation, Review, Notification, BookingModificationRequest, Payment, Deposit, WebhookEvent, AuditLog.
+- **API Platform resources**: endpoints exposed via PHP attributes on entities/DTOs, not manual controllers. Only exceptions: WebhookController, IcalExportController, PaymentProviderCallbackController, HealthCheckController, InvoiceController, BookingExportController, RevenueExportController, LogoutController.
 - **State layer**: Processors handle writes (BookingCreateProcessor, PaymentCreateProcessor, etc.), Providers handle reads (AvailabilitySearchProvider, MyBookingsProvider, etc.).
 - **Error responses**: RFC 7807 (Problem Details for HTTP APIs). API Platform handles this natively.
 - **Security**: Symfony Voters for authorization (StaffVoter, LodgingOwnerVoter, BookingAccessVoter, ModificationRequestVoter). Staff permissions are stored in DB and checked per-request (not in JWT). Multi-tenant isolation is mandatory.
-- **Services**: domain logic in dedicated services: `AvailabilityResolver`, `PriceCalculator`, `OrphanProtectionChecker`, `PendingBookingCleaner`, `IcalSyncService`, `CancellationPolicyResolver`, `DepositManager`, `StatisticsCalculator`, `NotificationDispatcher`, `MercurePublisher`, `EmailSender`.
+- **Services**: domain logic in dedicated services: `AvailabilityResolver`, `PriceCalculator`, `OrphanProtectionChecker`, `PendingBookingCleaner`, `IcalSyncService`, `CancellationPolicyResolver`, `DepositManager`, `StatisticsCalculator`, `NotificationDispatcher`, `MercurePublisher`, `EmailSender`, `InvoiceGenerator`.
+- **Serialization**: `MoneyNormalizer` wraps monetary fields as `{amount, currency}`. `OpenApiDecorator` adds descriptions to all operations + manual endpoints.
 - **Async**: Symfony Messenger with Doctrine transport. Messages: `SendNotificationMessage`, `SyncIcalFeedsMessage`.
 - **Payments**: `PaymentGatewayInterface` with `StripeGateway`, `PayPalGateway`, `StubPaymentGateway` (test). Factory pattern via `PaymentGatewayFactory`.
 
@@ -82,21 +83,28 @@ Follow standard Symfony + API Platform conventions as spec'd in the documentatio
 - **Orphan protection**: configurable per lodging. Rejects bookings that would create a gap shorter than min_stay.
 - **Staff permissions**: granular (can_view_bookings, can_edit_bookings, can_block_dates, can_view_revenue, can_manage_lodgings) + lodging scope. Revenue filtering (not 403) when can_view_bookings without can_view_revenue.
 - **Modification requests**: double validation — both parties must agree. TTL 48h, price recalculated at acceptance.
+- **Check-in/check-out**: tracked via `checkedInAt`/`checkedOutAt` on Booking. Check-out sets status to `completed`.
+- **Review editing**: customers can edit reviews within 14 days of creation.
+- **Idempotency**: `Idempotency-Key` header supported on payment creation. Duplicate key returns existing payment.
+- **Monetary responses**: all amounts are wrapped as `{amount: int, currency: "EUR"}` via MoneyNormalizer.
+- **Notifications**: machine-readable `type` (NotificationType enum) + `params` JSON with contextual variables.
 
-## Known issues (from audit V3)
+## V3 audit — RESOLVED
 
-These are documented bugs/security issues to fix in V3. Be aware when working near these areas:
+All V3 audit issues have been fixed:
 
-- **Null safety**: `getExpiresAt()` returns `?DateTimeImmutable` — `null < now()` is `true` in PHP. Always null-check before comparing.
-- **N+1 queries**: `findByLodging()` loads ALL bookings/blocked dates without date filter. Use targeted queries with date range + status filter.
-- **Mercure sync**: `NotificationDispatcher` publishes to Mercure before DB flush. Should use Messenger instead.
-- **Payment amount**: currently client-controlled in `CreatePaymentRequest`. Must be computed server-side.
+- **Null safety**: all nullable DateTimeImmutable comparisons now have explicit null checks (triple condition pattern).
+- **N+1 queries**: replaced with batch queries (`findActiveOverlappingForLodgings`, `aggregateStats`, etc.) and JOIN FETCH.
+- **Mercure sync**: `NotificationDispatcher` uses buffer pattern — `publishPendingNotifications()` called after flush.
+- **Payment amount**: computed server-side from `booking.totalPrice`. Client cannot supply amounts.
+- **Webhook deduplication**: `WebhookEvent` entity prevents reprocessing. Unhandled event types are logged.
+- **Rate limiting**: split into read (200/min) vs write (60/min) by IP + per-user (300/min). Headers exposed.
 
 ## Do NOT
 
 - Use SQLite for tests (btree_gist requires PostgreSQL)
 - Use float for monetary values (always integer cents)
-- Create manual controllers (use API Platform attributes on entities/DTOs) — except for webhooks, iCal export, health check
+- Create manual controllers (use API Platform attributes on entities/DTOs) — except for webhooks, iCal export, health check, invoice, CSV exports, logout
 - Put business logic in controllers or processors (use dedicated services)
 - Store permissions in JWT (DB-only, checked per request)
 - Return 403 for filtered data (use response filtering instead, e.g. hide revenue fields)
