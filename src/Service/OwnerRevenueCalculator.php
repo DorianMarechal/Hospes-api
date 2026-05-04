@@ -60,24 +60,31 @@ class OwnerRevenueCalculator
             return [];
         }
 
-        $results = $this->em->createQuery(
+        $lodgingIds = array_filter(array_map(fn ($l) => $l->getId()?->toRfc4122(), $lodgings));
+        if (empty($lodgingIds)) {
+            return [];
+        }
+
+        $results = $this->em->getConnection()->executeQuery(
             "SELECT l.id as lodging_id, l.name as lodging_name, l.currency,
-                    SUBSTRING(p.createdAt, 1, 7) as month,
+                    TO_CHAR(p.created_at, 'YYYY-MM') as month,
                     COALESCE(SUM(p.amount), 0) as gross,
                     COUNT(DISTINCT b.id) as cnt
-             FROM App\Entity\Payment p
-             JOIN p.booking b
-             JOIN b.lodging l
-             WHERE l.propertyOwner = :owner
-             AND p.status = :status
-             AND b.status IN (:statuses)
+             FROM payment p
+             JOIN booking b ON b.id = p.booking_id
+             JOIN lodging l ON l.id = b.lodging_id
+             WHERE l.property_owner_id = ?
+             AND p.status = ?
+             AND b.status IN (?, ?)
              GROUP BY l.id, l.name, l.currency, month
-             ORDER BY month DESC, l.name ASC"
-        )
-            ->setParameter('owner', $owner)
-            ->setParameter('status', PaymentStatus::SUCCEEDED)
-            ->setParameter('statuses', [BookingStatus::CONFIRMED, BookingStatus::COMPLETED])
-            ->getResult();
+             ORDER BY month DESC, l.name ASC",
+            [
+                $owner->getId()?->toRfc4122(),
+                PaymentStatus::SUCCEEDED->value,
+                BookingStatus::CONFIRMED->value,
+                BookingStatus::COMPLETED->value,
+            ],
+        )->fetchAllAssociative();
 
         $rate = (float) $owner->getCommissionRate();
         $statements = [];

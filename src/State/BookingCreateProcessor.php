@@ -107,19 +107,31 @@ class BookingCreateProcessor implements ProcessorInterface
         $booking->setCancellationPolicy($lodging->getCancellationPolicy());
         $booking->setCurrency($quote->currency);
 
-        // Apply promotion code if provided
+        // Apply promotion code if provided (with pessimistic lock to prevent race condition)
         if (null !== $data->promotionCode) {
             $promo = $this->promotionCodeRepository->findByCode($data->promotionCode);
-            if (null !== $promo && $promo->isUsable()) {
-                $promoLodging = $promo->getLodging();
-                if (null === $promoLodging || $promoLodging->getId()?->equals($lodging->getId())) {
-                    $discount = $promo->calculateDiscount($quote->totalPrice);
-                    $booking->setDiscountAmount($discount);
-                    $booking->setPromotionCode($promo->getCode());
-                    $booking->setTotalPrice($quote->totalPrice - $discount);
-                    $promo->incrementUsesCount();
-                }
+            if (null === $promo) {
+                throw new HttpException(422, 'Invalid promotion code.');
             }
+
+            // Lock the row to prevent concurrent use beyond maxUses
+            $this->entityManager->lock($promo, \Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE);
+            $this->entityManager->refresh($promo);
+
+            if (!$promo->isUsable()) {
+                throw new HttpException(422, 'This promotion code is no longer valid.');
+            }
+
+            $promoLodging = $promo->getLodging();
+            if (null !== $promoLodging && !$promoLodging->getId()?->equals($lodging->getId())) {
+                throw new HttpException(422, 'This promotion code is not valid for this lodging.');
+            }
+
+            $discount = $promo->calculateDiscount($quote->totalPrice);
+            $booking->setDiscountAmount($discount);
+            $booking->setPromotionCode($promo->getCode());
+            $booking->setTotalPrice($quote->totalPrice - $discount);
+            $promo->incrementUsesCount();
         }
 
         $booking->setStatus(BookingStatus::PENDING);

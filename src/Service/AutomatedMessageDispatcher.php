@@ -62,7 +62,7 @@ class AutomatedMessageDispatcher
         $now = new \DateTimeImmutable();
 
         $count += $this->processTimeTrigger(MessageTemplateTrigger::CHECKIN_MINUS_1D, $now);
-        $count += $this->processTimeTrigger(MessageTemplateTrigger::CHECKIN_MINUS_3H, $now);
+        $count += $this->processTimeTrigger(MessageTemplateTrigger::CHECKIN_SAME_DAY, $now);
         $count += $this->processTimeTrigger(MessageTemplateTrigger::CHECKOUT_PLUS_1D, $now);
 
         $this->entityManager->flush();
@@ -138,23 +138,28 @@ class AutomatedMessageDispatcher
             $subject = $this->substituteVariables($template->getSubject(), $booking);
             $body = $this->substituteVariables($template->getBody(), $booking);
 
-            match ($channel) {
-                MessageChannel::EMAIL => $this->emailSender->sendAutomatedMessage(
+            if (MessageChannel::SMS === $channel) {
+                $this->logger->info('SMS channel not implemented yet', [
+                    'booking' => $booking->getReference(),
+                    'subject' => $subject,
+                ]);
+                continue;
+            }
+
+            if (MessageChannel::EMAIL === $channel) {
+                $this->emailSender->sendAutomatedMessage(
                     $customer->getEmail(),
                     $subject,
                     $body,
-                ),
-                MessageChannel::IN_APP => $this->notificationDispatcher->automatedMessage(
+                );
+            } elseif (MessageChannel::IN_APP === $channel) {
+                $this->notificationDispatcher->automatedMessage(
                     $customer,
                     $subject,
                     $body,
                     $booking,
-                ),
-                MessageChannel::SMS => $this->logger->info('SMS channel not implemented yet', [
-                    'booking' => $booking->getReference(),
-                    'subject' => $subject,
-                ]),
-            };
+                );
+            }
 
             $this->logMessage($template, $booking, $channel);
             $sent = true;
@@ -181,7 +186,7 @@ class AutomatedMessageDispatcher
         $customer = $booking->getCustomer();
 
         $variables = [
-            '{guest_name}' => $customer?->getFirstName().' '.$customer?->getLastName(),
+            '{guest_name}' => trim(($customer?->getFirstName() ?? '').' '.($customer?->getLastName() ?? '')),
             '{lodging_name}' => $lodging?->getName() ?? '',
             '{checkin_date}' => $booking->getCheckin()?->format('d/m/Y') ?? '',
             '{checkout_date}' => $booking->getCheckout()?->format('d/m/Y') ?? '',
@@ -207,7 +212,7 @@ class AutomatedMessageDispatcher
                 ->getQuery()
                 ->getResult(),
 
-            MessageTemplateTrigger::CHECKIN_MINUS_3H => $this->bookingRepository->createQueryBuilder('b')
+            MessageTemplateTrigger::CHECKIN_SAME_DAY => $this->bookingRepository->createQueryBuilder('b')
                 ->andWhere('b.checkin = :today')
                 ->andWhere('b.status = :status')
                 ->setParameter('today', $now->setTime(0, 0))

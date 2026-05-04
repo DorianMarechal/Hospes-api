@@ -60,6 +60,10 @@ class PricingWebhookController
             return new JsonResponse(['error' => 'Missing or empty "rates" array'], 422);
         }
 
+        if (\count($rates) > 366) {
+            return new JsonResponse(['error' => 'Too many rates (max 366)'], 422);
+        }
+
         $now = new \DateTimeImmutable();
         $processed = 0;
 

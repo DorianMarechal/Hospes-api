@@ -60,6 +60,10 @@ class BulkRatesProcessor implements ProcessorInterface
             throw new HttpException(422, 'Start date must be before or equal to end date');
         }
 
+        if ($startDate->diff($endDate)->days > 366) {
+            throw new HttpException(422, 'Date range cannot exceed 366 days');
+        }
+
         $now = new \DateTimeImmutable();
         $result = [];
         $current = $startDate;

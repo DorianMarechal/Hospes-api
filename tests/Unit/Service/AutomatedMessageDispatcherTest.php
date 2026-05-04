@@ -138,7 +138,7 @@ class AutomatedMessageDispatcherTest extends TestCase
             ->with($this->callback(function (Envelope $envelope) {
                 $stamps = $envelope->all(DelayStamp::class);
 
-                return count($stamps) === 1 && $stamps[0]->getDelay() === 30 * 60 * 1000;
+                return 1 === count($stamps) && $stamps[0]->getDelay() === 30 * 60 * 1000;
             }))
             ->willReturn(new Envelope(new \stdClass()));
 
@@ -155,7 +155,7 @@ class AutomatedMessageDispatcherTest extends TestCase
         $this->templateRepository
             ->method('findEnabledByTrigger')
             ->willReturnCallback(function (MessageTemplateTrigger $trigger) use ($template) {
-                return $trigger === MessageTemplateTrigger::CHECKIN_MINUS_1D ? [$template] : [];
+                return MessageTemplateTrigger::CHECKIN_MINUS_1D === $trigger ? [$template] : [];
             });
 
         $tomorrow = (new \DateTimeImmutable())->modify('+1 day')->setTime(0, 0);
@@ -187,7 +187,7 @@ class AutomatedMessageDispatcherTest extends TestCase
         $this->templateRepository
             ->method('findEnabledByTrigger')
             ->willReturnCallback(function (MessageTemplateTrigger $trigger) use ($template) {
-                return $trigger === MessageTemplateTrigger::CHECKOUT_PLUS_1D ? [$template] : [];
+                return MessageTemplateTrigger::CHECKOUT_PLUS_1D === $trigger ? [$template] : [];
             });
 
         $yesterday = (new \DateTimeImmutable())->modify('-1 day')->setTime(0, 0);
@@ -227,7 +227,7 @@ class AutomatedMessageDispatcherTest extends TestCase
         $this->templateRepository
             ->method('findEnabledByTrigger')
             ->willReturnCallback(function (MessageTemplateTrigger $trigger) use ($template) {
-                return $trigger === MessageTemplateTrigger::CHECKIN_MINUS_1D ? [$template] : [];
+                return MessageTemplateTrigger::CHECKIN_MINUS_1D === $trigger ? [$template] : [];
             });
 
         $tomorrow = (new \DateTimeImmutable())->modify('+1 day')->setTime(0, 0);

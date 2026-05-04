@@ -48,7 +48,7 @@ class DispatchAutomatedMessageHandler
 
         $lodging = $booking->getLodging();
         $variables = [
-            '{guest_name}' => $customer->getFirstName().' '.$customer->getLastName(),
+            '{guest_name}' => trim(($customer->getFirstName() ?? '').' '.($customer->getLastName() ?? '')),
             '{lodging_name}' => $lodging?->getName() ?? '',
             '{checkin_date}' => $booking->getCheckin()?->format('d/m/Y') ?? '',
             '{checkout_date}' => $booking->getCheckout()?->format('d/m/Y') ?? '',

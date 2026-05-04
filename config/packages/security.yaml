@@ -58,6 +58,7 @@ security:
         - { path: ^/api/webhooks/,           roles: PUBLIC_ACCESS }
         - { path: ^/api/payment-provider/.+/callback, roles: PUBLIC_ACCESS }
         - { path: ^/api/staff-invitations/, roles: PUBLIC_ACCESS }
+        - { path: ^/api/lodgings/[^/]+/pricing-webhook, roles: PUBLIC_ACCESS }
         - { path: ^/api/lodgings/[^/]+/ical-export\.ics, roles: PUBLIC_ACCESS }
         - { path: ^/api/lodgings/[^/]+/reviews, roles: PUBLIC_ACCESS }
         - { path: ^/api/availability,       roles: PUBLIC_ACCESS }

@@ -10,7 +10,6 @@ use App\Enum\BookingStatus;
 use App\Enum\PaymentStatus;
 use App\Repository\LodgingRepository;
 use App\Service\OwnerRevenueCalculator;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use PHPUnit\Framework\TestCase;
@@ -188,11 +187,14 @@ class OwnerRevenueCalculatorTest extends TestCase
     public function testCalculateStatementsReturnsOwnerStatements(): void
     {
         $owner = $this->createOwner('10');
-        $lodgingId = Uuid::v7();
+        $ownerId = Uuid::v7();
+        $ref = new \ReflectionProperty(PropertyOwner::class, 'id');
+        $ref->setValue($owner, $ownerId);
 
+        $lodgingId = Uuid::v7();
         $lodging = $this->createLodging();
-        $ref = new \ReflectionProperty(Lodging::class, 'id');
-        $ref->setValue($lodging, $lodgingId);
+        $lodgingRef = new \ReflectionProperty(Lodging::class, 'id');
+        $lodgingRef->setValue($lodging, $lodgingId);
 
         $this->lodgingRepository->method('findBy')->willReturn([$lodging]);
 
@@ -207,29 +209,38 @@ class OwnerRevenueCalculatorTest extends TestCase
             ],
         ];
 
-        $query = $this->getMockBuilder(Query::class)->disableOriginalConstructor()->getMock();
-        $query->method('setParameter')->willReturnSelf();
-        $query->method('getResult')->willReturn($queryResult);
+        $result = $this->createMock(\Doctrine\DBAL\Result::class);
+        $result->method('fetchAllAssociative')->willReturn($queryResult);
 
-        $this->em->method('createQuery')->willReturn($query);
+        $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $connection->method('executeQuery')->willReturn($result);
 
-        $result = $this->calculator->calculateStatements($owner);
+        $this->em->method('getConnection')->willReturn($connection);
 
-        $this->assertCount(1, $result);
-        $this->assertInstanceOf(OwnerStatement::class, $result[0]);
-        $this->assertSame('2026-04', $result[0]->month);
-        $this->assertSame('Chalet Alpin', $result[0]->lodgingName);
-        $this->assertSame(30000, $result[0]->grossRevenue);
-        $this->assertSame(3000, $result[0]->commission);   // 30000 * 10% = 3000
-        $this->assertSame(27000, $result[0]->netRevenue);
-        $this->assertSame('EUR', $result[0]->currency);
-        $this->assertSame(2, $result[0]->bookingCount);
+        $statements = $this->calculator->calculateStatements($owner);
+
+        $this->assertCount(1, $statements);
+        $this->assertInstanceOf(OwnerStatement::class, $statements[0]);
+        $this->assertSame('2026-04', $statements[0]->month);
+        $this->assertSame('Chalet Alpin', $statements[0]->lodgingName);
+        $this->assertSame(30000, $statements[0]->grossRevenue);
+        $this->assertSame(3000, $statements[0]->commission);   // 30000 * 10% = 3000
+        $this->assertSame(27000, $statements[0]->netRevenue);
+        $this->assertSame('EUR', $statements[0]->currency);
+        $this->assertSame(2, $statements[0]->bookingCount);
     }
 
     public function testCalculateStatementsMultipleMonths(): void
     {
         $owner = $this->createOwner('20');
+        $ownerId = Uuid::v7();
+        $ref = new \ReflectionProperty(PropertyOwner::class, 'id');
+        $ref->setValue($owner, $ownerId);
+
+        $lodgingId = Uuid::v7();
         $lodging = $this->createLodging();
+        $lodgingRef = new \ReflectionProperty(Lodging::class, 'id');
+        $lodgingRef->setValue($lodging, $lodgingId);
 
         $this->lodgingRepository->method('findBy')->willReturn([$lodging]);
 
@@ -252,18 +263,20 @@ class OwnerRevenueCalculatorTest extends TestCase
             ],
         ];
 
-        $query = $this->getMockBuilder(Query::class)->disableOriginalConstructor()->getMock();
-        $query->method('setParameter')->willReturnSelf();
-        $query->method('getResult')->willReturn($queryResult);
+        $result = $this->createMock(\Doctrine\DBAL\Result::class);
+        $result->method('fetchAllAssociative')->willReturn($queryResult);
 
-        $this->em->method('createQuery')->willReturn($query);
+        $connection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $connection->method('executeQuery')->willReturn($result);
 
-        $result = $this->calculator->calculateStatements($owner);
+        $this->em->method('getConnection')->willReturn($connection);
 
-        $this->assertCount(2, $result);
-        $this->assertSame('2026-05', $result[0]->month);
-        $this->assertSame(2000, $result[0]->commission);    // 10000 * 20%
-        $this->assertSame('2026-04', $result[1]->month);
-        $this->assertSame(4000, $result[1]->commission);    // 20000 * 20%
+        $statements = $this->calculator->calculateStatements($owner);
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('2026-05', $statements[0]->month);
+        $this->assertSame(2000, $statements[0]->commission);    // 10000 * 20%
+        $this->assertSame('2026-04', $statements[1]->month);
+        $this->assertSame(4000, $statements[1]->commission);    // 20000 * 20%
     }
 }

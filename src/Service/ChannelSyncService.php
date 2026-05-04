@@ -37,6 +37,13 @@ class ChannelSyncService
         // Pull reservations from channel
         $reservations = $manager->syncBookings($connection);
 
+        // Pre-load bookings and blocked dates once to avoid N+1
+        $lodging = $connection->getLodging();
+        $existingBookings = null !== $lodging
+            ? $this->em->getRepository(Booking::class)->findBy(['lodging' => $lodging])
+            : [];
+        $blockedDates = null !== $lodging ? $lodging->getBlockedDates()->toArray() : [];
+
         foreach ($reservations as $reservation) {
             $externalId = $reservation['external_id'];
             $existing = $this->channelBookingRepository->findByExternalId($channel, $externalId);
@@ -44,7 +51,7 @@ class ChannelSyncService
             if (null !== $existing) {
                 $this->updateExistingBooking($existing, $reservation);
             } else {
-                if ($this->importBooking($connection, $reservation)) {
+                if ($this->importBooking($connection, $reservation, $existingBookings, $blockedDates)) {
                     ++$count;
                 }
             }
@@ -61,8 +68,10 @@ class ChannelSyncService
 
     /**
      * @param array{external_id: string, guest_name: string, checkin: string, checkout: string, guests: int, status: string, total_price: int} $reservation
+     * @param Booking[]                                                                                                                        $existingBookings
+     * @param \App\Entity\BlockedDate[]                                                                                                        $blockedDates
      */
-    private function importBooking(ChannelConnection $connection, array $reservation): bool
+    private function importBooking(ChannelConnection $connection, array $reservation, array $existingBookings, array $blockedDates): bool
     {
         $lodging = $connection->getLodging();
         if (null === $lodging) {
@@ -80,11 +89,7 @@ class ChannelSyncService
             return false;
         }
 
-        // Check local availability before import
-        $bookings = $this->em->getRepository(Booking::class)->findBy(['lodging' => $lodging]);
-        $blockedDates = $lodging->getBlockedDates()->toArray();
-
-        if (!$this->availabilityResolver->isAvailable($lodging, $checkin, $checkout, $bookings, $blockedDates, null)) {
+        if (!$this->availabilityResolver->isAvailable($lodging, $checkin, $checkout, $existingBookings, $blockedDates, null)) {
             $this->logger->warning('Channel booking conflicts with local availability', [
                 'external_id' => $reservation['external_id'],
                 'lodging' => (string) $lodging->getId(),

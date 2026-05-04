@@ -64,7 +64,7 @@ use Symfony\Component\Uid\Uuid;
         new GetCollection(
             uriTemplate: '/bookings/{id}/nights',
             provider: BookingNightsProvider::class,
-            security: "is_granted('ROLE_USER')",
+            security: "is_granted('BOOKING_VIEW', object)",
             normalizationContext: ['groups' => ['booking_night:read']],
         ),
         new GetCollection(

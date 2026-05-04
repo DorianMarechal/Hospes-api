@@ -202,7 +202,6 @@ class Lodging
     private string $currency = 'EUR';
 
     #[ORM\Column(length: 64, nullable: true)]
-    #[Groups(['lodging:read'])]
     private ?string $pricingWebhookApiKey = null;
 
     /**
